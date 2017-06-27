@@ -6,14 +6,14 @@
 ##### Load everything
 ## Number of reads per sample from data from CRUK pipeline before realignment.
 setwd("/Volumes/Flypeaks/flypeaks/")
-filename<-"Rdata/012_SLX-12998_nrreads.rda"
+filename<-"Rdata/012_SLX-14229_nrreads.rda"
 if(!file.exists(filename)){
-  lines<-system("zgrep -c $ SLX-12998/*fq.gz",intern=TRUE)
+  lines<-system("zgrep -c $ SLX-14229/*fq.gz",intern=TRUE)
   tmp<-strsplit(lines,":")
   nrreads<-sapply(tmp,function(x){as.numeric(x[2])/4})
   names(nrreads)<-sapply(tmp,function(x){x[1]})
-  names(nrreads)<-gsub("SLX-12998/","",names(nrreads))
-  names(nrreads)<-gsub(".H772BBXX.s_2.r_1.bwa.homo_sapiens.fq.gz","",names(nrreads))
+  names(nrreads)<-gsub("SLX-14229/","",names(nrreads))
+  names(nrreads)<-gsub(".HJJL7BBXX.s_8.r_1.fq.gz","",names(nrreads))
   names(nrreads)<-gsub(".r_1.fq.gz","",names(nrreads))
   save(nrreads,file=filename)
 } else {
@@ -22,13 +22,14 @@ if(!file.exists(filename)){
 
 ## Reads aligned (on genomic portions too) on realigned data
 
-filename<-"Rdata/012_SLX-12998_aligned.rda"
+filename<-"Rdata/012_SLX-14229_aligned.rda"
 
 if(!file.exists(filename)){
   aligned<-list()
   for(nr in names(nrreads)){
-    bn<-paste0(nr,".r_1.fq.gz.bam")
-    file<-paste0("./SLX-12998_mmhs/",bn)
+    bn<-paste0(nr,".HJJL7BBXX.s_8.r_1.fq.gz.bam")
+    message(bn)
+    file<-paste0("./SLX-14229_mmhs/",bn)
     # SAM tools flags
     # -F256 removes the non primary alignments
     # -F4 remove the non aligned ones
@@ -69,29 +70,29 @@ toplot[,3]<-mms+hss
 toplot[,4]<-mms/(mms+hss)
 toplot[,5]<-hss/(mms+hss)
 
-toplot<-toplot[grep('SLX-12998.D', sort(rownames(toplot)), value=TRUE),]
+toplot<-toplot[grep('SLX-14229.D', sort(rownames(toplot)), value=TRUE),]
 
 ## Barplot of relative alignments
 # Convert sample names to informative ones
 
-rownames(toplot)<-c(
-  "4b-",#"SLX-12998.D704_D505",
-  "2b-",#"SLX-12998.D704_D506",
-  "2a+",#"SLX-12998.D704_D507",
+#rownames(toplot)<-c(
+  "4b-",#"SLX-14229.D704_D505",
+  "2b-",#"SLX-14229.D704_D506",
+  "2a+",#"SLX-14229.D704_D507",
   "1a+",#"SLX-.D705_D506",
   "Input",#"SLX-.D705_D507",
   "3b-",#"SLX-.D705_D508",
-  "3a+",#"SLX-12998.D706_D505",
-  "4a+",#"SLX-12998.D706_D507",
-  "1b-"#"SLX-12998.D706_D508"
-)
+  "3a+",#"SLX-14229.D706_D505",
+  "4a+",#"SLX-14229.D706_D507",
+  "1b-"#"SLX-14229.D706_D508"
+#)
 
 
 
 # Sort by total reads aligned
 toplot<-toplot[order(-toplot[,3]),]
 
-png("plots/012_SLX-12998_relativeAligned.png",w=1000,h=1000,point=30)
+png("plots/012_SLX-14229_relativeAligned.png",w=1000,h=1000,point=30)
 par(las=2,mar=c(4,4,3,5))
 bp<-barplot(t(toplot[,4:5]),beside=TRUE,main="Relative Read Alignment in samples",
             ylab="Fraction of total aligned",col=c("royalblue2","tomato"),ylim=c(-0.05,1.05))
