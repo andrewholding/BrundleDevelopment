@@ -15,7 +15,7 @@ png("plots/006_SLX-12998_binding_overlaps.png",w=1000,h=1000,p=30)
 plot(op,type="o",lwd=3,xlab="Nr. Samples",main="Binding Overlaps",ylab="Nr. Peaks",pch=16)
 dev.off()
 
-dba <- dba.count(dba, minOverlap = 3, summits=200)
+dba <- dba.count(dba,  summits=200)
 
 png("plots/006_SLX-12998_heatmap.png",w=1000,h=1000,p=30)
 plot(dba)
@@ -43,7 +43,7 @@ png("plots/006_SLX-8047_Binding_Overlaps.png",w=1000,h=1000,p=30)
 plot(op,type="o",lwd=3,xlab="Nr. Samples",main="Binding Overlaps",ylab="Nr. Peaks",pch=16)
 dev.off()
 
-dba_fly <- dba.count(dba_fly, minOverlap = 3, summits=200)
+dba_fly <- dba.count(dba_fly,  summits=200)
 png("plots/006_SLX-8047_heatmap.png",w=1000,h=1000,p=30)
 plot(dba_fly)
 dev.off()
@@ -69,7 +69,7 @@ png("plots/006_SLX-14229_Binding_Overlaps.png",w=1000,h=1000,p=30)
 plot(op,type="o",lwd=3,xlab="Nr. Samples",main="Binding Overlaps",ylab="Nr. Peaks",pch=16)
 dev.off()
 
-dba_ctcf <- dba.count(dba_ctcf, minOverlap = 2, summits=200) #Less reps so less overlap
+dba_ctcf <- dba.count(dba_ctcf,  summits=200) #Less reps so less overlap
 png("plots/006_SLX-14229_heatmap.png",w=1000,h=1000,p=30)
 plot(dba_ctcf)
 dev.off()
