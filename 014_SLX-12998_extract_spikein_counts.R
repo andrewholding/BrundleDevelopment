@@ -4,13 +4,13 @@
 ###############################################################################
 
 
-### Essentially the idea is to use Drosophila reads to normalize the Human reads
+### Essentially the idea is to use spike in reads to normalize the Human reads
 library(DiffBind)
 
 setwd("/Volumes/FlyPeaks/flypeaks")
-filename<-"Rdata/014_SLX-8047_dba_drosophila.rda"
+filename<-"Rdata/014_SLX-12998_dba_mouse.rda"
 if(!file.exists(filename)){
-  dba<-dba(sampleSheet = "samplesheet/samplesheet_SLX8047_dm.csv")
+  dba<-dba(sampleSheet = "samplesheet/samplesheet_SLX12998_mm.csv")
   save(dba,file=filename)
 } else {
   load(filename)
@@ -19,14 +19,14 @@ if(!file.exists(filename)){
 
 ### Ash's magic
 op<-dba.overlap(dba, mode=DBA_OLAP_RATE)
-png("plots/014_SLX-8047_diffbind_overlap_drosophila.png",w=1000,h=1000,p=30)
+png("plots/014_SLX-12998_diffbind_overlap_mouse.png",w=1000,h=1000,p=30)
 plot(op,type="o",lwd=3,xlab="Nr. Samples",main="Binding Overlaps",ylab="Nr. Peaks",pch=16)
 grid()
 dev.off()
 
 
 
-filename<-"Rdata/014_SLX-8047_dba.counts.rda"
+filename<-"Rdata/014_SLX-12998_dba.counts.rda"
 if(!file.exists(filename)){
   dba <- dba.count(dba, minOverlap = 5, summits=200)
   
@@ -36,7 +36,7 @@ if(!file.exists(filename)){
   ### Asking for DBA_SCORE_READS provides raw read counts from ChIP only (the simplest score)
   dba <- dba.count(dba, peaks=NULL, score=DBA_SCORE_READS)
   
-  png("plots/014_SLX-8047_dba.counts.png")
+  png("plots/014_SLX-12998_dba.counts.png")
   plot(dba)
   dev.off()
   
@@ -47,8 +47,8 @@ if(!file.exists(filename)){
 
 
 ### Extract the peakset as a matrix
-dmconsensus <- dba.peakset(dba, bRetrieve = T, DataType = DBA_DATA_FRAME)
-save(dmconsensus,file="Rdata/014_SLX-8047_dmconsensus.rda")
+mmconsensus <- dba.peakset(dba, bRetrieve = T, DataType = DBA_DATA_FRAME)
+save(mmconsensus,file="Rdata/014_SLX-12998_mmconsensus.rda")
 
 # Total reads in peaks (aka measure of efficiency of ChIPSeq)
 #readsInPeaks<-apply(dmconsensus[,-(1:3)],2,sum)
