@@ -75,17 +75,18 @@ toplot<-toplot[grep('SLX-14229.D', sort(rownames(toplot)), value=TRUE),]
 ## Barplot of relative alignments
 # Convert sample names to informative ones
 
-#rownames(toplot)<-c(
-  "4b-",#"SLX-14229.D704_D505",
-  "2b-",#"SLX-14229.D704_D506",
-  "2a+",#"SLX-14229.D704_D507",
-  "1a+",#"SLX-.D705_D506",
-  "Input",#"SLX-.D705_D507",
-  "3b-",#"SLX-.D705_D508",
-  "3a+",#"SLX-14229.D706_D505",
-  "4a+",#"SLX-14229.D706_D507",
-  "1b-"#"SLX-14229.D706_D508"
-#)
+rownames(toplot)<-c(
+  "1+",
+  "1-",
+  "CTCF-",
+  "Input-",
+  "2+",
+  "CTCF+",
+  "2-",
+  "3-",
+  "Input+",
+  "3+"
+)
 
 
 

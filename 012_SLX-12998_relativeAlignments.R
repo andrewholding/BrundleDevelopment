@@ -75,15 +75,16 @@ toplot<-toplot[grep('SLX-12998.D', sort(rownames(toplot)), value=TRUE),]
 # Convert sample names to informative ones
 
 rownames(toplot)<-c(
-  "4b-",#"SLX-12998.D704_D505",
-  "2b-",#"SLX-12998.D704_D506",
-  "2a+",#"SLX-12998.D704_D507",
-  "1a+",#"SLX-.D705_D506",
-  "Input",#"SLX-.D705_D507",
-  "3b-",#"SLX-.D705_D508",
-  "3a+",#"SLX-12998.D706_D505",
-  "4a+",#"SLX-12998.D706_D507",
-  "1b-"#"SLX-12998.D706_D508"
+  "Input ICI",
+  "2 ICI",
+  "1 Control",
+  "4 ICI",
+  "2 Control",
+  "3 Control",
+  "1 ICI",
+  "4 Control",
+  "3 ICI",
+  "Input Control"
 )
 
 
@@ -102,10 +103,10 @@ bpx<-apply(bp,2,mean)
 raxis<-(toplot[,3])/(max(toplot[,3]))
 lines(bpx,raxis,type="b",lwd=3,pch=16)
 axis(4,at=seq(0,1,0.2),
-     labels=seq(0,1,0.2) * (max(toplot[,3]))
+     labels=round((seq(0,1,0.2) * max(toplot[,3])/10**6))
      )
 par(las=3)
-mtext("Reads aligned",side=4,line=4)
+mtext("Reads aligned (Millions)",side=4,line=4)
 
 dev.off()
 
