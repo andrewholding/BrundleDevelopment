@@ -104,10 +104,10 @@ bpx<-apply(bp,2,mean)
 raxis<-(toplot[,3])/(max(toplot[,3]))
 lines(bpx,raxis,type="b",lwd=3,pch=16)
 axis(4,at=seq(0,1,0.2),
-     labels=seq(0,1,0.2) * (max(toplot[,3]))
-     )
+     labels=round((seq(0,1,0.2) * max(toplot[,3])/10**6))
+)
 par(las=3)
-mtext("Reads aligned",side=4,line=4)
+mtext("Reads aligned (Millions)",side=4,line=4)
 
 dev.off()
 
