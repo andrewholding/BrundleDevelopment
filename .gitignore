@@ -1,3 +1,6 @@
+.DS_Store    
+.Rapp.history
+.Rhistory    
 genomes/**
 SLX-12998/*
 SLX-12998_mmhs/*
