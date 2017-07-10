@@ -2,7 +2,7 @@
 ### It will be like using counts, but we will use reads in peaks
 library(DiffBind)
 
-setwd("/Volumes/Estrocycle and FlyPeaks/FlyPeaks")
+setwd("/Volumes/FlyPeaks/FlyPeaks")
 
 
 # a is treated, b is not treated
@@ -13,8 +13,8 @@ conversion<-setNames(
 
 
 # Read consensus peaks
-hsconsensus<-readRDS("Rdata/015_hsconsensus.rds")
-dmconsensus<-readRDS("Rdata/015_dmconsensus.rds")
+hsconsensus<-readRDS("Rdata/015_SLX-8047_hsconsensus.rds")
+dmconsensus<-readRDS("Rdata/015_SLX-8047_dmconsensus.rds")
 
 # Get counts
 hscounts<-hsconsensus[,-c(1:3)]
@@ -39,14 +39,14 @@ M<-apply(hsrpm,1,function(x){
 A<-apply(hsrpm,1,function(x){
   return(log10(sum(x)))
 })
-png("plots/016_MA_RPMpeaks.png",w=1000,h=1000,p=30)
+png("plots/016_SLX-8047_MA_RPMpeaks.png",w=1000,h=1000,p=30)
 plot(A,M,pch=20,xlab="A, log10(RPM)",ylab="M, log2FC(fulvestrant)",main="RPM reads in peaks")
 abline(h=0)
 dev.off()
 
 
 ### MA RPM aligned reads
-load("Rdata/012_aligned.rda")
+load("Rdata/012_SLX-8047_aligned.rda")
 aligned<-aligned[grep("SLX-8047.D",names(aligned))]
 aligned<-sapply(aligned,sum)/1E6
 names(aligned)<-conversion[names(aligned)]
@@ -68,14 +68,14 @@ M<-apply(hsrpm,1,function(x){
 A<-apply(hsrpm,1,function(x){
   return(log10(sum(x)))
 })
-png("plots/016_MA_RPMaligned.png",w=1000,h=1000,p=30)
+png("plots/016_SLX-8047_MA_RPMaligned.png",w=1000,h=1000,p=30)
 plot(A,M,pch=20,xlab="A, log10(RPM)",ylab="M, log2FC(fulvestrant)",main="RPM aligned reads")
 abline(h=0)
 dev.off()
 
 
 ### MA RPM total reads
-load("Rdata/012_nrreads.rda")
+load("Rdata/012_SLX-8047_nrreads.rda")
 nrreads<-nrreads[grep("SLX-8047.D",names(nrreads))]
 nrreads<-nrreads/1E6
 names(nrreads)<-conversion[names(nrreads)]
@@ -97,7 +97,7 @@ M<-apply(hsrpm,1,function(x){
 A<-apply(hsrpm,1,function(x){
   return(log10(sum(x)))
 })
-png("plots/016_MA_RPMtotal.png",w=1000,h=1000,p=30)
+png("plots/016_SLX-8047_MA_RPMtotal.png",w=1000,h=1000,p=30)
 plot(A,M,pch=20,xlab="A, log10(RPM)",ylab="M, log2FC(fulvestrant)",main="RPM total reads")
 abline(h=0)
 dev.off()
@@ -116,7 +116,7 @@ M<-apply(hscounts,1,function(x){
 A<-apply(hscounts,1,function(x){
   return(log10(sum(x)))
 })
-png("plots/016_MA_counts.png",w=1000,h=1000,p=30)
+png("plots/016_SLX-8047_MA_counts.png",w=1000,h=1000,p=30)
 plot(A,M,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)",main="Raw counts in peaks")
 abline(h=0)
 dev.off()
@@ -145,7 +145,7 @@ Mdm<-apply(dmcounts,1,function(x){
 Adm<-apply(dmcounts,1,function(x){
   return(log10(sum(x)))
 })
-png("plots/016_MA_counts_HsDm.png",w=1000,h=1000,p=30)
+png("plots/016_SLX-8047_MA_counts_HsDm.png",w=1000,h=1000,p=30)
 plot(Ahs,Mhs,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)",main="Raw counts in peaks",ylim=c(-6.25,2))
 points(Adm,Mdm,pch=20,col="cornflowerblue")
 abline(h=0)
@@ -163,7 +163,7 @@ angularcoeff<-lm1$coef[2]
 MhsFit<-Mhs-(Ahs*angularcoeff)-intercept
 MdmFit<-Mdm-(Adm*angularcoeff)-intercept
 
-png("plots/016_MA_counts_HsDm_Fit.png",w=1000,h=1000,p=30)
+png("plots/016_SLX-8047-MA_counts_HsDm_Fit.png",w=1000,h=1000,p=30)
 plot(Ahs,MhsFit,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)",main="Counts normalized by Drosophila Distribution",ylim=c(-6.25,2))
 points(Adm,MdmFit,pch=20,col="cornflowerblue")
 abline(h=0)
