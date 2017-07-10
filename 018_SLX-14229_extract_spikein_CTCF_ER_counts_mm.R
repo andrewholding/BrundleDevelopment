@@ -50,6 +50,7 @@ if(!file.exists(filename)){
 ### Extract the peakset as a matrix
 mmconsensus <- dba.peakset(dba, bRetrieve = T, DataType = DBA_DATA_FRAME)
 save(mmconsensus,file="Rdata/018_SLX-14229_mmconsensus_CTCF.rda")
+saveRDS(mmconsensus,file="Rdata/018_SLX-14229_mmconsensus_CTCF.rds")
 
 png("plots/018_SLX-14229_MAplot_mouse_CTCF.png")
 dba.plotMA(dba.analyze(dba))
@@ -102,6 +103,7 @@ if(!file.exists(filename)){
 ### Extract the peakset as a matrix
 mmconsensus <- dba.peakset(dba, bRetrieve = T, DataType = DBA_DATA_FRAME)
 save(mmconsensus,file="Rdata/018_SLX-14229_mmconsensus_ER.rda")
+saveRDS(mmconsensus,file="Rdata/018_SLX-14229_mmconsensus_ER.rds")
 
 png("plots/018_SLX-14229_MAplot_mouse_ER.png")
 dba.plotMA(dba.analyze(dba))
