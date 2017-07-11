@@ -28,7 +28,7 @@ dev.off()
 
 filename<-"Rdata/014_SLX-12998_dba.counts.rda"
 if(!file.exists(filename)){
-  dba <- dba.count(dba, minOverlap = 5, summits=200)
+  dba <- dba.count(dba,  summits=200)
   
   ### If peaks==NULL the ‘score’, ‘filter’, and ‘summits’ parameters are honored, updating the global binding matrix
   ### without re-counting in the cases of ‘score’ and ‘filter’, and only counting after re-centering

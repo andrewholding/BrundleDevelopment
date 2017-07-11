@@ -84,6 +84,12 @@ lm1<-lm(Mmm_CTCF~Amm_CTCF)
 abline(lm1$coef,col="red")
 lm1<-lm(Mhs_CTCF~Ahs_CTCF)
 abline(lm1$coef,col="blue")
+lm1<-lm(Mmm_ER~Amm_ER)
+abline(lm1$coef,col="orange")
+lm1<-lm(Mhs_ER~Ahs_ER)
+abline(lm1$coef,col="purple")
+legend("bottomright",legend=c("Mouse ER","Human ER", "Mouse CTCF", "Human CTCF"),pch=20,col=c("orange","purple","red","blue"), cex=0.5)
+
 dev.off()
 
 
@@ -110,6 +116,12 @@ lm1<-lm(MmmFit_CTCF~Amm_CTCF)
 abline(lm1$coef,col="red")
 lm1<-lm(MhsFit_CTCF~Ahs_CTCF)
 abline(lm1$coef,col="blue")
+lm1<-lm(MmmFit_ER~Amm_ER)
+abline(lm1$coef,col="orange")
+lm1<-lm(MhsFit_ER~Ahs_ER)
+abline(lm1$coef,col="purple")
+legend("bottomright",legend=c("Mouse ER","Human ER", "Mouse CTCF", "Human CTCF"),pch=20,col=c("orange","purple","red","blue"), cex=0.5)
+
 dev.off()
 
 png("plots/019_SLX-14229_MA_counts_HsMm_Normalised_Alpha.png",w=1000,h=1000,p=30)
@@ -124,6 +136,11 @@ lm1<-lm(MmmFit_CTCF~Amm_CTCF)
 abline(lm1$coef,col="red")
 lm1<-lm(MhsFit_CTCF~Ahs_CTCF)
 abline(lm1$coef,col="blue")
+lm1<-lm(MmmFit_ER~Amm_ER)
+abline(lm1$coef,col="orange")
+lm1<-lm(MhsFit_ER~Ahs_ER)
+abline(lm1$coef,col="purple")
+legend("bottomright",legend=c("Mouse ER","Human ER", "Mouse CTCF", "Human CTCF"),pch=20,col=c("orange","purple","red","blue"), cex=0.5)
 dev.off()
 
 
