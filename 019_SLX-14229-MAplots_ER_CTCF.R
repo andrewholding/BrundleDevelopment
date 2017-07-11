@@ -30,8 +30,8 @@ head(hscounts_CTCF)
 ### MA for Mouse + Human Counts
 # a is treated, b is not treated
 Mhs_ER<-apply(hscounts_ER,1,function(x){
-  fulvestrant<-mean(x[c(2,4,6)])
-  untreated<-mean(x[c(1,3,5)])
+  fulvestrant<-mean(x[c(2,4,5)])
+  untreated<-mean(x[c(1,3,6)])
   fc<-mean(fulvestrant)/mean(untreated)
   log2fc<-log2(fc)
   return(log2fc)
@@ -40,8 +40,8 @@ Ahs_ER<-apply(hscounts_ER,1,function(x){
   return(log10(sum(x)))
 })
 Mmm_ER<-apply(mmcounts_ER,1,function(x){
-  fulvestrant<-mean(x[c(2,4,6)])
-  untreated<-mean(x[c(1,3,5)])
+  fulvestrant<-mean(x[c(2,4,5)])
+  untreated<-mean(x[c(1,3,6)])
   fc<-mean(fulvestrant)/mean(untreated)
   log2fc<-log2(fc)
   return(log2fc)
@@ -50,8 +50,8 @@ Amm_ER<-apply(mmcounts_ER,1,function(x){
   return(log10(sum(x)))
 })
 Mhs_CTCF<-apply(hscounts_CTCF,1,function(x){
-  fulvestrant<-mean(x[c(2,4,6)])
-  untreated<-mean(x[c(1,3,5)])
+  fulvestrant<-mean(x[c(2,4,5)])
+  untreated<-mean(x[c(1,3,6)])
   fc<-mean(fulvestrant)/mean(untreated)
   log2fc<-log2(fc)
   return(log2fc)
@@ -60,8 +60,8 @@ Ahs_CTCF<-apply(hscounts_CTCF,1,function(x){
   return(log10(sum(x)))
 })
 Mmm_CTCF<-apply(mmcounts_CTCF,1,function(x){
-  fulvestrant<-mean(x[c(2,4,6)])
-  untreated<-mean(x[c(1,3,5)])
+  fulvestrant<-mean(x[c(2,4,5)])
+  untreated<-mean(x[c(1,3,6)])
   fc<-mean(fulvestrant)/mean(untreated)
   log2fc<-log2(fc)
   return(log2fc)

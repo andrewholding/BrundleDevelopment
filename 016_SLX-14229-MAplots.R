@@ -30,8 +30,8 @@ mmrpm<-apply(mmcounts,2,function(x){
   1E6*x/sum(x)
 })
 M<-apply(hsrpm,1,function(x){
-  fulvestrant<-mean(x[c(2,4,6)])
-  untreated<-mean(x[c(1,3,5)])
+  fulvestrant<-mean(x[c(2,4,5)])
+  untreated<-mean(x[c(1,3,6)])
   fc<-mean(fulvestrant)/mean(untreated)
   log2fc<-log2(fc)
   return(log2fc)
@@ -59,8 +59,8 @@ for(i in 1:length(mmrpm)){
   mmrpm[i]<-mmcounts[i]/aligned[i]
 }
 M<-apply(hsrpm,1,function(x){
-  fulvestrant<-mean(x[c(2,4,6)])
-  untreated<-mean(x[c(1,3,5)])
+  fulvestrant<-mean(x[c(2,4,5)])
+  untreated<-mean(x[c(1,3,6)])
   fc<-mean(fulvestrant)/mean(untreated)
   log2fc<-log2(fc)
   return(log2fc)
@@ -88,8 +88,8 @@ for(i in 1:length(mmrpm)){
   mmrpm[i]<-mmcounts[i]/nrreads[i]
 }
 M<-apply(hsrpm,1,function(x){
-  fulvestrant<-mean(x[c(2,4,6)])
-  untreated<-mean(x[c(1,3,5)])
+  fulvestrant<-mean(x[c(2,4,5)])
+  untreated<-mean(x[c(1,3,6)])
   fc<-mean(fulvestrant)/mean(untreated)
   log2fc<-log2(fc)
   return(log2fc)
@@ -107,8 +107,8 @@ dev.off()
 ### MA Counts human
 # a is treated, b is not treated
 M<-apply(hscounts,1,function(x){
-  fulvestrant<-mean(x[c(2,4,6)])
-  untreated<-mean(x[c(1,3,5)])
+  fulvestrant<-mean(x[c(2,4,5)])
+  untreated<-mean(x[c(1,3,6)])
   fc<-mean(fulvestrant)/mean(untreated)
   log2fc<-log2(fc)
   return(log2fc)
@@ -126,8 +126,8 @@ dev.off()
 ### MA for Mouse + Human Counts
 # a is treated, b is not treated
 Mhs<-apply(hscounts,1,function(x){
-  fulvestrant<-mean(x[c(2,4,6)])
-  untreated<-mean(x[c(1,3,5)])
+  fulvestrant<-mean(x[c(2,4,5)])
+  untreated<-mean(x[c(1,3,6)])
   fc<-mean(fulvestrant)/mean(untreated)
   log2fc<-log2(fc)
   return(log2fc)
@@ -136,8 +136,8 @@ Ahs<-apply(hscounts,1,function(x){
   return(log10(sum(x)))
 })
 Mmm<-apply(mmcounts,1,function(x){
-  fulvestrant<-mean(x[c(2,4,6)])
-  untreated<-mean(x[c(1,3,5)])
+  fulvestrant<-mean(x[c(2,4,5)])
+  untreated<-mean(x[c(1,3,6)])
   fc<-mean(fulvestrant)/mean(untreated)
   log2fc<-log2(fc)
   return(log2fc)
