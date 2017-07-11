@@ -14,7 +14,9 @@ SLX-14229/blacklist_filtered/*
 SLX-14229_mmhs/blacklist_filtered/*
 SLX-8047/blacklist_filtered/*
 SLX-8047_dmhs/blacklist_filtered/*
-
+ENCODE/*.fq
+ENCODE/*.bam
+ENCODE/*.bai
 
 
 
