@@ -9,24 +9,25 @@ hsconsensus_CTCF<-readRDS("Rdata/018_SLX-14229_hsconsensus_CTCF.rds")
 mmconsensus_ER<-readRDS("Rdata/018_SLX-14229_mmconsensus_ER.rds")
 mmconsensus_CTCF<-readRDS("Rdata/018_SLX-14229_mmconsensus_CTCF.rds")
 
+x<-0
 
 filename<-"Rdata/020_SLX-14229_hsconsensus_localnorm_ER.rda"
 if(!file.exists(filename)){
-normalisation_window<-2000 #take all CTCF peaks this many base pairs up and down stream
+normalisation_window<-2000000 #2mb #take all CTCF peaks this many base pairs up and down stream
 hsconsensus_localnorm_ER<-hsconsensus_ER
 
-#Normalise all ER peaks to the CTCF peaks 1kb either side.
+#Normalise all ER peaks to the CTCF peaks x kb either side.
 
 for (n in rownames(hsconsensus_ER)){
 min_location<-hsconsensus_ER[n,2]-(normalisation_window/2)
-max_location<-hsconsensus_ER[n,3]-(normalisation_window/2)
+max_location<-hsconsensus_ER[n,3]+(normalisation_window/2)
 
 control_peaks <-
   hsconsensus_CTCF[
   hsconsensus_CTCF[,1]==hsconsensus_ER[n,1] &
-  hsconsensus_CTCF[,2]<=min_location &
+  hsconsensus_CTCF[,2]>=min_location &
   hsconsensus_CTCF[,3]<=max_location,]
-
+x<-append(x,nrow(control_peaks))
 normalisation_factors<-colSums(control_peaks[,-c(1:3)])/mean(colSums(control_peaks[,-c(1:3)]))
 
 hsconsensus_localnorm_ER[n,-c(1:3)]<-(hsconsensus_ER[n,-c(1:3)]/normalisation_factors)
@@ -38,16 +39,16 @@ save(hsconsensus_localnorm_ER,file=filename)
 
 filename<-"Rdata/020_SLX-14229_hsconsensus_localnorm_CTCF.rda"
 if(!file.exists(filename)){
-#Normalise all CTCF peaks to the CTCF peaks 1kb either side for consistancy
+#Normalise all CTCF peaks to the CTCF peaks x kb either side for consistancy
 hsconsensus_localnorm_CTCF<-hsconsensus_CTCF
 for (n in rownames(hsconsensus_CTCF)){
   min_location<-hsconsensus_CTCF[n,2]-(normalisation_window/2)
-  max_location<-hsconsensus_CTCF[n,3]-(normalisation_window/2)
+  max_location<-hsconsensus_CTCF[n,3]+(normalisation_window/2)
   
   control_peaks <-
     hsconsensus_CTCF[
       hsconsensus_CTCF[,1]==hsconsensus_ER[n,1] &
-        hsconsensus_CTCF[,2]<=min_location &
+        hsconsensus_CTCF[,2]>=min_location &
         hsconsensus_CTCF[,3]<=max_location,]
   normalisation_factors<-colSums(control_peaks[,-c(1:3)])/mean(colSums(control_peaks[,-c(1:3)]))
 
