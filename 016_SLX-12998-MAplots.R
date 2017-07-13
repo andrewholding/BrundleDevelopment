@@ -176,4 +176,38 @@ dev.off()
 
 
 
+### MA for Mouse + Human Counts
+# a is treated, b is not treated
+Mhs<-apply(hscounts,1,function(x){
+  fulvestrant<-mean(x[c(1,2,4,5)])
+  untreated<-mean(x[c(3,6,7,8)])
+  fc<-mean(fulvestrant)/mean(untreated)
+  log2fc<-log2(fc)
+  return(log2fc)
+})
+Ahs<-apply(hscounts,1,function(x){
+  return(log10(sum(x)))
+})
+Mmm<-apply(mmcounts,1,function(x){
+  fulvestrant<-mean(x[c(1,2,4,5)])
+  untreated<-mean(x[c(3,6,7,8)])
+  fc<-mean(fulvestrant)/mean(untreated)
+  log2fc<-log2(fc)
+  return(log2fc)
+})
+Amm<-apply(mmcounts,1,function(x){
+  return(log10(sum(x)))
+})
+png("plots/016_SLX-12998_MA_counts_HsMm_twin_fit.png",w=1000,h=1000,p=30)
+plot(Ahs,Mhs,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)",main="Raw counts in peaks",ylim=c(-6.25,4))
+points(Amm,Mmm,pch=20,col="darkolivegreen3")
+abline(h=0)
+legend("topright",legend=c("Mouse","Human"),pch=20,col=c("darkolivegreen3","black"))
+lm1<-lm(Mmm~Amm)
+abline(lm1$coef,col="red")
+lm1<-lm(Mhs~Ahs)
+abline(lm1$coef,col="purple")
+legend("bottomright",legend=c("Mouse","Human"),pch=20,col=c("red","purple"))
+
+dev.off()
 
