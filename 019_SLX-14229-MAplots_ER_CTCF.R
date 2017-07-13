@@ -73,6 +73,42 @@ Amm_CTCF<-apply(mmcounts_CTCF,1,function(x){
 
 library(scales)
 
+### MA RPM aligned reads
+load("Rdata/012_SLX-14229_aligned.rda")
+aligned<-aligned[grep("SLX-14229.D",names(aligned))]
+aligned<-sapply(aligned,sum)/1E6
+#Need to creat conversion matrix names(aligned)<-conversion[names(aligned)]
+
+
+hsrpm<-hscounts_ER
+for(i in 1:length(hsrpm)){
+  hsrpm[i]<-hscounts_ER[i]/aligned[i]
+}
+M<-apply(hsrpm,1,function(x){
+  fulvestrant<-mean(x[c(2,4,5)])
+  untreated<-mean(x[c(1,3,6)])
+  fc<-mean(fulvestrant)/mean(untreated)
+  log2fc<-log2(fc)
+  return(log2fc)
+})
+A<-apply(hsrpm,1,function(x){
+  return(log10(sum(x)))
+})
+
+
+png("plots/019_SLX-14229_MA_RPM_HsMm_ERonly.png",w=1000,h=1000,p=30)
+plot(A,M,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="RPM aligned reads")
+abline(h=0)
+
+dev.off()
+
+
+png("plots/019_SLX-14229_MA_counts_HsMm_ERonly.png",w=1000,h=1000,p=30)
+plot(Ahs_ER,Mhs_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Raw counts in peaks")
+abline(h=0)
+
+dev.off()
+
 png("plots/019_SLX-14229_MA_counts_HsMm.png",w=1000,h=1000,p=30)
 plot(Ahs_ER,Mhs_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Raw counts in peaks")
 points(Ahs_CTCF,Mhs_CTCF,pch=20,col="gray")
@@ -101,7 +137,7 @@ MmmFit_CTCF<-Mmm_CTCF-(Amm_CTCF*angularcoeff)-intercept
 
 
 png("plots/019_SLX-14229_MA_counts_HsMm_Normalised.png",w=1000,h=1000,p=30)
-plot(Ahs_ER,MhsFit_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Raw counts in peaks")
+plot(Ahs_ER,MhsFit_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Normalised to Human CTCF")
 points(Ahs_CTCF,MhsFit_CTCF,pch=20,col="gray")
 
 abline(h=0)
@@ -164,7 +200,7 @@ MmmFit_CTCF<-Mmm_CTCF-(Amm_CTCF*angularcoeff)-intercept
 
 
 png("plots/019_SLX-14229_Mm_MA_counts_HsMm_Normalised.png",w=1000,h=1000,p=30)
-plot(Ahs_ER,MhsFit_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Raw counts in peaks")
+plot(Ahs_ER,MhsFit_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Normalised to Human CTCF")
 points(Ahs_CTCF,MhsFit_CTCF,pch=20,col="gray")
 points(Amm_ER,MmmFit_ER,pch=20,col="darkolivegreen3")
 points(Amm_CTCF,MmmFit_CTCF,pch=20,col="darkolivegreen")

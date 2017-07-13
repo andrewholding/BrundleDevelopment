@@ -49,6 +49,10 @@ dev.off()
 load("Rdata/012_SLX-14229_aligned.rda")
 aligned<-aligned[grep("SLX-14229.D",names(aligned))]
 aligned<-sapply(aligned,sum)/1E6
+
+#remove inputs/controls to match samples here
+aligned<-aligned[c(1,2,5,7,8,10)]
+
 #Need to creat conversion matrix names(aligned)<-conversion[names(aligned)]
 hsrpm<-hscounts
 for(i in 1:length(hsrpm)){
@@ -58,6 +62,8 @@ mmrpm<-mmcounts
 for(i in 1:length(mmrpm)){
   mmrpm[i]<-mmcounts[i]/aligned[i]
 }
+
+
 M<-apply(hsrpm,1,function(x){
   fulvestrant<-mean(x[c(2,4,5)])
   untreated<-mean(x[c(1,3,6)])
@@ -78,6 +84,10 @@ dev.off()
 load("Rdata/012_SLX-14229_nrreads.rda")
 nrreads<-nrreads[grep("SLX-14229.D",names(nrreads))]
 nrreads<-nrreads/1E6
+
+#remove inputs/controls to match samples here
+nrreads<-nrreads[c(1,2,5,7,8,10)]
+
 # Again need conversion matrix names(nrreads)<-conversion[names(nrreads)]
 hsrpm<-hscounts
 for(i in 1:length(hsrpm)){
