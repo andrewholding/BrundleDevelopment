@@ -76,6 +76,64 @@ library(scales)
 png("plots/019_SLX-14229_MA_counts_HsMm.png",w=1000,h=1000,p=30)
 plot(Ahs_ER,Mhs_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Raw counts in peaks")
 points(Ahs_CTCF,Mhs_CTCF,pch=20,col="gray")
+abline(h=0)
+legend("topright",legend=c("Human ER",  "Human CTCF"),pch=20,col=c("black","gray"), cex=0.5)
+
+lm1<-lm(Mhs_CTCF~Ahs_CTCF)
+abline(lm1$coef,col="blue")
+lm1<-lm(Mhs_ER~Ahs_ER)
+abline(lm1$coef,col="purple")
+legend("bottomright",legend=c("Human ER", "Human CTCF"),pch=20,col=c("purple","blue"), cex=0.5)
+
+dev.off()
+
+
+### 20th century normalization
+# Residuals  fit
+lm1<-lm(Mhs_CTCF~Ahs_CTCF)
+intercept<-lm1$coef[1]
+angularcoeff<-lm1$coef[2]
+MhsFit_ER<-Mhs_ER-(Ahs_ER*angularcoeff)-intercept
+MmmFit_ER<-Mmm_ER-(Amm_ER*angularcoeff)-intercept
+MhsFit_CTCF<-Mhs_CTCF-(Ahs_CTCF*angularcoeff)-intercept
+MmmFit_CTCF<-Mmm_CTCF-(Amm_CTCF*angularcoeff)-intercept
+
+
+
+png("plots/019_SLX-14229_MA_counts_HsMm_Normalised.png",w=1000,h=1000,p=30)
+plot(Ahs_ER,MhsFit_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Raw counts in peaks")
+points(Ahs_CTCF,MhsFit_CTCF,pch=20,col="gray")
+
+abline(h=0)
+legend("topright",legend=c("Human ER",  "Human CTCF"),pch=20,col=c("black","gray"), cex=0.5)
+
+lm1<-lm(MhsFit_CTCF~Ahs_CTCF)
+abline(lm1$coef,col="blue")
+lm1<-lm(MhsFit_ER~Ahs_ER)
+abline(lm1$coef,col="purple")
+legend("bottomright",legend=c("Human ER", "Human CTCF"),pch=20,col=c("purple","blue"), cex=0.5)
+
+dev.off()
+
+png("plots/019_SLX-14229_MA_counts_HsMm_Normalised_Alpha.png",w=1000,h=1000,p=30)
+
+plot(Ahs_ER,MhsFit_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Normalised to Human CTCF",col=alpha("black",0.2))
+points(Ahs_CTCF,MhsFit_CTCF,pch=20,col=alpha("gray",0.2))
+
+abline(h=0)
+legend("topright",legend=c("Human ER",  "Human CTCF"),pch=20,col=c("black","gray"), cex=0.5)
+
+lm1<-lm(MhsFit_CTCF~Ahs_CTCF)
+abline(lm1$coef,col="blue")
+lm1<-lm(MhsFit_ER~Ahs_ER)
+abline(lm1$coef,col="purple")
+legend("bottomright",legend=c("Human ER", "Human CTCF"),pch=20,col=c("purple","blue"), cex=0.5)
+
+dev.off()
+
+png("plots/019_SLX-14229_Mm_MA_counts_HsMm.png",w=1000,h=1000,p=30)
+plot(Ahs_ER,Mhs_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Raw counts in peaks")
+points(Ahs_CTCF,Mhs_CTCF,pch=20,col="gray")
 points(Amm_ER,Mmm_ER,pch=20,col="darkolivegreen3")
 points(Amm_CTCF,Mmm_CTCF,pch=20,col="darkolivegreen")
 abline(h=0)
@@ -105,7 +163,7 @@ MmmFit_CTCF<-Mmm_CTCF-(Amm_CTCF*angularcoeff)-intercept
 
 
 
-png("plots/019_SLX-14229_MA_counts_HsMm_Normalised.png",w=1000,h=1000,p=30)
+png("plots/019_SLX-14229_Mm_MA_counts_HsMm_Normalised.png",w=1000,h=1000,p=30)
 plot(Ahs_ER,MhsFit_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Raw counts in peaks")
 points(Ahs_CTCF,MhsFit_CTCF,pch=20,col="gray")
 points(Amm_ER,MmmFit_ER,pch=20,col="darkolivegreen3")
@@ -124,7 +182,7 @@ legend("bottomright",legend=c("Mouse ER","Human ER", "Mouse CTCF", "Human CTCF")
 
 dev.off()
 
-png("plots/019_SLX-14229_MA_counts_HsMm_Normalised_Alpha.png",w=1000,h=1000,p=30)
+png("plots/019_SLX-14229_Mm_MA_counts_HsMm_Normalised_Alpha.png",w=1000,h=1000,p=30)
 
 plot(Ahs_ER,MhsFit_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Normalised to Human CTCF",col=alpha("black",0.2))
 points(Ahs_CTCF,MhsFit_CTCF,pch=20,col=alpha("gray",0.2))
@@ -142,6 +200,9 @@ lm1<-lm(MhsFit_ER~Ahs_ER)
 abline(lm1$coef,col="purple")
 legend("bottomright",legend=c("Mouse ER","Human ER", "Mouse CTCF", "Human CTCF"),pch=20,col=c("orange","purple","red","blue"), cex=0.5)
 dev.off()
+
+
+
 
 
 

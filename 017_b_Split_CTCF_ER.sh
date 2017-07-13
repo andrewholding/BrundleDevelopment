@@ -4,7 +4,7 @@ mkdir CTCF
 for f in *.narrowPeak
 do
 	echo $f
-	bedtools intersect -a CTCF_union.bed -b $f > CTCF/$f 
+	bedtools intersect -a $f -b CTCF_union.bed  > CTCF/$f 
 done
 
 mkdir ER
@@ -23,7 +23,7 @@ mkdir CTCF
 for f in *.narrowPeak
 do
 	echo $f
-	bedtools intersect -a CTCF_union.bed -b $f > CTCF/$f 
+	bedtools intersect -a $f -b CTCF_union.bed  > CTCF/$f 
 done
 
 mkdir ER
