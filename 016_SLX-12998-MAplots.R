@@ -49,7 +49,8 @@ dev.off()
 load("Rdata/012_SLX-12998_aligned.rda")
 aligned<-aligned[grep("SLX-12998.D",names(aligned))]
 aligned<-sapply(aligned,sum)/1E6
-#Need to creat conversion matrix names(aligned)<-conversion[names(aligned)]
+aligned<-aligned[c(4,7,8,9,2,3,6,5)]
+
 hsrpm<-hscounts
 for(i in 1:length(hsrpm)){
   hsrpm[i]<-hscounts[i]/aligned[i]
@@ -78,7 +79,7 @@ dev.off()
 load("Rdata/012_SLX-12998_nrreads.rda")
 nrreads<-nrreads[grep("SLX-12998.D",names(nrreads))]
 nrreads<-nrreads/1E6
-# Again need conversion matrix names(nrreads)<-conversion[names(nrreads)]
+nrreads<-nrreads[c(4,7,8,9,2,3,6,5)]
 hsrpm<-hscounts
 for(i in 1:length(hsrpm)){
   hsrpm[i]<-hscounts[i]/nrreads[i]

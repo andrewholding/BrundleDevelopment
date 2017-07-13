@@ -7,8 +7,8 @@ setwd("/Volumes/FlyPeaks/FlyPeaks")
 
 # a is treated, b is not treated
 conversion<-setNames(
-  c("4b","2b","2a","1a","input","3b","3a","4a","1b"),
-  c("SLX-8047.D704_D505.C81G5ANXX.s_1.r_1.fq","SLX-8047.D704_D506.C81G5ANXX.s_1.r_1.fq","SLX-8047.D704_D507.C81G5ANXX.s_1.r_1.fq","SLX-8047.D705_D506.C81G5ANXX.s_1.r_1.fq","SLX-8047.D705_D507.C81G5ANXX.s_1.r_1.fq","SLX-8047.D705_D508.C81G5ANXX.s_1.r_1.fq","SLX-8047.D706_D505.C81G5ANXX.s_1.r_1.fq","SLX-8047.D706_D507.C81G5ANXX.s_1.r_1.fq","SLX-8047.D706_D508.C81G5ANXX.s_1.r_1.fq")
+  c("X4b","X2b","X2a","X1a","input","X3b","X3a","X4a","X1b"),
+  c("SLX-8047.D704_D505.C81G5ANXX.s_1","SLX-8047.D704_D506.C81G5ANXX.s_1","SLX-8047.D704_D507.C81G5ANXX.s_1","SLX-8047.D705_D506.C81G5ANXX.s_1","SLX-8047.D705_D507.C81G5ANXX.s_1","SLX-8047.D705_D508.C81G5ANXX.s_1","SLX-8047.D706_D505.C81G5ANXX.s_1","SLX-8047.D706_D507.C81G5ANXX.s_1","SLX-8047.D706_D508.C81G5ANXX.s_1")
 )
 
 
@@ -50,6 +50,7 @@ load("Rdata/012_SLX-8047_aligned.rda")
 aligned<-aligned[grep("SLX-8047.D",names(aligned))]
 aligned<-sapply(aligned,sum)/1E6
 names(aligned)<-conversion[names(aligned)]
+aligned = aligned[c(4,9,3,2,6,7,8,1)]
 hsrpm<-hscounts
 for(i in 1:length(hsrpm)){
   hsrpm[i]<-hscounts[i]/aligned[i]
@@ -79,6 +80,7 @@ load("Rdata/012_SLX-8047_nrreads.rda")
 nrreads<-nrreads[grep("SLX-8047.D",names(nrreads))]
 nrreads<-nrreads/1E6
 names(nrreads)<-conversion[names(nrreads)]
+nrreads = nrreads[c(4,9,3,2,6,7,8,1)]
 hsrpm<-hscounts
 for(i in 1:length(hsrpm)){
   hsrpm[i]<-hscounts[i]/nrreads[i]

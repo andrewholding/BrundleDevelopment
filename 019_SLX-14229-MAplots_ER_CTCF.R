@@ -77,31 +77,54 @@ library(scales)
 load("Rdata/012_SLX-14229_aligned.rda")
 aligned<-aligned[grep("SLX-14229.D",names(aligned))]
 aligned<-sapply(aligned,sum)/1E6
-#Need to creat conversion matrix names(aligned)<-conversion[names(aligned)]
 
 
-hsrpm<-hscounts_ER
+#remove inputs/controls to match samples here
+aligned<-aligned[c(1,2,5,7,8,10)]
+
+hsrpm_ER<-hscounts_ER
 for(i in 1:length(hsrpm)){
-  hsrpm[i]<-hscounts_ER[i]/aligned[i]
+  hsrpm_ER[i]<-hscounts_ER[i]/aligned[i]
 }
-M<-apply(hsrpm,1,function(x){
+M_RPM_ER<-apply(hsrpm_ER,1,function(x){
   fulvestrant<-mean(x[c(2,4,5)])
   untreated<-mean(x[c(1,3,6)])
   fc<-mean(fulvestrant)/mean(untreated)
   log2fc<-log2(fc)
   return(log2fc)
 })
-A<-apply(hsrpm,1,function(x){
+A_RPM_ER<-apply(hsrpm_ER,1,function(x){
   return(log10(sum(x)))
 })
 
 
-png("plots/019_SLX-14229_MA_RPM_HsMm_ERonly.png",w=1000,h=1000,p=30)
-plot(A,M,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="RPM aligned reads")
+png("plots/019_SLX-14229_MA_RPM_HsMm_ER.png",w=1000,h=1000,p=30)
+plot(A_RPM_ER,M_RPM_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="RPM aligned reads")
 abline(h=0)
 
 dev.off()
 
+
+hsrpm_CTCF<-hscounts_CTCF
+for(i in 1:length(hsrpm)){
+  hsrpm_CTCF[i]<-hscounts_CTCF[i]/aligned[i]
+}
+M_RPM_CTCF<-apply(hsrpm_CTCF,1,function(x){
+  fulvestrant<-mean(x[c(2,4,5)])
+  untreated<-mean(x[c(1,3,6)])
+  fc<-mean(fulvestrant)/mean(untreated)
+  log2fc<-log2(fc)
+  return(log2fc)
+})
+A_RPM_CTCF<-apply(hsrpm_CTCF,1,function(x){
+  return(log10(sum(x)))
+})
+
+png("plots/019_SLX-14229_MA_RPM_HsMm_ER_CTCF.png",w=1000,h=1000,p=30)
+plot(A_RPM_ER,M_RPM_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="RPM aligned reads")
+points(A_RPM_CTCF,M_RPM_CTCF,pch=20,col="gray")
+abline(h=0)
+dev.off()
 
 png("plots/019_SLX-14229_MA_counts_HsMm_ERonly.png",w=1000,h=1000,p=30)
 plot(Ahs_ER,Mhs_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Raw counts in peaks")
