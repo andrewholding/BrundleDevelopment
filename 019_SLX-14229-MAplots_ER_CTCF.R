@@ -83,7 +83,7 @@ aligned<-sapply(aligned,sum)/1E6
 aligned<-aligned[c(1,2,5,7,8,10)]
 
 hsrpm_ER<-hscounts_ER
-for(i in 1:length(hsrpm)){
+for(i in 1:length(hsrpm_ER)){
   hsrpm_ER[i]<-hscounts_ER[i]/aligned[i]
 }
 M_RPM_ER<-apply(hsrpm_ER,1,function(x){
@@ -106,7 +106,7 @@ dev.off()
 
 
 hsrpm_CTCF<-hscounts_CTCF
-for(i in 1:length(hsrpm)){
+for(i in 1:length(hsrpm_CTCF)){
   hsrpm_CTCF[i]<-hscounts_CTCF[i]/aligned[i]
 }
 M_RPM_CTCF<-apply(hsrpm_CTCF,1,function(x){
@@ -123,6 +123,8 @@ A_RPM_CTCF<-apply(hsrpm_CTCF,1,function(x){
 png("plots/019_SLX-14229_MA_RPM_HsMm_ER_CTCF.png",w=1000,h=1000,p=30)
 plot(A_RPM_ER,M_RPM_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="RPM aligned reads")
 points(A_RPM_CTCF,M_RPM_CTCF,pch=20,col="gray")
+lm1<-lm(M_RPM_CTCF~A_RPM_CTCF)
+abline(lm1$coef,col="blue")
 abline(h=0)
 dev.off()
 
