@@ -28,8 +28,13 @@ control_peaks <-
   hsconsensus_CTCF[,2]>=min_location &
   hsconsensus_CTCF[,3]<=max_location,]
 x<-append(x,nrow(control_peaks))
-normalisation_factors<-colSums(control_peaks[,-c(1:3)])/mean(colSums(control_peaks[,-c(1:3)]))
-
+if (mean(colSums(control_peaks[,-c(1:3)])>0))
+    {
+    normalisation_factors<-colSums(control_peaks[,-c(1:3)])/mean(colSums(control_peaks[,-c(1:3)]))
+}else {
+  normalisation_factors <- rep(1,6)
+}
+    
 hsconsensus_localnorm_ER[n,-c(1:3)]<-(hsconsensus_ER[n,-c(1:3)]/normalisation_factors)
 }
 save(hsconsensus_localnorm_ER,file=filename)
