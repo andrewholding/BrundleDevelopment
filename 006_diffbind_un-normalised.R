@@ -32,6 +32,32 @@ png("plots/006_SLX-12998_MA.png",w=1000,h=1000,p=30)
 dba.plotMA(dba_analyze, contrast=1)
 dev.off()
 
+### Mouse Peaks 3 samples
+
+dba<-dba(sampleSheet = "samplesheet/samplesheet_SLX12998_3samples.csv")
+
+op<-dba.overlap(dba, mode=DBA_OLAP_RATE)
+
+png("plots/006_SLX-12998_binding_overlaps.png",w=1000,h=1000,p=30)
+plot(op,type="o",lwd=3,xlab="Nr. Samples",main="Binding Overlaps",ylab="Nr. Peaks",pch=16)
+dev.off()
+
+dba <- dba.count(dba,  summits=200)
+
+png("plots/006_SLX-12998_heatmap_3samples.png",w=1000,h=1000,p=30)
+plot(dba)
+dev.off()
+
+png("plots/006_SLX-12998_PCA_3samples.png",w=1000,h=1000,p=30)
+dba.plotPCA(dba)
+dev.off()
+
+dba.contrast(dba)
+dba_analyze<-dba.analyze(dba)
+
+png("plots/006_SLX-12998_MA_3samples.png",w=1000,h=1000,p=30)
+dba.plotMA(dba_analyze, contrast=1)
+dev.off()
 
 ### Fly Peaks
 

@@ -111,10 +111,10 @@ untreated_CTCF<-rowMeans(hsrpm_CTCF[c(1,3,6)])
 
 png("plots/025_CTCF_peak_count_comparision_linear.png")
 plot(fulvestrant_CTCF,untreated_CTCF, pch=20, xlab="Counts in peak after treatment" ,  ylab="Counts in peak before treatment" , main="Comparision of counts in peaks for CTCF")
-lm1<-lm(untreated_CTCF~ 0 + fulvestrant_CTCF)
-abline(c(0,lm1$coef),col="red3")
-intercept<-0
-angularcoeff<-lm1$coef[1] #is > 1 which implies less fuvestrant cells
+lm1<-lm(untreated_CTCF ~ fulvestrant_CTCF)
+abline(lm1$coef,col="red3")
+intercept<-lm1$coef[1]
+angularcoeff<-lm1$coef[2] #is > 1 which implies less fuvestrant cells
 fulvestrant_CTCF_fit<-fulvestrant_CTCF*angularcoeff+intercept
 points(fulvestrant_CTCF_fit,untreated_CTCF,pch=20, col="royalblue3" )
 legend("topleft",legend=c("Raw", "Normalised"),pch=20,col=c("black","royalblue3"))
@@ -169,48 +169,49 @@ plot(log2(fulvestrant_CTCF),log2(untreated_CTCF), pch=20,
      xlab="Log2(counts) in peak after treatment" ,  ylab="Log2(counts) in peak before treatment" ,
      main="Comparision of Log2(counts) in peaks for CTCF")
 
-lm1<-lm(log2(untreated_CTCF)~ 0 + log2(fulvestrant_CTCF))
-abline(c(0,lm1$coef),col="red3")
+lm1<-lm(log2(untreated_CTCF)~  log2(fulvestrant_CTCF))
+abline(lm1$coef,col="red3")
 abline(h=0)
 
-intercept<-0
-angularcoeff<-lm1$coef[1] #is > 1 which implies less fuvestrant cells
+intercept<-lm1$coef[1]
+angularcoeff<-lm1$coef[2] #is > 1 which implies less fuvestrant cells
 
-fulvestrant_CTCF_log2fit<-fulvestrant_CTCF**angularcoeff
+fulvestrant_CTCF_log2fit<-2**intercept*fulvestrant_CTCF**angularcoeff
 points(log2(fulvestrant_CTCF_log2fit),log2(untreated_CTCF),pch=20, col="royalblue3" )
-abline(c(0,lm1$coef),col="red3")
+abline(lm1$coef,col="red3")
 abline(h=0)
-lm1<-lm(log2(untreated_CTCF)~ 0 + log2(fulvestrant_CTCF_log2fit))
-abline(c(0,lm1$coef),col="purple")
+lm1<-lm(log2(untreated_CTCF)~  log2(fulvestrant_CTCF_log2fit))
+abline(lm1$coef,col="purple")
 abline(h=0)
 legend("topleft",legend=c("Raw", "Normalised"),pch=20,col=c("black","royalblue3"))
 dev.off()
 
+log2fit_offset<-intercept
 log2fit_coeff<-angularcoeff
 
 M_RPM_CTCF_log_corrected<-apply(hsrpm_CTCF,1,function(x){
-  fulvestrant<-mean(x[c(2,4,5)])**angularcoeff
+  fulvestrant<-2**(log2fit_offset)*mean(x[c(2,4,5)])**angularcoeff
   untreated<-mean(x[c(1,3,6)])
   fc<-mean(fulvestrant)/mean(untreated)
   log2fc<-log2(fc)
   return(log2fc)
 })
 A_RPM_CTCF_log_corrected<-apply(hsrpm_CTCF,1,function(x){
-  fulvestrant<-mean(x[c(2,4,5)])**angularcoeff
+  fulvestrant<-2**(log2fit_offset)*mean(x[c(2,4,5)])**angularcoeff
   untreated<-mean(x[c(1,3,6)])
   return(log10(sum(fulvestrant+untreated)))
 })
 
 
 M_RPM_ER_log_corrected<-apply(hsrpm_ER,1,function(x){
-  fulvestrant<-mean(x[c(2,4,5)])**angularcoeff
+  fulvestrant<-2**(log2fit_offset)*mean(x[c(2,4,5)])**angularcoeff
   untreated<-mean(x[c(1,3,6)])
   fc<-mean(fulvestrant)/mean(untreated)
   log2fc<-log2(fc)
   return(log2fc)
 })
 A_RPM_ER_log_corrected<-apply(hsrpm_ER,1,function(x){
-  fulvestrant<-mean(x[c(2,4,5)])**angularcoeff
+  fulvestrant<-2**(log2fit_offset)*mean(x[c(2,4,5)])**angularcoeff
   untreated<-mean(x[c(1,3,6)])
   return(log10(sum(fulvestrant+untreated)))
 })
@@ -229,7 +230,7 @@ hsconsensus <- dba.peakset(dba_analysis, bRetrieve = T, DataType = DBA_DATA_FRAM
 names(hsconsensus)<-c("CHR","START","END","1a","1b","2a","2b","3b","3a")
 hsconsensus_CTCFfit<-hsconsensus
 #change to RPM, fit and then convert back. 
-hsconsensus_CTCFfit[c(5,7,8)]<-round(((hsconsensus[c(5,7,8)]/aligned[c(2,4,5)])**log2fit_coeff)*aligned[c(2,4,5)])
+hsconsensus_CTCFfit[c(5,7,8)]<-round(2**(log2fit_offset)*((hsconsensus[c(5,7,8)]/aligned[c(2,4,5)])**log2fit_coeff)*aligned[c(2,4,5)])
   
 newDBA <- DiffBind:::pv.resetCounts(dba, hsconsensus_CTCFfit)
 newDBA_analysis<-dba.analyze(newDBA)
