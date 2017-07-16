@@ -35,9 +35,11 @@ if(!file.exists(filename)){
 }
 
 
+
+#use a stringent overlap for control peaks.
 filename<-"Rdata/026_SLX-8047_dba.counts_drosophila.rda"
 if(!file.exists(filename)){
-  dba_dm <- dba.count(dba_dm, summits=200)
+  dba_dm <- dba.count(dba_dm, summits=200, minOverlap = 5)
   dba_dm <- dba.count(dba_dm, peaks=NULL, score=DBA_SCORE_READS)
   save(dba_dm,file=filename)
 } else {
@@ -52,14 +54,14 @@ dev.off()
 
 
 
-hsconsensus <- dba.peakset(dba_analysis, bRetrieve = T, DataType = DBA_DATA_FRAME)
-dmconsensus <- dba.peakset(dba_analysis_dm, bRetrieve = T, DataType = DBA_DATA_FRAME)
+hsconsensus <- dba.peakset(dba, bRetrieve = T, DataType = DBA_DATA_FRAME)
+dmconsensus <- dba.peakset(dba_dm, bRetrieve = T, DataType = DBA_DATA_FRAME)
 #Correct names to samplesheet and test on intial data
 names(hsconsensus)<-c("CHR","START","END","1a","1b","2a","2b","3a","3b","4a","4b")
-names(dsconsensus)<-c("CHR","START","END","1a","1b","2a","2b","3a","3b","4a","4b")
+names(dmconsensus)<-c("CHR","START","END","1a","1b","2a","2b","3a","3b","4a","4b")
 
 
-#Now lets try a linear model.
+#Now lets try to correct the bias model.
 
 load("Rdata/012_SLX-8047_aligned.rda")
 #Remove lost reads bam
@@ -68,136 +70,136 @@ aligned<-sapply(aligned,sum)/1E6
 #remove inputs/controls to match sample order here
 aligned<-aligned[c(4,9,3,2,7,6,8,1)]
 
+#Corrected for Hs/Dm only Bams. Future work is to add code to do automatically
+hs_aligned<-c(4222714,6996508,11021281,10222291,10098809,5988566,4303772,10222291)
+hs_aligned<-sapply(hs_aligned,sum)/1E6
+dm_aligned<-c(12457121,10702574,9040006,8234849,6539216,5527308,16722010,6231542 )
+dm_aligned<-sapply(dm_aligned,sum)/1E6
+
+aligned=hs_aligned+dm_aligned
+
+
 hscounts<-hsconsensus[,-c(1:3)]
 dmcounts<-dmconsensus[,-c(1:3)]
 
-hsrpm<-hscounts
-for(i in 1:length(hsrpm)){
-  hsrpm[i]<-hscounts[i]/aligned[i]
-}
-
-dmrpm<-dmcounts
-for(i in 1:length(dmrpm)){
-  dmrpm[i]<-dmrpm[i]/aligned[i]
-}
 
 
-
-M_RPM<-apply(hsrpm,1,function(x){
+M<-apply(hscounts,1,function(x){
   untreated<-mean(x[c(2,4,6,8)])
   fulvestrant<-mean(x[c(1,3,5,7)])
   fc<-mean(fulvestrant)/mean(untreated)
   log2fc<-log2(fc)
   return(log2fc)
 })
-A_RPM<-apply(hsrpm,1,function(x){
+A<-apply(hscounts,1,function(x){
   return(log10(sum(x)))
 })
 
-M_dm_RPM<-apply(dmrpm,1,function(x){
+M_dm<-apply(dmcounts,1,function(x){
   untreated<-mean(x[c(2,4,6,8)])
   fulvestrant<-mean(x[c(1,3,5,7)])
   fc<-mean(fulvestrant)/mean(untreated)
   log2fc<-log2(fc)
   return(log2fc)
 })
-A_dm_RPM<-apply(dmrpm,1,function(x){
+A_dm<-apply(dmcounts,1,function(x){
   return(log10(sum(x)))
 })
 
 png("plots/026_MAplot_HsDm.png")
-plot(A_RPM,M_RPM,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="RPM aligned reads")
-points(A_dm_RPM,M_dm_RPM,pch=20,col="cornflowerblue")
-lm1<-lm(M_dm_RPM~A_dm_RPM)
+plot(A,M,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Raw aligned reads")
+points(A_dm,M_dm,pch=20,col="cornflowerblue")
+lm1<-lm(M_dm~A_dm)
 abline(lm1$coef,col="red4")
 abline(h=0)
 dev.off()
 
-untreated<-rowMeans(dmrpm[c(1,3,5,7)])
-fulvestrant<-rowMeans(dmrpm[c(2,4,6,8)])
+untreated<-rowMeans(dmcounts[c(1,3,5,7)])
+fulvestrant<-rowMeans(dmcounts[c(2,4,6,8)])
 
-png("plots/026_Dm_peak_count_comparision_log.png")
-plot(log2(untreated),log2(fulvestrant), pch=20,
-     xlab="Log2(counts) in peak after treatment" ,  ylab="Log2(counts) in peak before treatment" ,
-     main="Comparision of Log2(counts) in peaks for Drosophila")
+png("plots/026_Dm_peak_count_comparision.png")
+plot(untreated,fulvestrant, pch=20,
+     xlab="Counts in peak after treatment" ,  ylab="Counts in peak before treatment" ,
+     main="Comparision of Counts in peaks for Drosophila")
+abline(0,1,col="grey")
+lm1<-lm(  fulvestrant~0+ untreated)
+abline(c(0,lm1$coef),col="red3")
 
-lm1<-lm(log2(untreated)~  log2(fulvestrant))
-abline(lm1$coef,col="red3")
-abline(h=0)
+intercept<-0
+angularcoeff<-1/lm1$coef[1] #is < 1 which implies less fuvestrant cells
 
-intercept<-lm1$coef[1]
-angularcoeff<-lm1$coef[2] #is > 1 which implies less fuvestrant cells
-
-fulvestrant_log2fit<-2**intercept*fulvestrant**angularcoeff
-points(log2(fulvestrant_log2fit),log2(untreated),pch=20, col="royalblue3" )
-abline(c(lm1$coef),col="red3")
-abline(h=0)
-lm1<-lm(log2(untreated) ~log2(fulvestrant_log2fit))
-abline(c(lm1$coef),col="purple")
-abline(h=0)
+points(fulvestrant*angularcoeff+intercept,untreated,pch=20, col="royalblue3" )
+fulvestrant_fit<-fulvestrant*angularcoeff+intercept
+lm1<-lm(fulvestrant_fit  ~0+untreated)
+abline(c(0,lm1$coef),col="purple")
 legend("topleft",legend=c("Raw", "Normalised"),pch=20,col=c("black","royalblue3"))
 dev.off()
 
 
 #Check fit by MA plot
 
-log2fit_coeff<-angularcoeff
-log2fit_offset<-intercept
+fit_coeff<-angularcoeff
+fit_offset<-intercept
 
-M_RPM_log_corrected<-apply(hsrpm,1,function(x){
-  untreated<-2**log2fit_offset*mean(x[c(2,4,6,8)])**log2fit_coeff
+M_corrected<-apply(hscounts,1,function(x){
+  untreated<-fit_coeff*mean(x[c(2,4,6,8)])+fit_offset
   fulvestrant<-mean(x[c(1,3,5,7)])
   fc<-mean(fulvestrant)/mean(untreated)
   log2fc<-log2(fc)
   return(log2fc)
 })
-A_RPM_log_corrected<-apply(hsrpm,1,function(x){
-  untreated<-2**log2fit_offset*mean(x[c(2,4,6,8)])**log2fit_coeff
+A_corrected<-apply(hscounts,1,function(x){
+  untreated<-fit_coeff*mean(x[c(2,4,6,8)])+fit_offset
   fulvestrant<-mean(x[c(1,3,5,7)])
   return(log10(sum(fulvestrant+untreated)))
 })
 
-M_dm_RPM_log_corrected<-apply(dmrpm,1,function(x){
-  untreated<-2**log2fit_offset*mean(x[c(2,4,6,8)])**(log2fit_coeff)
+M_dm_corrected<-apply(dmcounts,1,function(x){
+  untreated<-fit_coeff*mean(x[c(2,4,6,8)])+fit_offset
   fulvestrant<-mean(x[c(1,3,5,7)])
   fc<-mean(fulvestrant)/mean(untreated)
   log2fc<-log2(fc)
   return(log2fc)
 })
-A_dm_RPM_log_corrected<-apply(dmrpm,1,function(x){
-  untreated<-2**log2fit_offset*mean(x[c(2,4,6,8)])**log2fit_coeff
+A_dm_corrected<-apply(dmcounts,1,function(x){
+  untreated<-fit_coeff*mean(x[c(2,4,6,8)])+fit_offset
   fulvestrant<-mean(x[c(1,3,5,7)])
   return(log10(sum(fulvestrant+untreated)))
 })
 
 
-png("plots/026_MAplot_dm_log2fit.png")
-plot(A_RPM_log_corrected,M_RPM_log_corrected,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="RPM aligned reads - log2 CTCF Fit")
-points(A_dm_RPM_log_corrected,M_dm_RPM_log_corrected,pch=20,col="cornflowerblue")
-lm1<-lm(M_dm_RPM_log_corrected~A_dm_RPM_log_corrected)
+png("plots/026_MAplot_dm_fit.png")
+plot(A_corrected,M_corrected,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Raw aligned reads - log2 Dm Fit")
+points(A_dm_corrected,M_dm_corrected,pch=20,col="cornflowerblue")
+lm1<-lm(M_dm_corrected~A_dm_corrected)
 abline(lm1$coef,col="red4")
 abline(h=0)
 dev.off()
 
-#Apply the log2 dmfit
+#Apply the  dmfit
 hsconsensus_dm_fit<-hsconsensus
 dmconsensus_dm_fit<-dmconsensus
-#change to RPM, fit and then convert back. 
+
+
+#DeSeq called by Diffbind will divide though by library size, 
+#therefore undo our work. Solution is to correct for that before
+#hand with this control factor.
+control_factor<-sum(aligned[c(2,4,6,8)])/sum(aligned[c(1,3,5,7)])
 
 hsconsensus_dm_fit[c(5,7,9,11)]<-
-    round(2**(log2fit_offset)*(hsconsensus[c(5,7,9,11)]/aligned[c(2,4,6,8)])**(log2fit_coeff)*aligned[c(2,4,6,8)])
+    (fit_coeff*hsconsensus[c(5,7,9,11)]+fit_offset)/control_factor
 
 
 dmconsensus_dm_fit[c(5,7,9,11)]<-
-  round(2**(log2fit_offset)*(dmconsensus[c(5,7,9,11)]/aligned[c(2,4,6,8)])**(log2fit_coeff )*aligned[c(2,4,6,8)])
+  (fit_coeff*dmconsensus[c(5,7,9,11)]+fit_offset)
 
-lm1<-lm(log2(rowMeans(dmconsensus_dm_fit[c(4,6,8,10)]))~
-        log2(rowMeans(dmconsensus_dm_fit[c(5,7,9,11)])))
-lm1$coefficients
+
 
 newDBA <- DiffBind:::pv.resetCounts(dba, hsconsensus_dm_fit)
 newDBA_analysis<-dba.analyze(newDBA)
 
+
 png("plots/026_diffbindMA_reimported_dm_fit.png")
 dba.plotMA(newDBA_analysis)
 dev.off()
+
