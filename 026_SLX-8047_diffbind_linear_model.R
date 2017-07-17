@@ -1,3 +1,5 @@
+#This has been replaced with 027, so may have been have unfixed bugs.
+
 setwd("/Volumes/FlyPeaks/FlyPeaks")
 library(DiffBind)
 
@@ -70,7 +72,12 @@ aligned<-sapply(aligned,sum)/1E6
 #remove inputs/controls to match sample order here
 aligned<-aligned[c(4,9,3,2,7,6,8,1)]
 
+
+
 #Corrected for Hs/Dm only Bams. Future work is to add code to do automatically
+#e.g. library(Rsamtools)
+#e.g. colSums(idxstatsBam("SLX-8047/SLX-8047.D704_D505.C81G5ANXX.s_1.bwa.homo_sapiens.bam")[c(3,4)])
+
 hs_aligned<-c(4222714,6996508,11021281,10222291,10098809,5988566,4303772,10222291)
 hs_aligned<-sapply(hs_aligned,sum)/1E6
 dm_aligned<-c(12457121,10702574,9040006,8234849,6539216,5527308,16722010,6231542 )
@@ -118,6 +125,7 @@ untreated<-rowMeans(dmcounts[c(1,3,5,7)])
 fulvestrant<-rowMeans(dmcounts[c(2,4,6,8)])
 
 png("plots/026_Dm_peak_count_comparision.png")
+#THIS IS FLIPPED from plot to points below!!! Given the points are 1:1 it isn't obvious
 plot(untreated,fulvestrant, pch=20,
      xlab="Counts in peak after treatment" ,  ylab="Counts in peak before treatment" ,
      main="Comparision of Counts in peaks for Drosophila")
@@ -126,7 +134,7 @@ lm1<-lm(  fulvestrant~0+ untreated)
 abline(c(0,lm1$coef),col="red3")
 
 intercept<-0
-angularcoeff<-1/lm1$coef[1] #is < 1 which implies less fuvestrant cells
+angularcoeff<-1/lm1$coef[1] 
 
 points(fulvestrant*angularcoeff+intercept,untreated,pch=20, col="royalblue3" )
 fulvestrant_fit<-fulvestrant*angularcoeff+intercept
