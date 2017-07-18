@@ -1,7 +1,9 @@
 
 library(DiffBind)
 library(Rsamtools)
-library(codetools) 
+library(codetools)
+library(DESeq2)
+library(lattice)
 
 ######################
 #
@@ -29,9 +31,9 @@ jg.plotNormalization<-function(jg.controlCountsTreated,jg.controlCountsUntreated
 {
   plot(rowMeans(jg.controlCountsTreated),rowMeans(jg.controlCountsUntreated), pch=20,
        xlab="Counts in peak after treatment" ,  ylab="Counts in peak before treatment" ,
-       main="Comparision of Counts in peaks for Drosophila")
+       main="Comparision of Counts in peaks for CTCF")
   lm1<-lm(rowMeans(jg.controlCountsUntreated) ~ 0 + rowMeans(jg.controlCountsTreated))
-
+  
   abline(c(0,lm1$coef),col="red3")
   print(lm1$coefficients)
   angularcoeff<-lm1$coef[1]
@@ -50,7 +52,7 @@ jg.getNormalizationCoefficient<-function(jg.controlCountsTreated,jg.controlCount
   return(lm1$coef[1])
 }
 
-jg.MAplot<-function(jg.experimentPeakset,jg.controlPeakset,jg.untreatedNames,jg.treatedNames,jg.coefficient)
+jg.plotMA<-function(jg.experimentPeakset,jg.controlPeakset,jg.untreatedNames,jg.treatedNames,jg.coefficient)
 {
   M_corrected<-apply(jg.experimentPeakset[-c(1:3)],1,function(x){
     untreated<-mean(x[jg.untreatedNames])
@@ -104,7 +106,7 @@ jg.dbaGetPeakset <-function(dba)
   jg.peakset<-dba.peakset(dba, bRetrieve = T, DataType = DBA_DATA_FRAME)
   #Correct sample names back to that in sample sheet, 
   #as DiffBind changes them on export.
-
+  
   jg.sampleIds<-dba$samples[,'SampleID']
   names(jg.peakset)<-c("CHR","START","END",jg.sampleIds)
   return(jg.peakset)
@@ -159,8 +161,8 @@ checkUsage(jd.applyNormalisation)
 setwd("/Volumes/FlyPeaks/FlyPeaks")
 dbaSummits                <- 200
 jg.controlMinOverlap      <- 5
-jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX8047_dm.csv"
-jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX8047_hs.csv"
+jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX14229_hs_CTCF_DBA.csv"
+jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX14229_hs_ER_DBA.csv"
 jg.treatedCondition       =  "Fulvestrant"
 jg.untreatedCondition     =  "none"
 
@@ -215,7 +217,7 @@ jg.coefficient<-jg.getNormalizationCoefficient(jg.controlCountsTreated,
 
 
 #Check by MA plot (Optional)
-jg.MAplot(jg.experimentPeakset,jg.controlPeakset,jg.untreatedNames,jg.treatedNames,jg.coefficient)
+jg.plotMA(jg.experimentPeakset,jg.controlPeakset,jg.untreatedNames,jg.treatedNames,jg.coefficient)
 
 #DeSeq called by Diffbind will divide though by library size to normalise, 
 #and therefore partially undo our work. Solution is to correct our normalisation
@@ -225,22 +227,22 @@ jg.MAplot(jg.experimentPeakset,jg.controlPeakset,jg.untreatedNames,jg.treatedNam
 jg.correctionFactor<-jg.getCorrectionFactor(jg.experimentSampleSheet,
                                             jg.treatedNames,
                                             jg.untreatedNames
-                                            )
+)
 
 #Apply coefficent and control factor
 jg.experimentPeaksetNormalised<-jd.applyNormalisation(jg.experimentPeakset,
                                                       jg.coefficient,
-                                                      jg.correctionFactor
+                                                      jg.correctionFactor,
                                                       jg.treatedNames
-                                                      )
- 
+)
+
 
 #Return values to Diffbind and plot normalised result.
 jg.dba <- DiffBind:::pv.resetCounts(dbaExperiment,
                                     jg.experimentPeaksetNormalised
-                                    )
-             
-#Analyze and plot with Diffbind                                                           
+)
+
+#Analyze and plot with Diffbind      
 jg.dba_analysis<-dba.analyze(jg.dba)
 dba.plotMA(jg.dba_analysis)
 

@@ -1,7 +1,9 @@
 
 library(DiffBind)
 library(Rsamtools)
-library(codetools) 
+library(codetools)
+library(DESeq2)
+library(lattice)
 
 ######################
 #
@@ -29,7 +31,7 @@ jg.plotNormalization<-function(jg.controlCountsTreated,jg.controlCountsUntreated
 {
   plot(rowMeans(jg.controlCountsTreated),rowMeans(jg.controlCountsUntreated), pch=20,
        xlab="Counts in peak after treatment" ,  ylab="Counts in peak before treatment" ,
-       main="Comparision of Counts in peaks for Drosophila")
+       main="Comparision of Counts in peaks for CTCF")
   lm1<-lm(rowMeans(jg.controlCountsUntreated) ~ 0 + rowMeans(jg.controlCountsTreated))
 
   abline(c(0,lm1$coef),col="red3")
@@ -50,7 +52,7 @@ jg.getNormalizationCoefficient<-function(jg.controlCountsTreated,jg.controlCount
   return(lm1$coef[1])
 }
 
-jg.MAplot<-function(jg.experimentPeakset,jg.controlPeakset,jg.untreatedNames,jg.treatedNames,jg.coefficient)
+jg.plotMA<-function(jg.experimentPeakset,jg.controlPeakset,jg.untreatedNames,jg.treatedNames,jg.coefficient)
 {
   M_corrected<-apply(jg.experimentPeakset[-c(1:3)],1,function(x){
     untreated<-mean(x[jg.untreatedNames])
@@ -139,6 +141,18 @@ jd.applyNormalisation<-function(jg.experimentPeakset,jg.coefficient, jg.correcti
 }
 
 
+plot.ma.lattice <- function(ma.df, filename = 'file.name', p = 0.01, title.main = "Differential ChIP",log2fold =0.5)
+{;
+  #Adapted from ....
+  #pdf(paste("MA_plot", filename, ".pdf", sep=''), width=3.83, height=3.83);
+  print(xyplot(ma.df$log2FoldChange ~ log(ma.df$baseMean, base=10),
+               groups=(ma.df$padj < p & abs(ma.df$log2FoldChange) > log2fold & !is.na(ma.df$padj)),
+               col=c("black","red"), main=title.main, scales="free", aspect=1, pch=20, cex=0.5,
+               ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),
+               par.settings=list(par.xlab.text=list(cex=1.1,font=2), par.ylab.text=list(cex=1.1,font=2))));
+  #dev.off()
+}
+
 #Check Functions
 checkUsage(jg.countAlignedMReads)
 checkUsage(jg.getControlCounts)
@@ -159,8 +173,8 @@ checkUsage(jd.applyNormalisation)
 setwd("/Volumes/FlyPeaks/FlyPeaks")
 dbaSummits                <- 200
 jg.controlMinOverlap      <- 5
-jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX8047_dm.csv"
-jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX8047_hs.csv"
+jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX14229_hs_CTCF_DBA.csv"
+jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX14229_hs_ER_DBA.csv"
 jg.treatedCondition       =  "Fulvestrant"
 jg.untreatedCondition     =  "none"
 
@@ -192,62 +206,88 @@ jg.sampleIds <- jg.getSampleIds(jg.controlSampleSheet)
 jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
 jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl)
 
+#Convert Peakset to DeSeq Workflow
+jg.controlPeaksetDeSeq<-jg.controlPeakset[-c(1:3)]
+row.names(jg.controlPeaksetDeSeq)<-
+   paste(jg.controlPeakset[,1], ':', jg.controlPeakset[,2], '-', jg.controlPeakset[,3], sep='')
+  
+#Establish size factors directly from Control data
+jf.controlSizeFactors = estimateSizeFactorsForMatrix(jg.controlPeaksetDeSeq)
 
-#Get counts for each condition
-jg.controlCountsTreated<-jg.getControlCounts(jg.controlPeakset, 
-                                             jg.controlSampleSheet,
-                                             jg.treatedCondition)
-jg.controlCountsUntreated<-jg.getControlCounts(jg.controlPeakset,
-                                               jg.controlSampleSheet,
-                                               jg.untreatedCondition)
+#Get conditions dataframe for DeSeq
+jf.conditions <- read.csv(file=jg.controlSampleSheet, header=TRUE, sep=",")['Condition']
 
-#Get sample names for conditions
-jg.untreatedNames <- names(jg.controlCountsUntreated)
-jg.treatedNames   <- names(jg.controlCountsTreated)
+#Run DeSeq on control
+jg.controlDeSeq = DESeqDataSetFromMatrix(jg.controlPeaksetDeSeq, jf.conditions, ~Condition)
+jg.controlDeSeq = estimateSizeFactors(jg.controlDeSeq)
+jg.controlDeSeq = estimateDispersions(jg.controlDeSeq)
+jg.controlDeSeq = nbinomWaldTest(jg.controlDeSeq)
+jg.controlResultsDeseq   = results(jg.controlDeSeq)
 
-##Plot showing normalization calculation (Optional)
-jg.plotNormalization(jg.controlCountsTreated,
-                     jg.controlCountsUntreated)
+#Repeat for experiment
 
-##Get Normalization Coefficient
-jg.coefficient<-jg.getNormalizationCoefficient(jg.controlCountsTreated,
-                                               jg.controlCountsUntreated)
+#Convert experiment Peakset to DeSeq Workflow
+jg.experimentPeaksetDeSeq<-jg.experimentPeakset[-c(1:3)]
+row.names(jg.experimentPeaksetDeSeq)<-
+  paste(jg.experimentPeakset[,1], ':', jg.experimentPeakset[,2], '-', jg.experimentPeakset[,3], sep='')
+
+jg.experimentDeSeq = DESeqDataSetFromMatrix(jg.experimentPeaksetDeSeq, jf.conditions, ~Condition)
+sizeFactors(jg.experimentDeSeq) = jf.controlSizeFactors #Use control size factors
+jg.experimentDeSeq         = estimateDispersions(jg.experimentDeSeq)
+jg.experimentDeSeq = nbinomWaldTest(jg.experimentDeSeq)
+jg.experimentResultsDeseq   = results(jg.experimentDeSeq)
+
+plot.ma.lattice(jg.controlResultsDeseq, p=0.01, filename = 'test.ctcf')
+plot.ma.lattice(jg.experimentResultsDeseq, p=0.01 ,filename = 'er.ctcf')
+
+#Repeat not using out control
+jg.experimentDeSeqInternal = estimateSizeFactors(jg.experimentDeSeq)
+jg.experimentDeSeqInternal = nbinomWaldTest(jg.experimentDeSeqInternal)
+jg.experimentResultsDeseqInternal   = results(jg.experimentDeSeqInternal)
+
+plot.ma.lattice(jg.experimentResultsDeseqInternal, p=0.01, filename = 'test.ctcf')
+
+#Just drawing figure
+jg.controlResultsDeseq$group = 'a'
+jg.experimentResultsDeseq$group = 'b'
+
+padjX = 0.01
+
+for (i in 1:length(jg.experimentResultsDeseq$group)) {
+  if (!is.na(jg.experimentResultsDeseq$padj[i]) & !is.na(jg.experimentResultsDeseq$log2FoldChange[i]) & jg.experimentResultsDeseq$padj[i] < padjX & jg.experimentResultsDeseq$log2FoldChange[i] < 0) {
+    jg.experimentResultsDeseq$group[i] <- 'c'
+  }
+  else if (!is.na(jg.experimentResultsDeseq$padj[i]) & !is.na(jg.experimentResultsDeseq$log2FoldChange[i]) & jg.experimentResultsDeseq$padj[i] < padjX & jg.experimentResultsDeseq$log2FoldChange[i] > 0) {
+    jg.experimentResultsDeseq$group[i] <- 'd'
+  }
+}
+
+for (i in 1:length(jg.controlResultsDeseq$group)) {
+  if (!is.na(jg.controlResultsDeseq$padj[i]) & !is.na(jg.controlResultsDeseq$log2FoldChange[i]) & jg.controlResultsDeseq$padj[i] < padjX & jg.controlResultsDeseq$log2FoldChange[i] < 0) {
+    jg.controlResultsDeseq$group[i] <- 'e'
+  }
+  else if (!is.na(jg.controlResultsDeseq$padj[i]) & !is.na(jg.controlResultsDeseq$log2FoldChange[i]) & jg.controlResultsDeseq$padj[i] < padjX & jg.controlResultsDeseq$log2FoldChange[i] > 0) {
+    jg.controlResultsDeseq$group[i] <- 'f'
+  }
+}
 
 
-#Check by MA plot (Optional)
-jg.MAplot(jg.experimentPeakset,jg.controlPeakset,jg.untreatedNames,jg.treatedNames,jg.coefficient)
 
-#DeSeq called by Diffbind will divide though by library size to normalise, 
-#and therefore partially undo our work. Solution is to correct our normalisation
-#factor to with this correction factor to remove library size part of our 
-#NormalisationFactor.
 
-jg.correctionFactor<-jg.getCorrectionFactor(jg.experimentSampleSheet,
-                                            jg.treatedNames,
-                                            jg.untreatedNames
-                                            )
+full.res = rbind(jg.controlResultsDeseq, jg.experimentResultsDeseq)
 
-#Apply coefficent and control factor
-jg.experimentPeaksetNormalised<-jd.applyNormalisation(jg.experimentPeakset,
-                                                      jg.coefficient,
-                                                      jg.correctionFactor
-                                                      jg.treatedNames
-                                                      )
- 
+#pdf('Holding_plot.pdf', width=3.5, height=3.5, useDingbats=FALSE)
+xyplot(full.res$log2FoldChange ~ log(full.res$baseMean, base=10), data = full.res,
+       groups=full.res$group,
+       col=c("grey40","grey80",  "#ff5454", "#5480ff", "#750505", "#08298a"),
+       ylab = expression('log'[2]*' Differential ChIP'),
+       xlab = expression("log"[10]~"Mean of Normalized Counts"),
+       aspect=1.0,
+       pch=16,
+       cex=0.5,
+       scales=list(x=list(cex=0.8, relation = "free"), y =list(cex=0.8, relation="free")),
+       between=list(y=0.5, x=0.5),
+)
+#dev.off()
 
-#Return values to Diffbind and plot normalised result.
-jg.dba <- DiffBind:::pv.resetCounts(dbaExperiment,
-                                    jg.experimentPeaksetNormalised
-                                    )
-             
-#Analyze and plot with Diffbind                                                           
-jg.dba_analysis<-dba.analyze(jg.dba)
-dba.plotMA(jg.dba_analysis)
-
-#Original vs Normalised data for comparison
-dba_analysis<-dba.analyze(dbaExperiment)
-par(mfrow=c(1,2))
-dba.plotMA(dba_analysis)
-dba.plotMA(jg.dba_analysis)
-par(mfrow=c(1,1))
 
