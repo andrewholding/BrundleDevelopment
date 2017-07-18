@@ -227,6 +227,9 @@ jg.correctionFactor<-jg.getCorrectionFactor(jg.experimentSampleSheet,
                                             jg.untreatedNames
                                             )
 
+#Try setting Reads to unity instead
+jg.correctionFactor<-1
+
 #Apply coefficent and control factor
 jg.experimentPeaksetNormalised<-jd.applyNormalisation(jg.experimentPeakset,
                                                       jg.coefficient,
@@ -239,7 +242,8 @@ jg.experimentPeaksetNormalised<-jd.applyNormalisation(jg.experimentPeakset,
 jg.dba <- DiffBind:::pv.resetCounts(dbaExperiment,
                                     jg.experimentPeaksetNormalised
                                     )
-             
+jg.dba$class["Reads",]<-as.numeric(jg.dba$class["Reads",])*0+1  
+           
 #Analyze and plot with Diffbind                                                           
 jg.dba_analysis<-dba.analyze(jg.dba)
 dba.plotMA(jg.dba_analysis)
