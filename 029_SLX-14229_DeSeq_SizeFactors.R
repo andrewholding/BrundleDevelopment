@@ -284,12 +284,12 @@ jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX14229_hs_ER_DBA.csv"
 #loading of data which can be slow.
 
 #Note if comparing with 028 use 
-#filename<-"Rdata/028_SLX-14229_dba_human_ER_CTCF.rda"
+filename<-"Rdata/028_SLX-14229_dba_human_ER_CTCF.rda"
 #As there seems to be seed involved in counting which gives
 #a small variance to the the results which is best avoided.
 
 
-filename<-"Rdata/029_SLX-14229_dba_human_ER_CTCF.rda"
+#filename<-"Rdata/029_SLX-14229_dba_human_ER_CTCF.rda"
 if(!file.exists(filename)){
   dbaExperiment <- jg.getDba(jg.experimentSampleSheet,   dbaSummits)
   dbaControl    <- jg.getDba(jg.controlSampleSheet,   dbaSummits)
