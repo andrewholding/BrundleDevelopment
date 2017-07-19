@@ -95,7 +95,7 @@ jg.getDba<-function (jg.experimentSampleSheet,dbaSummits)
 {
   
   dba <- dba(sampleSheet = jg.experimentSampleSheet)
-  dba <- dba.count(dba, summits=dbaSummits)
+  dba <- dba.count(dba)# summits=dbaSummits
   dba <- dba.count(dba, peaks=NULL, score=DBA_SCORE_READS)
   return(dba)
 }
@@ -143,7 +143,7 @@ jd.applyNormalisation<-function(jg.experimentPeakset,jg.coefficient, jg.correcti
 
 jg.plotDeSeq<- function(ma.df, filename = 'file.name', p = 0.01, title.main = "Differential ChIP",log2fold =0.5)
 {;
- xyplot(ma.df$log2FoldChange ~ log(ma.df$baseMean, base=10),
+ xyplot(-ma.df$log2FoldChange ~ log(ma.df$baseMean, base=10),
                groups=(ma.df$padj < p & abs(ma.df$log2FoldChange) > log2fold & !is.na(ma.df$padj)),
                col=c("black","red"), main=title.main, scales="free", aspect=1, pch=20, cex=0.5,
                ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),
@@ -178,9 +178,9 @@ jg.plotDeSeqCombined <- function(jg.controlResultsDeseq,jg.experimentResultsDese
   full.res = rbind(jg.controlResultsDeseq, jg.experimentResultsDeseq)
   
   
-  xyplot(full.res$log2FoldChange ~ log(full.res$baseMean, base=10), data = full.res,
+  xyplot(-full.res$log2FoldChange ~ log(full.res$baseMean, base=10), data = full.res,
          groups=full.res$group,
-         col=c("grey40","grey80",  "#ff5454", "#5480ff", "#750505", "#08298a"),
+         col=c("grey40","grey80",  "#5480ff","#ff5454",  "#08298a","#750505"),
          ylab = expression('log'[2]*' Differential ChIP'),
          xlab = expression("log"[10]~"Mean of Normalized Counts"),
          aspect=1.0,
@@ -361,10 +361,10 @@ dbaExperimentCorrected<-jg.correctDBASizeFactors(dbaExperiment,
 #Plot DiffBind MA - Before and After
 png("plots/029_SLX-14229_DiffBind_Analysis_ER_nocorrection.png")
   dbaExperimentAnalysis<-dba.analyze(dbaExperiment)
-  dba.plotMA(dbaExperimentAnalysis)
+  dba.plotMA(dbaExperimentAnalysis, bFlip=TRUE)
 dev.off()
   
 png("plots/029_SLX-14229_DiffBind_Analysis_ER.png")
   dbaExperimentAnalysisCorrected<-dba.analyze(dbaExperimentCorrected)
-  dba.plotMA(dbaExperimentAnalysisCorrected)
+  dba.plotMA(dbaExperimentAnalysisCorrected, bFlip=TRUE)
 dev.off()

@@ -229,6 +229,7 @@ jg.correctionFactor<-jg.getCorrectionFactor(jg.experimentSampleSheet,
                                             jg.untreatedNames
 )
 
+
 #Apply coefficent and control factor
 jg.experimentPeaksetNormalised<-jd.applyNormalisation(jg.experimentPeakset,
                                                       jg.coefficient,
@@ -241,6 +242,7 @@ jg.experimentPeaksetNormalised<-jd.applyNormalisation(jg.experimentPeakset,
 jg.dba <- DiffBind:::pv.resetCounts(dbaExperiment,
                                     jg.experimentPeaksetNormalised
 )
+
 
 #Analyze and plot with Diffbind      
 jg.dba_analysis<-dba.analyze(jg.dba)
