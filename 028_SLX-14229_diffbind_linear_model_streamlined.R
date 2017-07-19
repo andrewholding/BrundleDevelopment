@@ -184,8 +184,16 @@ jg.untreatedCondition     =  "none"
 # to output as a the DiffBind object for downstream processing.
 #
 
-dbaExperiment <- jg.getDba(jg.experimentSampleSheet,dbaSummits)
-dbaControl    <- jg.getDba(jg.controlSampleSheet,   dbaSummits)
+filename<-"Rdata/028_SLX-14229_dba_human_ER_CTCF.rda"
+if(!file.exists(filename)){
+  dbaExperiment <- jg.getDba(jg.experimentSampleSheet,dbaSummits)
+  dbaControl    <- jg.getDba(jg.controlSampleSheet,   dbaSummits)
+  save(dbaExperiment,dbaControl,file=filename)
+} else {
+  load(filename)
+}
+
+
 
 #Load Sample Ids from control sample sheet.
 jg.sampleIds <- jg.getSampleIds(jg.controlSampleSheet)
@@ -246,12 +254,21 @@ jg.dba <- DiffBind:::pv.resetCounts(dbaExperiment,
 
 #Analyze and plot with Diffbind      
 jg.dba_analysis<-dba.analyze(jg.dba)
-dba.plotMA(jg.dba_analysis)
+png("plots/028_SLX-14229_DiffBind_Analysis.png")
+  dba.plotMA(jg.dba_analysis,bFlip=TRUE)
+dev.off()
+
+#Analyze and plot with Diffbind      
+dba_analysis<-dba.analyze(dbaExperiment)
+png("plots/028_SLX-14229_DiffBind_Analysis_no_correction.png")
+dba.plotMA(dba_analysis,bFlip=TRUE)
+dev.off()
+
 
 #Original vs Normalised data for comparison
-dba_analysis<-dba.analyze(dbaExperiment)
-par(mfrow=c(1,2))
-dba.plotMA(dba_analysis)
-dba.plotMA(jg.dba_analysis)
-par(mfrow=c(1,1))
-
+png("plots/028_SLX-14229_DiffBind_Analysis_Before_After.png")
+  par(mfrow=c(1,2))
+  dba.plotMA(dba_analysis,bFlip=TRUE)
+  dba.plotMA(jg.dba_analysis,bFlip=TRUE)
+  par(mfrow=c(1,1))
+  dev.off()

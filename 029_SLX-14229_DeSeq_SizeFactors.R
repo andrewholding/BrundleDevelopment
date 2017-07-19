@@ -283,6 +283,12 @@ jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX14229_hs_ER_DBA.csv"
 #The key function is jg.getDba, the saving of file is to speed up the 
 #loading of data which can be slow.
 
+#Note if comparing with 028 use 
+#filename<-"Rdata/028_SLX-14229_dba_human_ER_CTCF.rda"
+#As there seems to be seed involved in counting which gives
+#a small variance to the the results which is best avoided.
+
+
 filename<-"Rdata/029_SLX-14229_dba_human_ER_CTCF.rda"
 if(!file.exists(filename)){
   dbaExperiment <- jg.getDba(jg.experimentSampleSheet,   dbaSummits)
@@ -361,10 +367,10 @@ dbaExperimentCorrected<-jg.correctDBASizeFactors(dbaExperiment,
 #Plot DiffBind MA - Before and After
 png("plots/029_SLX-14229_DiffBind_Analysis_ER_nocorrection.png")
   dbaExperimentAnalysis<-dba.analyze(dbaExperiment)
-  dba.plotMA(dbaExperimentAnalysis, bFlip=TRUE)
+  dba.plotMA(dbaExperimentAnalysis,bFlip=TRUE)
 dev.off()
   
 png("plots/029_SLX-14229_DiffBind_Analysis_ER.png")
   dbaExperimentAnalysisCorrected<-dba.analyze(dbaExperimentCorrected)
-  dba.plotMA(dbaExperimentAnalysisCorrected, bFlip=TRUE)
+  dba.plotMA(dbaExperimentAnalysisCorrected,bFlip=TRUE)
 dev.off()
