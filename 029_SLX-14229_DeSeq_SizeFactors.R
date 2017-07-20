@@ -374,3 +374,19 @@ png("plots/029_SLX-14229_DiffBind_Analysis_ER.png")
   dbaExperimentAnalysisCorrected<-dba.analyze(dbaExperimentCorrected)
   dba.plotMA(dbaExperimentAnalysisCorrected,bFlip=TRUE)
 dev.off()
+
+#Count number of differntially bound CTCF sites
+#Less than FDR.
+nrow(jg.controlResultsDeseq)
+
+#Signficant
+jg.DeSeqSignificant <- jg.controlResultsDeseq$"padj" < 0.01 & !is.na(jg.controlResultsDeseq$"padj")
+nrow(jg.controlResultsDeseq[jg.DeSeqSignificant,])
+#Up (not < 0 as we have to flip data to plot)
+jg.DeSeqSignificantUp <- jg.controlResultsDeseq[jg.DeSeqSignificant,]$"log2FoldChange" < 0
+nrow(jg.controlResultsDeseq[jg.DeSeqSignificant,][jg.DeSeqSignificantUp,])
+#Down
+jg.DeSeqSignificantDown <- jg.controlResultsDeseq[jg.DeSeqSignificant,]$"log2FoldChange" > 0
+nrow(jg.controlResultsDeseq[jg.DeSeqSignificant,][jg.DeSeqSignificantDown,])
+
+
