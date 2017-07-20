@@ -159,8 +159,8 @@ checkUsage(jd.applyNormalisation)
 setwd("/Volumes/FlyPeaks/FlyPeaks")
 dbaSummits                <- 200
 jg.controlMinOverlap      <- 5
-jg.controlSampleSheet     <- "samplesheet/titration/samplesheet_SLX8047_dm.csv"
-jg.experimentSampleSheet  <- "samplesheet/titration/samplesheet_SLX8047_hs.csv"
+jg.controlSampleSheet     <- "samplesheet/titration/samplesheet_SLX8047_dm_A50.csv"
+jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX8047_hs.csv"
 jg.treatedCondition       =  "Fulvestrant"
 jg.untreatedCondition     =  "none"
 
