@@ -195,6 +195,7 @@ if(!file.exists(filename)){
 
 
 
+
 #Load Sample Ids from control sample sheet.
 jg.sampleIds <- jg.getSampleIds(jg.controlSampleSheet)
 
@@ -272,3 +273,9 @@ png("plots/028_SLX-14229_DiffBind_Analysis_Before_After.png")
   dba.plotMA(jg.dba_analysis,bFlip=TRUE)
   par(mfrow=c(1,1))
   dev.off()
+  
+#FRiP Comparision
+
+mean(as.numeric(dbaExperiment$SN))    #2%  Reads in ER Peaks 
+mean(as.numeric(dbaControl$SN))       #42% Reads in CTCF Peaks
+
