@@ -194,4 +194,63 @@ legend("bottomright",legend=c("Human ER", "Human CTCF"),pch=20,col=c("purple","b
 
 dev.off()
 
+### Trying to set up for diffbind
 
+hscounts_ER<-hscounts_ER/(colSums(hscounts_ER)/mean(colSums(hscounts_ER)))
+hscounts_CTCF<-hscounts_CTCF/(colSums(hscounts_CTCF, na.rm=T)/mean(colSums(hscounts_CTCF, na.rm=T)))
+
+#Recalculate MA
+
+
+Mhs_ER<-apply(hscounts_ER,1,function(x){
+  fulvestrant<-mean(x[c(2,4,5)])
+  untreated<-mean(x[c(1,3,6)])
+  fc<-mean(fulvestrant)/mean(untreated)
+  log2fc<-log2(fc)
+  return(log2fc)
+})
+Ahs_ER<-apply(hscounts_ER,1,function(x){
+  return(log10(sum(x)))
+})
+
+Mhs_CTCF<-apply(hscounts_CTCF,1,function(x){
+  fulvestrant<-mean(x[c(2,4,5)])
+  untreated<-mean(x[c(1,3,6)])
+  fc<-mean(fulvestrant)/mean(untreated)
+  log2fc<-log2(fc)
+  return(log2fc)
+})
+Ahs_CTCF<-apply(hscounts_CTCF,1,function(x){
+  return(log10(sum(x)))
+})
+
+
+#Replot
+plot(Ahs_ER,MhsFit_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Corrected local normalised counts in peaks")
+points(Ahs_CTCF,MhsFit_CTCF,pch=20,col="gray")
+abline(h=0)
+legend("topright",legend=c("Human ER",  "Human CTCF"),pch=20,col=c("black","gray"), cex=0.5)
+lm1<-lm(MhsFit_CTCF~Ahs_CTCF)
+abline(lm1$coef,col="blue")
+lm1<-lm(MhsFit_ER~Ahs_ER)
+abline(lm1$coef,col="purple")
+legend("bottomright",legend=c("Human ER", "Human CTCF"),pch=20,col=c("purple","blue"), cex=0.5)
+
+#Look at it in DB
+library(DiffBind)
+dba <- dba(sampleSheet = "samplesheet/samplesheet_SLX14229_hs_ER.csv")
+dba <- dba.count(dba, summits=200)
+dba <- dba.count(dba, peaks=NULL, score=DBA_SCORE_READS)
+sampleIds<-as.character(read.csv(file="samplesheet/samplesheet_SLX14229_hs_ER.csv", header=TRUE, sep=",")[,'SampleID'])
+
+dbaPeakset<-dba.peakset(dba, bRetrieve = T, DataType = DBA_DATA_FRAME)
+names(dbaPeakset)<-c("CHR","START","END",sampleIds)
+
+dbaPeakset[-c(1:3)]<-hscounts_ER
+
+dba <- DiffBind:::pv.resetCounts(dba, dbaPeakset)
+dba$class["Reads",]<-as.numeric(dba$class["Reads",])*0+1
+dba.analysis<-dba.analyze(dba)
+dba.plotMA(dba.analysis,bFlip=TRUE)
+
+#Worse than other methods so not followed up. 
