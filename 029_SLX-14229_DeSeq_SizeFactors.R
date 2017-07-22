@@ -85,13 +85,15 @@ jg.experimentResultsDeseq   = results(jg.experimentDeSeq)
 png("plots/029_SLX-14229_DeSeq_Analysis_ER.png")
   jg.plotDeSeq(jg.controlResultsDeseq,
                p=0.01, 
-               title.main="Fold-change in CTCF binding"
+               title.main="Fold-change in CTCF binding",
+               flip=T
                )
 dev.off()
 png("plots/029_SLX-14229_DeSeq_Analysis_CTCF.png")
 jg.plotDeSeq(jg.experimentResultsDeseq,
              p=0.01,
-             title.main="Fold-change in ER binding"
+             title.main="Fold-change in ER binding",
+             flip=T
              )
 dev.off()
 
@@ -102,7 +104,9 @@ jg.experimentResultsDeseqInternal   = results(jg.experimentDeSeqInternal)
 png("plots/029_SLX-14229_DeSeq_Analysis_ER_nocorrection.png")
   jg.plotDeSeq(jg.experimentResultsDeseqInternal,
                title.main="Fold-change in ER binding (no correction)",
-               p=0.01)
+               p=0.01,
+               flip=T
+               )
 dev.off()
 
 
@@ -111,7 +115,7 @@ png("plots/029_SLX-14229_DeSeq_Analysis_ER_CTCF.png")
   jg.plotDeSeqCombined(jg.controlResultsDeseq,
                        jg.experimentResultsDeseq,
                        title.main="ER and CTCF Binding Folding changes on ER treatment",
-                       p=0.01)
+                       p=0.01,flip=TRUE)
 dev.off()
 
 

@@ -147,9 +147,15 @@ jd.applyNormalisation<-function(jg.experimentPeakset,jg.coefficient, jg.correcti
 }
 
 
-jg.plotDeSeq<- function(ma.df, filename = 'file.name', p = 0.01, title.main = "Differential ChIP",log2fold =0.5)
+jg.plotDeSeq<- function(ma.df, filename = 'file.name', p = 0.01, title.main = "Differential ChIP",log2fold =0.5, flip=FALSE)
 {;
-  xyplot(-ma.df$log2FoldChange ~ log(ma.df$baseMean, base=10),
+  
+  if (flip == TRUE)
+  {
+    ma.df$log2FoldChange <- -ma.df$log2FoldChange
+  }
+  
+  xyplot(ma.df$log2FoldChange ~ log(ma.df$baseMean, base=10),
          groups=(ma.df$padj < p & abs(ma.df$log2FoldChange) > log2fold & !is.na(ma.df$padj)),
          col=c("black","red"), main=title.main, scales="free", aspect=1, pch=20, cex=0.5,
          ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),
@@ -170,19 +176,19 @@ jg.plotDeSeqCombined <- function(jg.controlResultsDeseq,jg.experimentResultsDese
   
   for (i in 1:length(jg.experimentResultsDeseq$group)) {
     if (!is.na(jg.experimentResultsDeseq$padj[i]) & !is.na(jg.experimentResultsDeseq$log2FoldChange[i]) & jg.experimentResultsDeseq$padj[i] < padjX & jg.experimentResultsDeseq$log2FoldChange[i] < 0) {
-      jg.experimentResultsDeseq$group[i] <- 'c'
+      jg.experimentResultsDeseq$group[i] <- 'd'
     }
     else if (!is.na(jg.experimentResultsDeseq$padj[i]) & !is.na(jg.experimentResultsDeseq$log2FoldChange[i]) & jg.experimentResultsDeseq$padj[i] < padjX & jg.experimentResultsDeseq$log2FoldChange[i] > 0) {
-      jg.experimentResultsDeseq$group[i] <- 'd'
+      jg.experimentResultsDeseq$group[i] <- 'c'
     }
   }
   
   for (i in 1:length(jg.controlResultsDeseq$group)) {
     if (!is.na(jg.controlResultsDeseq$padj[i]) & !is.na(jg.controlResultsDeseq$log2FoldChange[i]) & jg.controlResultsDeseq$padj[i] < padjX & jg.controlResultsDeseq$log2FoldChange[i] < 0) {
-      jg.controlResultsDeseq$group[i] <- 'e'
+      jg.controlResultsDeseq$group[i] <- 'f'
     }
     else if (!is.na(jg.controlResultsDeseq$padj[i]) & !is.na(jg.controlResultsDeseq$log2FoldChange[i]) & jg.controlResultsDeseq$padj[i] < padjX & jg.controlResultsDeseq$log2FoldChange[i] > 0) {
-      jg.controlResultsDeseq$group[i] <- 'f'
+      jg.controlResultsDeseq$group[i] <- 'e'
     }
   }
   

@@ -72,9 +72,10 @@ jg.untreatedNames <- names(jg.controlCountsUntreated)
 jg.treatedNames   <- names(jg.controlCountsTreated)
 
 ##Plot showing normalization calculation (Optional)
-jg.plotNormalization(jg.controlCountsTreated,
+png("plots/028_SLX-14229_Normalization.png")
+  jg.plotNormalization(jg.controlCountsTreated,
                      jg.controlCountsUntreated)
-
+dev.off()
 ##Get Normalization Coefficient
 jg.coefficient<-jg.getNormalizationCoefficient(jg.controlCountsTreated,
                                                jg.controlCountsUntreated)

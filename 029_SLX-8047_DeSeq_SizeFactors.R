@@ -81,13 +81,15 @@ jg.experimentResultsDeseq   = results(jg.experimentDeSeq)
 png("plots/029_SLX-8047_DeSeq_Analysis_H2av.png")
   jg.plotDeSeq(jg.controlResultsDeseq,
                p=0.01, 
-               title.main="Fold-change in H2av binding"
+               title.main="Fold-change in H2av binding",
+               flip=T
                )
 dev.off()
 png("plots/029_SLX-8047_DeSeq_Analysis_ER.png")
 jg.plotDeSeq(jg.experimentResultsDeseq,
              p=0.01,
-             title.main="Fold-change in ER binding"
+             title.main="Fold-change in ER binding",
+             flip=T
              )
 dev.off()
 
@@ -98,7 +100,9 @@ jg.experimentResultsDeseqInternal   = results(jg.experimentDeSeqInternal)
 png("plots/029_SLX-8047_DeSeq_Analysis_ER_nocorrection.png")
   jg.plotDeSeq(jg.experimentResultsDeseqInternal,
                title.main="Fold-change in ER binding (no correction)",
-               p=0.01)
+               p=0.01,
+               flip=T
+               )
 dev.off()
 
 
