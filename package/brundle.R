@@ -138,7 +138,7 @@ jg.getCorrectionFactor <-function (jg.experimentSampleSheet,jg.treatedNames,jg.u
   return(jg.correctionFactor) 
 }
 
-jd.applyNormalisation<-function(jg.experimentPeakset,jg.coefficient, jg.correctionFactor,jg.treatedNames)
+jg.applyNormalisation<-function(jg.experimentPeakset,jg.coefficient, jg.correctionFactor,jg.treatedNames)
 {
   jg.experimentPeaksetNormalised<-jg.experimentPeakset
   jg.experimentPeaksetNormalised[jg.treatedNames]<-
@@ -259,7 +259,7 @@ checkUsage(jg.getDba)
 checkUsage(jg.dbaGetPeakset)
 checkUsage(jg.getSampleIds)
 checkUsage(jg.getCorrectionFactor)
-checkUsage(jd.applyNormalisation)
+checkUsage(jg.applyNormalisation)
 checkUsage(jg.plotDeSeq)
 checkUsage(jg.plotDeSeqCombined)
 checkUsage(jg.convertPeakset)

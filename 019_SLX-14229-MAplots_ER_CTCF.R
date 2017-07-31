@@ -98,8 +98,8 @@ A_RPM_ER<-apply(hsrpm_ER,1,function(x){
 })
 
 
-png("plots/019_SLX-14229_MA_RPM_HsMm_ER.png",w=1000,h=1000,p=30)
-plot(A_RPM_ER,M_RPM_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="RPM aligned reads")
+png("plots/019_SLX-14229_MA_RPM_HsMm_ER.png")
+plot(A_RPM_ER,M_RPM_ER,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="RPM aligned reads")
 abline(h=0)
 
 dev.off()
@@ -120,31 +120,31 @@ A_RPM_CTCF<-apply(hsrpm_CTCF,1,function(x){
   return(log10(sum(x)))
 })
 
-png("plots/019_SLX-14229_MA_RPM_HsMm_ER_CTCF.png",w=1000,h=1000,p=30)
-plot(A_RPM_ER,M_RPM_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="RPM aligned reads")
+png("plots/019_SLX-14229_MA_RPM_HsMm_ER_CTCF.png")
+plot(A_RPM_ER,M_RPM_ER,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="RPM aligned reads")
 points(A_RPM_CTCF,M_RPM_CTCF,pch=20,col="gray")
 lm1<-lm(M_RPM_CTCF~A_RPM_CTCF)
 abline(lm1$coef,col="blue")
 abline(h=0)
 dev.off()
 
-png("plots/019_SLX-14229_MA_counts_HsMm_ERonly.png",w=1000,h=1000,p=30)
-plot(Ahs_ER,Mhs_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Raw counts in peaks")
+png("plots/019_SLX-14229_MA_counts_HsMm_ERonly.png")
+plot(Ahs_ER,Mhs_ER,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Raw counts in peaks")
 abline(h=0)
 
 dev.off()
 
-png("plots/019_SLX-14229_MA_counts_HsMm.png",w=1000,h=1000,p=30)
-plot(Ahs_ER,Mhs_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Raw counts in peaks")
+png("plots/019_SLX-14229_MA_counts_HsMm.png")
+plot(Ahs_ER,Mhs_ER,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Raw counts in peaks")
 points(Ahs_CTCF,Mhs_CTCF,pch=20,col="gray")
 abline(h=0)
-legend("topright",legend=c("Human ER",  "Human CTCF"),pch=20,col=c("black","gray"), cex=0.5)
+legend("topright",legend=c("Human ER",  "Human CTCF"),pch=20,col=c("black","gray"), cex=1)
 
 lm1<-lm(Mhs_CTCF~Ahs_CTCF)
 abline(lm1$coef,col="blue")
 lm1<-lm(Mhs_ER~Ahs_ER)
 abline(lm1$coef,col="purple")
-legend("bottomright",legend=c("Human ER", "Human CTCF"),pch=20,col=c("purple","blue"), cex=0.5)
+legend("bottomright",legend=c("Human ER", "Human CTCF"),pch=20,col=c("purple","blue"), cex=1)
 
 dev.off()
 
@@ -161,44 +161,44 @@ MmmFit_CTCF<-Mmm_CTCF-(Amm_CTCF*angularcoeff)-intercept
 
 
 
-png("plots/019_SLX-14229_MA_counts_HsMm_Normalised.png",w=1000,h=1000,p=30)
-plot(Ahs_ER,MhsFit_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Normalised to Human CTCF")
+png("plots/019_SLX-14229_MA_counts_HsMm_Normalised.png")
+plot(Ahs_ER,MhsFit_ER,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Normalised to Human CTCF")
 points(Ahs_CTCF,MhsFit_CTCF,pch=20,col="gray")
 
 abline(h=0)
-legend("topright",legend=c("Human ER",  "Human CTCF"),pch=20,col=c("black","gray"), cex=0.5)
+legend("topright",legend=c("Human ER",  "Human CTCF"),pch=20,col=c("black","gray"), cex=1)
 
 lm1<-lm(MhsFit_CTCF~Ahs_CTCF)
 abline(lm1$coef,col="blue")
 lm1<-lm(MhsFit_ER~Ahs_ER)
 abline(lm1$coef,col="purple")
-legend("bottomright",legend=c("Human ER", "Human CTCF"),pch=20,col=c("purple","blue"), cex=0.5)
+legend("bottomright",legend=c("Human ER", "Human CTCF"),pch=20,col=c("purple","blue"), cex=1)
 
 dev.off()
 
-png("plots/019_SLX-14229_MA_counts_HsMm_Normalised_Alpha.png",w=1000,h=1000,p=30)
+png("plots/019_SLX-14229_MA_counts_HsMm_Normalised_Alpha.png")
 
-plot(Ahs_ER,MhsFit_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Normalised to Human CTCF",col=alpha("black",0.2))
+plot(Ahs_ER,MhsFit_ER,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Normalised to Human CTCF",col=alpha("black",0.2))
 points(Ahs_CTCF,MhsFit_CTCF,pch=20,col=alpha("gray",0.2))
 
 abline(h=0)
-legend("topright",legend=c("Human ER",  "Human CTCF"),pch=20,col=c("black","gray"), cex=0.5)
+legend("topright",legend=c("Human ER",  "Human CTCF"),pch=20,col=c("black","gray"), cex=1)
 
 lm1<-lm(MhsFit_CTCF~Ahs_CTCF)
 abline(lm1$coef,col="blue")
 lm1<-lm(MhsFit_ER~Ahs_ER)
 abline(lm1$coef,col="purple")
-legend("bottomright",legend=c("Human ER", "Human CTCF"),pch=20,col=c("purple","blue"), cex=0.5)
+legend("bottomright",legend=c("Human ER", "Human CTCF"),pch=20,col=c("purple","blue"), cex=1)
 
 dev.off()
 
-png("plots/019_SLX-14229_Mm_MA_counts_HsMm.png",w=1000,h=1000,p=30)
-plot(Ahs_ER,Mhs_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Raw counts in peaks")
+png("plots/019_SLX-14229_Mm_MA_counts_HsMm.png")
+plot(Ahs_ER,Mhs_ER,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Raw counts in peaks")
 points(Ahs_CTCF,Mhs_CTCF,pch=20,col="gray")
 points(Amm_ER,Mmm_ER,pch=20,col="darkolivegreen3")
 points(Amm_CTCF,Mmm_CTCF,pch=20,col="darkolivegreen")
 abline(h=0)
-legend("topright",legend=c("Mouse ER","Human ER", "Mouse CTCF", "Human CTCF"),pch=20,col=c("darkolivegreen3","black","darkolivegreen3","gray"), cex=0.5)
+legend("topright",legend=c("Mouse ER","Human ER", "Mouse CTCF", "Human CTCF"),pch=20,col=c("darkolivegreen3","black","darkolivegreen3","gray"), cex=1)
 lm1<-lm(Mmm_CTCF~Amm_CTCF)
 abline(lm1$coef,col="red")
 lm1<-lm(Mhs_CTCF~Ahs_CTCF)
@@ -207,7 +207,7 @@ lm1<-lm(Mmm_ER~Amm_ER)
 abline(lm1$coef,col="orange")
 lm1<-lm(Mhs_ER~Ahs_ER)
 abline(lm1$coef,col="purple")
-legend("bottomright",legend=c("Mouse ER","Human ER", "Mouse CTCF", "Human CTCF"),pch=20,col=c("orange","purple","red","blue"), cex=0.5)
+legend("bottomright",legend=c("Mouse ER","Human ER", "Mouse CTCF", "Human CTCF"),pch=20,col=c("orange","purple","red","blue"), cex=1)
 
 dev.off()
 
@@ -224,13 +224,13 @@ MmmFit_CTCF<-Mmm_CTCF-(Amm_CTCF*angularcoeff)-intercept
 
 
 
-png("plots/019_SLX-14229_Mm_MA_counts_HsMm_Normalised.png",w=1000,h=1000,p=30)
-plot(Ahs_ER,MhsFit_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Normalised to Human CTCF")
+png("plots/019_SLX-14229_Mm_MA_counts_HsMm_Normalised.png")
+plot(Ahs_ER,MhsFit_ER,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Normalised to Human CTCF")
 points(Ahs_CTCF,MhsFit_CTCF,pch=20,col="gray")
 points(Amm_ER,MmmFit_ER,pch=20,col="darkolivegreen3")
 points(Amm_CTCF,MmmFit_CTCF,pch=20,col="darkolivegreen")
 abline(h=0)
-legend("topright",legend=c("Mouse ER","Human ER", "Mouse CTCF", "Human CTCF"),pch=20,col=c("darkolivegreen3","black","darkolivegreen3","gray"), cex=0.5)
+legend("topright",legend=c("Mouse ER","Human ER", "Mouse CTCF", "Human CTCF"),pch=20,col=c("darkolivegreen3","black","darkolivegreen3","gray"), cex=1)
 lm1<-lm(MmmFit_CTCF~Amm_CTCF)
 abline(lm1$coef,col="red")
 lm1<-lm(MhsFit_CTCF~Ahs_CTCF)
@@ -239,18 +239,18 @@ lm1<-lm(MmmFit_ER~Amm_ER)
 abline(lm1$coef,col="orange")
 lm1<-lm(MhsFit_ER~Ahs_ER)
 abline(lm1$coef,col="purple")
-legend("bottomright",legend=c("Mouse ER","Human ER", "Mouse CTCF", "Human CTCF"),pch=20,col=c("orange","purple","red","blue"), cex=0.5)
+legend("bottomright",legend=c("Mouse ER","Human ER", "Mouse CTCF", "Human CTCF"),pch=20,col=c("orange","purple","red","blue"), cex=1)
 
 dev.off()
 
-png("plots/019_SLX-14229_Mm_MA_counts_HsMm_Normalised_Alpha.png",w=1000,h=1000,p=30)
+png("plots/019_SLX-14229_Mm_MA_counts_HsMm_Normalised_Alpha.png")
 
-plot(Ahs_ER,MhsFit_ER,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Normalised to Human CTCF",col=alpha("black",0.2))
+plot(Ahs_ER,MhsFit_ER,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Normalised to Human CTCF",col=alpha("black",0.2))
 points(Ahs_CTCF,MhsFit_CTCF,pch=20,col=alpha("gray",0.2))
 points(Amm_ER,MmmFit_ER,pch=20,col=alpha("darkolivegreen3",0.2))
 points(Amm_CTCF,MmmFit_CTCF,pch=20,col=alpha("darkolivegreen",0.2))
 abline(h=0)
-legend("topright",legend=c("Mouse ER","Human ER", "Mouse CTCF", "Human CTCF"),pch=20,col=c("darkolivegreen3","black","darkolivegreen3","gray"), cex=0.5)
+legend("topright",legend=c("Mouse ER","Human ER", "Mouse CTCF", "Human CTCF"),pch=20,col=c("darkolivegreen3","black","darkolivegreen3","gray"), cex=1)
 lm1<-lm(MmmFit_CTCF~Amm_CTCF)
 abline(lm1$coef,col="red")
 lm1<-lm(MhsFit_CTCF~Ahs_CTCF)
@@ -259,7 +259,7 @@ lm1<-lm(MmmFit_ER~Amm_ER)
 abline(lm1$coef,col="orange")
 lm1<-lm(MhsFit_ER~Ahs_ER)
 abline(lm1$coef,col="purple")
-legend("bottomright",legend=c("Mouse ER","Human ER", "Mouse CTCF", "Human CTCF"),pch=20,col=c("orange","purple","red","blue"), cex=0.5)
+legend("bottomright",legend=c("Mouse ER","Human ER", "Mouse CTCF", "Human CTCF"),pch=20,col=c("orange","purple","red","blue"), cex=1)
 dev.off()
 
 

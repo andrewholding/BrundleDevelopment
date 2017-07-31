@@ -90,10 +90,11 @@ rownames(toplot)<-c(
 
 
 # Sort by total reads aligned
+
 toplot<-toplot[order(-toplot[,3]),]
 
-png("plots/012_SLX-12998_relativeAligned.png",w=1000,h=1000,point=30)
-par(las=2,mar=c(4,4,3,5))
+png("plots/012_SLX-12998_relativeAligned.png",w=1000,h=1200,point=30)
+par(las=2,mar=c(7,4,3,5))
 bp<-barplot(t(toplot[,4:5]),beside=TRUE,main="Relative Read Alignment in samples",
             ylab="Fraction of total aligned",col=c("royalblue2","tomato"),ylim=c(-0.05,1.05))
 grid()

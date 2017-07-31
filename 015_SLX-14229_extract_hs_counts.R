@@ -42,7 +42,7 @@ if(!file.exists(filename)){
 } else {
 	load(filename)
 }
-png("plots/015_SLX-14229_diffbind_dbacounts_human.png",w=1000,h=1000,p=30)
+png("plots/015_SLX-14229_diffbind_dbacounts_human.png",w=1500,h=1500,p=45)
 plot(dbacounts)
 dev.off()
 png("plots/015_SLX-14229_diffbind_dbacounts_nocorr_human.png",w=1000,h=1000,p=30)

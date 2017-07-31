@@ -39,8 +39,8 @@ M<-apply(hsrpm,1,function(x){
 A<-apply(hsrpm,1,function(x){
   return(log10(sum(x)))
 })
-png("plots/016_SLX-8047_MA_RPMpeaks.png",w=1000,h=1000,p=30)
-plot(A,M,pch=20,xlab="A, log10(RPM)",ylab="M, log2FC(fulvestrant)",main="RPM reads in peaks")
+png("plots/016_SLX-8047_MA_RPMpeaks.png")
+plot(A,M,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM reads in peaks")
 abline(h=0)
 dev.off()
 
@@ -69,8 +69,8 @@ M<-apply(hsrpm,1,function(x){
 A<-apply(hsrpm,1,function(x){
   return(log10(sum(x)))
 })
-png("plots/016_SLX-8047_MA_RPMaligned.png",w=1000,h=1000,p=30)
-plot(A,M,pch=20,xlab="A, log10(RPM)",ylab="M, log2FC(fulvestrant)",main="RPM aligned reads")
+png("plots/016_SLX-8047_MA_RPMaligned.png")
+plot(A,M,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM aligned reads")
 abline(h=0)
 dev.off()
 
@@ -99,8 +99,8 @@ M<-apply(hsrpm,1,function(x){
 A<-apply(hsrpm,1,function(x){
   return(log10(sum(x)))
 })
-png("plots/016_SLX-8047_MA_RPMtotal.png",w=1000,h=1000,p=30)
-plot(A,M,pch=20,xlab="A, log10(RPM)",ylab="M, log2FC(fulvestrant)",main="RPM total reads")
+png("plots/016_SLX-8047_MA_RPMtotal.png")
+plot(A,M,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM total reads")
 abline(h=0)
 dev.off()
 
@@ -118,8 +118,8 @@ M<-apply(hscounts,1,function(x){
 A<-apply(hscounts,1,function(x){
   return(log10(sum(x)))
 })
-png("plots/016_SLX-8047_MA_counts.png",w=1000,h=1000,p=30)
-plot(A,M,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)",main="Raw counts in peaks")
+png("plots/016_SLX-8047_MA_counts.png")
+plot(A,M,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="Raw counts in peaks")
 abline(h=0)
 dev.off()
 
@@ -147,8 +147,8 @@ Mdm<-apply(dmcounts,1,function(x){
 Adm<-apply(dmcounts,1,function(x){
   return(log10(sum(x)))
 })
-png("plots/016_SLX-8047_MA_counts_HsDm.png",w=1000,h=1000,p=30)
-plot(Ahs,Mhs,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)",main="Raw counts in peaks",ylim=c(-6.25,2))
+png("plots/016_SLX-8047_MA_counts_HsDm.png")
+plot(Ahs,Mhs,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="Raw counts in peaks",ylim=c(-6.25,2))
 points(Adm,Mdm,pch=20,col="cornflowerblue")
 abline(h=0)
 legend("topright",legend=c("Drosophila","Human"),pch=20,col=c("cornflowerblue","black"))
@@ -165,8 +165,8 @@ angularcoeff<-lm1$coef[2]
 MhsFit<-Mhs-(Ahs*angularcoeff)-intercept
 MdmFit<-Mdm-(Adm*angularcoeff)-intercept
 
-png("plots/016_SLX-8047-MA_counts_HsDm_Fit.png",w=1000,h=1000,p=30)
-plot(Ahs,MhsFit,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)",main="Counts normalized by Drosophila Distribution",ylim=c(-6.25,2))
+png("plots/016_SLX-8047-MA_counts_HsDm_Fit.png")
+plot(Ahs,MhsFit,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="Counts normalized by Drosophila Distribution",ylim=c(-6.25,2))
 points(Adm,MdmFit,pch=20,col="cornflowerblue")
 abline(h=0)
 legend("topright",legend=c("Drosophila","Human"),pch=20,col=c("cornflowerblue","black"))

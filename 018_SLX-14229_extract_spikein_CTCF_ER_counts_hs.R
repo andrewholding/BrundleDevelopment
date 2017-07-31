@@ -36,15 +36,16 @@ if(!file.exists(filename)){
   ### Asking for DBA_SCORE_READS provides raw read counts from ChIP only (the simplest score)
   dba <- dba.count(dba, peaks=NULL, score=DBA_SCORE_READS)
   
-  png("plots/018_SLX-14229_dba.counts_CTCF.png")
-  plot(dba)
-  dev.off()
+
   
   save(dba,file=filename)
 } else {
   load(filename)
 }
 
+png("plots/018_SLX-14229_dba.counts_CTCF.png",w=1500,h=1500,p=45)
+plot(dba)
+dev.off()
 
 ### Extract the peakset as a matrix
 hsconsensus <- dba.peakset(dba, bRetrieve = T, DataType = DBA_DATA_FRAME)
@@ -90,15 +91,16 @@ if(!file.exists(filename)){
   ### Asking for DBA_SCORE_READS provides raw read counts from ChIP only (the simplest score)
   dba <- dba.count(dba, peaks=NULL, score=DBA_SCORE_READS)
   
-  png("plots/018_SLX-14229_dba.counts_human_ER.png")
-  plot(dba)
-  dev.off()
+  
   
   save(dba,file=filename)
 } else {
   load(filename)
 }
 
+png("plots/018_SLX-14229_dba.counts_human_ER.png",w=1500,h=1500,p=45)
+plot(dba)
+dev.off()
 
 ### Extract the peakset as a matrix
 hsconsensus <- dba.peakset(dba, bRetrieve = T, DataType = DBA_DATA_FRAME)
