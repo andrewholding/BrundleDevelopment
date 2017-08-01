@@ -1,10 +1,9 @@
-# TODO: Add comment
+# Extract counts
 # 
 # Author: giorgi01 & holdin01
 ###############################################################################
 
 
-### Essentially the idea is to use spike in reads to normalize the Human reads
 library(DiffBind)
 
 setwd("/Volumes/FlyPeaks/flypeaks")

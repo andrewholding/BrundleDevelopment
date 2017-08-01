@@ -1,10 +1,3 @@
-# TODO: Add comment
-# 
-# Author: giorgi01
-###############################################################################
-
-##ANH: My bowtie isn't patched for GZIP so had to unzip first.
-
 ### Align, Sort and Build indeces
 mkdir ./SLX-14229_mmhs
 cd ./SLX-14229_mmhs

@@ -1,7 +1,5 @@
 
-# The BAMs and BEDs should be splitted in Drosophila (for normalization) and in HUman (for diffbind)
-
-
+# The BAMs and BEDs should be split.
 
 ### BAMs, split in two
 cd ./SLX-14229_mmhs/blacklist_filtered

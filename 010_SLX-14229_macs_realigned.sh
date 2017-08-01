@@ -1,6 +1,7 @@
 ### MACS peak caller
 
-### RUn it on the blacklisted data
+### Run macs on the blacklisted data
+
 mkdir ./SLX-14229_mmhs/peaks
 cd ./SLX-14229_mmhs/peaks
 control=../blacklist_filtered/SLX-14229.D703_D503.HJJL7BBXX.s_8.r_1.fq.gz.bam

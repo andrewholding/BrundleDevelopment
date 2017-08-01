@@ -1,5 +1,5 @@
 
-### It will be like using counts, but we will use reads in peaks
+
 library(DiffBind)
 
 setwd("/Volumes/FlyPeaks/FlyPeaks")

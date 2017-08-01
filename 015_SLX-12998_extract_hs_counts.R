@@ -1,6 +1,6 @@
-# TODO: Add comment
+# Extract Counts
 # 
-# Author: giorgi01
+# Author: giorgi01 & holdi01
 ###############################################################################
 
 
@@ -119,19 +119,6 @@ grid()
 text(hssums3*1e3,mmsums*1e3,labels=names(hssums3))
 mtext("a=Fulvestrant, b=None",cex=0.8)
 dev.off()
-
-
-#######
-#
-# ANH:
-# Dividing by the DM normalisation factor doesn't do much
-#didn't run code below this point (now cut), requires citrus, which is Federico's private package.
-# But the idea is good to test using GSEA to compare normalisations.
-#
-#####
-
-
-
 
 
 

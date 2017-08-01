@@ -1,5 +1,4 @@
-# TODO: Add comment
-# 
+# Calculate number of reads by species 
 # Author: giorgi01 & holdin01
 ###############################################################################
 

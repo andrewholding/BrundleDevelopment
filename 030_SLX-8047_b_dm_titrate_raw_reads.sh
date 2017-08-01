@@ -7,7 +7,7 @@ echo Run with bash
 #Reads not including input
 #MCF 	75454626
 #S2 	64258555
-#Intially 85% Wow! MGA put it lower
+# MGA put it lower
 
 cd SLX-8047_dmhs_titration/blacklist_filtered/drosophila
 
