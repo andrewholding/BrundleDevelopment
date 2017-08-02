@@ -123,7 +123,7 @@ if(!file.exists(filename)){
 jg.dba_analysis_SLX8047<-dba.analyze(jg.dba_SLX8047)
 
 png("plots/032_SLX-8047_DiffBind_Analysis.png")
-dba.plotMA(jg.dba_analysis_SLX8047,bFlip=TRUE)
+dba.plotMA(jg.dba_analysis_SLX8047)
 dev.off()
 
 #Now re-extract the counts and plots xy scatter of similar peaks.
@@ -141,21 +141,68 @@ jg.peakset_SLX14229
 names(jg.peakset_SLX14229)[-c(1:3)]<-paste0("SLX_14229_",substr(names(jg.peakset_SLX14229[-c(1:3)]),2,3))
 names(jg.peakset_SLX8047)[-c(1:3)]<-paste0("SLX_8047_",substr(names(jg.peakset_SLX8047[-c(1:3)]),2,3))
 
-jg.peakset_combined<-jg.peakset_SLX14229
-jg.peakset_combined<-cbind(jg.peakset_combined, matrix(NA,nrow(jg.peakset_combined),ncol(jg.peakset_SLX8047[-c(1:3)])) ) 
-colnames(jg.peakset_combined)[-c(1:9)]<-names(jg.peakset_SLX8047[-c(1:3)])
+jg.peakset_combined<-jg.peakset_SLX8047
+jg.peakset_combined<-cbind(jg.peakset_combined, matrix(NA,nrow(jg.peakset_combined),ncol(jg.peakset_SLX14229[-c(1:3)])) ) 
+colnames(jg.peakset_combined)[-c(1:11)]<-names(jg.peakset_SLX14229[-c(1:3)])
 
 for (peak in rownames(jg.peakset_combined)) {
   matchingPeak<-which.min(abs(
-    rowMeans(cbind(jg.peakset_SLX8047$START[jg.peakset_SLX8047["CHR"]==jg.peakset_SLX14229[peak,"CHR"]],
-                   jg.peakset_SLX8047$END[jg.peakset_SLX8047["CHR"]==jg.peakset_SLX14229[peak,"CHR"]]))-
+    rowMeans(cbind(jg.peakset_SLX14229$START[jg.peakset_SLX14229["CHR"]==jg.peakset_SLX8047[peak,"CHR"]],
+                   jg.peakset_SLX14229$END[jg.peakset_SLX14229["CHR"]==jg.peakset_SLX8047[peak,"CHR"]]))-
       mean(jg.peakset_SLX14229[peak,]$START,jg.peakset_SLX14229[peak,]$END)
   ))
-  jg.peakset_combined[peak,][-c(1:9)]<-jg.peakset_SLX8047[matchingPeak,][-c(1:3)]
+  jg.peakset_combined[peak,][-c(1:9)]<-jg.peakset_SLX14229[matchingPeak,][-c(1:3)]
 }
 
  #Compared log ratios of SLX14229 to SLX8047
 jg.peakset_combined
   
 
+plot(jg.peakset_SLX14229[-c(1:3)])
+
+
+names(jg.peakset_combined[-c(1:3)])
+plot(log2(rowMeans(jg.peakset_combined[c(4,6,8,10)])),log2(rowMeans(jg.peakset_combined[c(5,7,9,11)])),pch=20)
+
+plot(log2(rowMeans(jg.peakset_combined[c(12,14,17)])),log2(rowMeans(jg.peakset_combined[c(13,15,16)])),pch=20)
   
+
+SLX14429_untreated<-jg.peakset_combined[c(12,14,17)]
+SLX14429_treated<-jg.peakset_combined[c(13,15,16)]
+SLX8047_untreaded<-jg.peakset_combined[c(5,7,9,11)]
+SLX8047_treaded<-jg.peakset_combined[c(4,6,8,10)]
+
+plot(
+    rowMeans(SLX14429_treated),
+    rowMeans(SLX8047_treaded),
+    pch=20,
+    xlab="Internal Control using CTCF binding",
+    ylab="Xenogenic Control using H2Av binding",
+    main="Comparision of fold-change in affinity of normalised reads"
+    )
+
+##Try again from DBA report
+
+dba.report(jg.dba_analysis_SLX8047)
+dba.report(jg.dba_analysis_SLX14229)
+
+nearestPeak <- nearest(dba.report(jg.dba_analysis_SLX8047),dba.report(jg.dba_analysis_SLX14229))
+SLX8047_fc<-dba.report(jg.dba_analysis_SLX8047,bFlip=TRUE)$Fold
+SLX14229_fc<-dba.report(jg.dba_analysis_SLX14229)[nearestPeak]$Fold
+
+
+png("plots/032_normalization_comparision.png")
+smoothScatter(SLX8047_fc,SLX14229_fc,pch=20, col="#00000055",
+              xlab="Fold change normalized using Drosophila/H2av spike-in",
+              ylab="Fold change normalized using CTCF control peaks",
+              main="Comparision of normalisation methods")
+abline(h=0, col="grey",lty=2)
+abline(v=0, col="grey",lty=2)
+coef<-lm( SLX8047_fc ~ SLX14229_fc + 0 )
+abline(coef, col="navyblue")
+text(3.1,-0.25, expression( "gradient = 0.96, r = 0.503, p-value < 2.2 x" ~ 10^{-16}))
+dev.off()     
+
+
+cor.test(SLX8047_fc,SLX14229_fc, method="pearson")
+
