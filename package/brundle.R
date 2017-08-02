@@ -97,13 +97,13 @@ jg.plotMA<-function(jg.experimentPeakset,jg.controlPeakset,jg.untreatedNames,jg.
   
 }
 
-jg.getDba<-function (jg.experimentSampleSheet,dbaSummits)
+jg.getDba<-function (jg.experimentSampleSheet,dbaSummits, ...)
 {
   
   dba <- dba(sampleSheet = jg.experimentSampleSheet)
   if(exists("dbaSummits"))
   {
-    dba <- dba.count(dba, summits=dbaSummits)
+    dba <- dba.count(dba, summits=dbaSummits, ...)
   } else {
     dba <- dba.count(dba)
   }

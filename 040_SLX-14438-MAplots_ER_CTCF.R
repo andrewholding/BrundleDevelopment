@@ -27,8 +27,8 @@ jg.untreatedCondition     =  "none"
 
 filename<-"Rdata/040_SLX-14438_dba_human_ER_CTCF.rda"
 if(!file.exists(filename)){
-  dbaExperiment <- jg.getDba(jg.experimentSampleSheet)
-  dbaControl    <- jg.getDba(jg.controlSampleSheet)
+  dbaExperiment <- jg.getDba(jg.experimentSampleSheet, bRemoveDuplicates=TRUE)
+  dbaControl    <- jg.getDba(jg.controlSampleSheet, bRemoveDuplicates=TRUE)
   save(dbaExperiment,dbaControl,file=filename)
 } else {
   load(filename)
