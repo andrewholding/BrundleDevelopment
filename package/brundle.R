@@ -101,7 +101,12 @@ jg.getDba<-function (jg.experimentSampleSheet,dbaSummits)
 {
   
   dba <- dba(sampleSheet = jg.experimentSampleSheet)
-  dba <- dba.count(dba, summits=dbaSummits)
+  if(exists("dbaSummits"))
+  {
+    dba <- dba.count(dba, summits=dbaSummits)
+  } else {
+    dba <- dba.count(dba)
+  }
   dba <- dba.count(dba, peaks=NULL, score=DBA_SCORE_READS)
   return(dba)
 }
