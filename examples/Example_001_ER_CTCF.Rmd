@@ -1,5 +1,5 @@
 ---
-title: "Normalization Example using internal CTCF peaks as a standard"
+title: "Normalization example using internal CTCF peaks as a standard"
 author: "Andrew Holding"
 date: "8/7/2017"
 output: pdf_document
@@ -7,7 +7,62 @@ output: pdf_document
 
 ## Introduction
 
-This is a normalisation using linear regression to CTCF of MCF7 cells chip treameant etc.
+This is a worked example of our method to normalize ER ChIP-seq data using CTCF binding to provide an internal control. 
+
+## Preprocessing.
+
+To prepare the data for the differential binding analysis the data had to be aligned and CTCF and ER peaks called. As our CTCF control doesn't require any special aligment, data was aligned as for a standard ChIP-seq experiment. Peak calling was done with macs2 using the script shown below. 
+
+```{bash, eval=FALSE}
+ 
+#Calls peaks for all files in a directory against a single control. Change
+# <filename> to the filename of you input sample.
+ 
+ control=<filename>
+
+ for bam in *bam
+ do
+   root=`basename $bam .bam`
+   macs2 callpeak -t $bam -c $control -f BAM -n $root -g hs
+ done
+
+```
+
+As macs2 cannot differentiate between a peak arising from CTCF binding or ER binding we used two samples were squence to establish a CTCF binding consensus. One treated and one untreated. These peaks were then merged as follows.
+
+```{bash, eval=FALSE}
+ 
+cat  SLX-14438.D701_D504.HKN27BBXX.s_8.r_1.fq.gz.bam_peaks.xls \
+      SLX-14438.D702_D503.HKN27BBXX.s_8.r_1.fq.gz.bam_peaks.xls > CTCF_merged.bed
+
+grep -v \# CTCF_merged.bed  | grep -v start > CTCF_merged_filtered.bed
+sort -k1,1 -k2,2n CTCF_merged_filtered.bed > CTCF_merged_sorted_filtered.bed
+
+bedtools merge -i CTCF_merged_sorted_filtered.bed  > CTCF_union.bed
+
+```
+
+We then used this CTCF consensus to establish specfic CTCF or ER binding in the experimental samples. Either taking the interesection of the CTCF consensus and the peak file for a particluar sample to provide a list of CTCF binding sites in the sample, or subratracting the consensus CTCF peaks from the macs2 output to provide a list ER binding sites for that sample. 
+
+```{bash, eval=FALSE}
+
+mkdir CTCF
+for f in *.narrowPeak
+do
+ 	echo $f
+ 	bedtools intersect -a $f -b CTCF_union.bed  > CTCF/$f 
+done
+
+mkdir ER
+for f in *.narrowPeak
+do
+ 	echo $f
+ 	bedtools subtract -b CTCF_union.bed -a $f -A > ER/$f 
+done
+
+```
+
+These were then used to write two DiffBind samplesheets as described in the DiffBind vignette. One using the CTCF peak list generated from the above scripts, this is the control sample sheet. The second uses the ER peaks, this is the experimetnal sample sheet. These two sample sheets are then provided as the input in the analysis below. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -15,13 +70,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Load convience functions
 
-These functions facilitate the normalisation of data.
+Brundle provies a series of functions we developed for this pipeline that are used to normalizing ChIP-seq data. The usage of these functions are explained in the example that follows.
 
-```{r brundle}
+```{r brundle,results='hide', message=FALSE, warning=FALSE}
 source('../package/brundle.R')
 ```
 
 ## Apply settings
+
+The intial settings for the analysis are minimal, jg.controlMinOverlap is set to 5 as this is 1 less than the total sample count and we want a strong consensus of CTCF peaks to normalise against. The control and experiment sample sheets are as described above. The conditions reflect the treated and untreaded condition we have used when writing our sample sheet. 
 
 ```{r}
 jg.controlMinOverlap      <- 5
@@ -34,7 +91,9 @@ jg.untreatedCondition     =  "none"
 
 ## Load control and experimental DiffBind object
 
-To keep file size down these are provided as a Rdata File rather than as raw counts.
+Typically we would load the raw data using Diffbind as we are plan to return our normalized data as a Diffbind object. 
+
+In this example, as the BAM files which are greater in size than the github filesize limit, we have included the data as the Diffbind object these function would output and instead load that directly. If the code doesn't find the R data object it will try to regenerate if from the raw data.  
 
 ```{r}
 filename<-"Rdata/example_001_SLX-14438_dba_human_ER_CTCF.rda"
@@ -48,18 +107,19 @@ if(!file.exists(filename)){
 
 ```
 
-```{r}
-#Load Sample Ids from control sample sheet.
-jg.sampleIds <- jg.getSampleIds(jg.controlSampleSheet)
-```
+Diffbind allows us to extract the counts in each peak, we use this function to obtain the data in a form that is easier to normalize.
 
 ```{r}
 
-## Extract Peak set from DiffBind
+#  Extract Peak set from DiffBind
+
 jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
 jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl)
 
 ```
+
+To normalize we need to seperate samples out by condition, this is done using the following function. The peakset contains the reads in peaks, the samplesheet provides the metadata needed and the jg.treatedCondition/jg.untreatedCondition specify which condition we want to get the counts for. 
+
 
 ```{r}
 #Get counts for each condition
@@ -72,6 +132,8 @@ jg.controlCountsUntreated<-jg.getControlCounts(jg.controlPeakset,
 
 ```
 
+At the same time we can extract the samples names for each condition to use later.
+
 ```{r}
 #Get sample names for conditions
 jg.untreatedNames <- names(jg.controlCountsUntreated)
@@ -79,16 +141,23 @@ jg.treatedNames   <- names(jg.controlCountsTreated)
 
 ```
 
-```{r}
+The normalization factor is generated by a linear regression generated from the mean number of counts for each peak before and after treatment. The gradient of the linear fit should be equal to 1 given the assumtion that before and after treatment the majority of the control peaks do not change.
 
-##Plot showing normalization calculation (Optional)
-  jg.plotNormalization(jg.controlCountsTreated,
+This plot is not neaded to caluclate the normalization factor but it does provide a visual interpretation of the process. 
+
+```{r, message=FALSE}
+
+# Plot showing normalization calculation (Optional)
+
+jg.plotNormalization(jg.controlCountsTreated,
                      jg.controlCountsUntreated)
 ```
 
+There are two parts to the normalization coefficent we use in the final correction. The first is the the coefficent to make the levels of CTCF binding before and after treament equal. The second is because DiffBind normalises against the total read count for each sample, we therefore generated a correction factor to control for this.
 
 ```{r}
-##Get Normalization Coefficient
+# Get Normalization Coefficient
+
 jg.coefficient<-jg.getNormalizationCoefficient(jg.controlCountsTreated,
                                                jg.controlCountsUntreated)
 jg.correctionFactor<-jg.getCorrectionFactor(jg.experimentSampleSheet,
@@ -97,6 +166,7 @@ jg.correctionFactor<-jg.getCorrectionFactor(jg.experimentSampleSheet,
 
 ```
 
+Once we have these two peices of information we apply both the normalisation coeffecent and the correction factor to our data. 
 
 ```{r}
 #Apply coefficent and control factor
@@ -106,6 +176,8 @@ jg.experimentPeaksetNormalised<-jg.applyNormalisation(jg.experimentPeakset,
                                                       jg.treatedNames)
 ```
 
+Finally we return the correct values into the DiffBind object. This requires a modificed version Diffbind as included in the original manuscript. It is expected that this will be supported natively by furture versions of Diffind. 
+
 ```{r}
 #Return values to Diffbind and plot normalised result.
 jg.dba <- DiffBind:::pv.resetCounts(dbaExperiment,
@@ -113,7 +185,9 @@ jg.dba <- DiffBind:::pv.resetCounts(dbaExperiment,
 
 ```
 
-```{r}
+We can then visualise the data as normal using DiffBind.
+
+```{r, message=FALSE}
 jg.dba_analysis<-dba.analyze(jg.dba)
 dba.plotMA(jg.dba_analysis,bFlip=TRUE)
 

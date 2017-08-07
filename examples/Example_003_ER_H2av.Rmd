@@ -7,7 +7,7 @@ output: pdf_document
 
 ## Introduction
 
-This is a normalisation using linear regression to CTCF of MCF7 cells chip treameant etc.
+This is a normalisation using H2av binding within an external spike-in of droshilia chromatin to provide a control for the analysis of ER binding in MCF7 cells after treatment with Fulvestrant. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -35,7 +35,7 @@ jg.untreatedCondition     =  "none"
 
 ## Load control and experimental DiffBind object
 
-To keep file size down these are provided as a Rdata File rather than as raw counts.
+As before to keep file size down data are provided as a RdatafFile rather than as raw BAM files.
 
 ```{r}
 filename<-"Rdata/example_003_SLX-8047_dba_HsDm.rda"
@@ -56,7 +56,7 @@ jg.sampleIds <- jg.getSampleIds(jg.controlSampleSheet)
 
 ```{r}
 
-## Extract Peak set from DiffBind
+# Extract Peak set from DiffBind
 jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
 jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl)
 

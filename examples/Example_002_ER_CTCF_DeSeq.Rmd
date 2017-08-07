@@ -7,7 +7,8 @@ output: pdf_document
 
 ## Introduction
 
-This is a normalisation using only DeSeq Size Factors to CTCF of MCF7 cells chip treameant etc.
+This is a worked example of our method alternative to normalize ER ChIP-seq data using CTCF binding to provide an internal control. Unlike our previous example this normalisation is using only DESeq Size Factors. This method was found to be less effective but was used for comparision in the supporting publication. This markdown builds on Example 001 and therefore that should be read first. Example 001 also explains the pre-processing steps. 
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -17,7 +18,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 These functions facilitate the normalisation of data.
 
-```{r brundle, echo=FALSE}
+```{r brundle,results='hide', message=FALSE, warning=FALSE}
 source('../package/brundle.R')
 ```
 
@@ -30,9 +31,11 @@ jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX14438_hs_ER_DBA.csv"
 
 ```
 
-## Load control and experimental DiffBind object
+## Load control and experimental counts from Example 001
 
-To keep file size down these are provided as a Rdata File rather than as raw counts.
+In this example Diffbind was simply used as a convient way to extract peak counts and provided consitancy for comparision between methods. 
+
+To keep file size down counts are provided as a Rdata file rather than as raw data.
 
 ```{r}
 filename<-"Rdata/example_001_SLX-14438_dba_human_ER_CTCF.rda"
@@ -46,9 +49,9 @@ if(!file.exists(filename)){
 
 ```
 
-Diffbind was simply used as a convient way to extract peak counts. The actual DESeq Pipeline starts simply needs a matrix so we covert from Diffbind and save as csv to provide a starting point for a DESeq pipeline. 
+The actual DESeq Pipeline starts simply needs a matrix so we covert from Diffbind and save as csv to provide a starting point. 
 
-```{r}
+```{r, message=FALSE}
 
 filename<-"csv/experimentalPeakset.csv"
 if(!file.exists(filename)){
@@ -74,8 +77,11 @@ write.csv(jg.controlPeaksetDeSeq,   file=filename)
 ```
 
 
-# Pipe line starts here
+# DESeq Pipeline starting from CSV
+
 ## Load CSV dataset in DESeq format
+
+Here we use the CSV files the example code above generated; however, it is possible to generate the input data through a wide variety of methods and we have provided only one.
 
 ```{r}
 jg.controlPeaksetDeSeq <- read.csv( file="csv/controlPeakset.csv"
@@ -84,9 +90,9 @@ jg.experimentPeaksetDeSeq<- read.csv(file="csv/experimentalPeakset.csv"
                                      ,check.names=FALSE, row.names = 1)
 ```
 
-Note we use the samplesheet here, not needed but neater.
+To normalize the data we use the DESeq2 function to estimate the size factors. This is a very simple method, and it provides some degree of normalization. We also use the original sample sheet to get the different conditions.
 
-```{r}
+```{r,message=FALSE}
 
 #Establish size factors directly from Control data
 jg.controlSizeFactors = estimateSizeFactorsForMatrix(jg.controlPeaksetDeSeq)
@@ -107,18 +113,22 @@ jg.experimentResultsDeseq   = results(jg.experimentDeSeq)
 
 ## Export results as CSV
 
-These are not annotated, but other packages exist to do that.
+We can export the DESeq2 results in CSV format. 
+
 ```{r}
 
 write.csv(file="results/Example_002.csv", jg.experimentResultsDeseq)
 
 ```
 
+## Plots
+
+The Brundle package also contains some convience functions for plotting the output of DESeq2 inplace of DiffBind. These generate the following figures. 
+
 ```{r}
 
-#Plot results
 
-  jg.plotDeSeq(jg.controlResultsDeseq,
+jg.plotDeSeq(jg.controlResultsDeseq,
                p=0.01, 
                title.main="Fold-change in CTCF binding",
                flip=T
