@@ -1,0 +1,144 @@
+---
+title: "Normalization Example using internal CTCF peaks as a standard (no-linear fit)"
+author: "Andrew Holding"
+date: "8/7/2017"
+output: pdf_document
+---
+
+## Introduction
+
+This is a normalisation using only DeSeq Size Factors to CTCF of MCF7 cells chip treameant etc.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load convience functions
+
+These functions facilitate the normalisation of data.
+
+```{r brundle, echo=FALSE}
+source('../package/brundle.R')
+```
+
+## Apply settings
+
+```{r}
+jg.controlMinOverlap      <- 5
+jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX14438_hs_CTCF_DBA.csv"
+jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX14438_hs_ER_DBA.csv"
+
+```
+
+## Load control and experimental DiffBind object
+
+To keep file size down these are provided as a Rdata File rather than as raw counts.
+
+```{r}
+filename<-"Rdata/example_001_SLX-14438_dba_human_ER_CTCF.rda"
+if(!file.exists(filename)){
+  dbaExperiment <- jg.getDba(jg.experimentSampleSheet, bRemoveDuplicates=TRUE)
+  dbaControl    <- jg.getDba(jg.controlSampleSheet, bRemoveDuplicates=TRUE)
+  save(dbaExperiment,dbaControl,file=filename)
+} else {
+  load(filename)
+}
+
+```
+
+Diffbind was simply used as a convient way to extract peak counts. The actual DESeq Pipeline starts simply needs a matrix so we covert from Diffbind and save as csv to provide a starting point for a DESeq pipeline. 
+
+```{r}
+
+filename<-"csv/experimentalPeakset.csv"
+if(!file.exists(filename)){
+  ## Extract Peak set from DiffBind
+  jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
+  #Convert Peakset to DeSeq Workflow
+  jg.experimentPeaksetDeSeq<-jg.convertPeakset(jg.experimentPeakset)
+  #Save to CSV
+
+  write.csv(jg.experimentPeaksetDeSeq,file=filename)
+} 
+
+#Repeat for control samples.
+
+filename<-"csv/controlPeakset.csv"
+if(!file.exists(filename)){
+jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl)
+jg.controlPeaksetDeSeq<-jg.convertPeakset(jg.controlPeakset)
+write.csv(jg.controlPeaksetDeSeq,   file=filename) 
+} 
+
+
+```
+
+
+# Pipe line starts here
+## Load CSV dataset in DESeq format
+
+```{r}
+jg.controlPeaksetDeSeq <- read.csv( file="csv/controlPeakset.csv"
+                                      ,check.names=FALSE, row.names = 1)
+jg.experimentPeaksetDeSeq<- read.csv(file="csv/experimentalPeakset.csv"
+                                     ,check.names=FALSE, row.names = 1)
+```
+
+Note we use the samplesheet here, not needed but neater.
+
+```{r}
+
+#Establish size factors directly from Control data
+jg.controlSizeFactors = estimateSizeFactorsForMatrix(jg.controlPeaksetDeSeq)
+
+#Get conditions dataframe for DeSeq
+jg.conditions <- read.csv(file=jg.controlSampleSheet, header=TRUE, sep=",")['Condition']
+
+#Run DeSeq on control
+jg.controlDeSeq<-jg.runDeSeq(jg.controlPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
+jg.controlResultsDeseq   = results(jg.controlDeSeq)
+
+#Run DeSeq on experiment
+jg.experimentDeSeq<-jg.runDeSeq(jg.experimentPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
+jg.experimentResultsDeseq   = results(jg.experimentDeSeq)
+
+```
+
+
+## Export results as CSV
+
+These are not annotated, but other packages exist to do that.
+```{r}
+
+write.csv(file="results/Example_002.csv", jg.experimentResultsDeseq)
+
+```
+
+```{r}
+
+#Plot results
+
+  jg.plotDeSeq(jg.controlResultsDeseq,
+               p=0.01, 
+               title.main="Fold-change in CTCF binding",
+               flip=T
+               )
+
+jg.plotDeSeq(jg.experimentResultsDeseq,
+             p=0.01,
+             title.main="Fold-change in ER binding",
+             flip=T
+             )
+
+
+
+#Draw Combined figure.
+  jg.plotDeSeqCombined(jg.controlResultsDeseq,
+                       jg.experimentResultsDeseq,
+                       title.main="ER and CTCF Binding Folding changes on ER treatment",
+                       p=0.01,flip=TRUE)
+
+
+
+```
+
