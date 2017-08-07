@@ -11,7 +11,7 @@ This is a worked example of our method to normalize ER ChIP-seq data using CTCF 
 
 ## Preprocessing.
 
-To prepare the data for the differential binding analysis the data had to be aligned and CTCF and ER peaks called. As our CTCF control doesn't require any special aligment, data was aligned as for a standard ChIP-seq experiment. Peak calling was done with macs2 using the script shown below. 
+To prepare the data for the differential binding analysis the data had to be aligned and CTCF and ER peaks called. As our CTCF control doesn't require any special aligment, data was aligned as for a standard ChIP-seq experiment and followed by removal of reads from blacklisted regions. Peak calling was done with macs2 using the script shown below. 
 
 ```{bash, eval=FALSE}
  
