@@ -93,3 +93,8 @@ plot(
     main = "Effect of Normalisation on p-value"
 )
 dev.off()
+
+
+result<-cor.test(normalised$p.value,unnormalised$p.value, method="pearson")
+result
+result$p.value

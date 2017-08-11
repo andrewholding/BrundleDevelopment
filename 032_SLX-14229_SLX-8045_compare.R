@@ -204,5 +204,5 @@ text(3.1,-0.25, expression( "gradient = 0.96, r = 0.503, p-value < 2.2 x" ~ 10^{
 dev.off()     
 
 
-cor.test(SLX8047_fc,SLX14229_fc, method="pearson")
+result<-cor.test(SLX8047_fc,SLX14229_fc, method="pearson")
 
