@@ -9,7 +9,7 @@ output: pdf_document
 
 This is a normalisation using H2av binding within an external spike-in of droshilia chromatin to provide a control for the analysis of ER binding in MCF7 cells after treatment with Fulvestrant. 
 
-This example builds on the previous two and therefore these should be read first as many details of key functions have not been repeated. 
+This example builds on the previous two and therefore they should be read first as many details of key functions have not been repeated. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Unlike Example 001 & 002 the use of a xenogenic spike in requires more pre-processing. The scripts for this process are provided below. Genomes were downloaded from http://support.illumina.com/sequencing/sequencing_software/igenome.html.
 
-The first step of our preprossing pipeline requires the generation of a combined Human/Drosophila genome. We used the following script to generated this. The human and drosophila genomes downloaded from the link provided above are contained in a subdirectory "genomes" relative to where the script was run. These example scripts are not evalutated in this markdown due to the time  it takes to process the data. 
+The first step of our preprossing pipeline requires the generation of a combined Human/Drosophila genome. We used the following script to generated this. The human and drosophila genomes downloaded from the link provided above are contained in a subdirectory "genomes" relative to where the script was run. These example scripts are not evalutated in this markdown due to the time it takes to process the data. 
 
 ```{bash, eval=FALSE}
 
@@ -209,7 +209,7 @@ done
 
 ```
 
-With the peak files and the seperate alignments extract we are can then write samplesheets. For the normalization we need one for the drosphila aligned reads from each sample and the respective H2av peak file, and one for human reads from each sample and their repsective ER peak files. This forms the bais of the following analysis.
+With the peak files and the seperate alignments extracted we are can then write samplesheets. For the normalization we need one for the drosphila aligned reads from each sample and the respective H2av peak file, and one for human reads from each sample and their repsective ER peak files. This forms the bais of the following analysis.
 
 ## Load convience functions
 
@@ -233,7 +233,7 @@ jg.untreatedCondition     =  "none"
 
 ## Load control and experimental DiffBind object
 
-As before to keep file size down data are provided as a RdatafFile rather than as raw BAM files.
+As before to keep file size down data are provided as in Rdata format rather than as raw BAM files.
 
 ```{r}
 filename<-"Rdata/example_003_SLX-8047_dba_HsDm.rda"

@@ -7,7 +7,7 @@ output: pdf_document
 
 ## Introduction
 
-This is a worked example of our method alternative to normalize ER ChIP-seq data using CTCF binding to provide an internal control. Unlike our previous example this normalisation is using only DESeq Size Factors. This method was found to be less effective but was used for comparision in the supporting publication. This markdown builds on Example 001 and therefore that should be read first. Example 001 also explains the pre-processing steps. 
+This is a worked example of our alternative method to normalize ER ChIP-seq data using CTCF binding to provide an internal control. Unlike our previous example this normalisation is using only DESeq Size Factors. This method was found to be less effective but was used for comparision in the supporting publication. This markdown builds on Example 001 and therefore that should be read first. Example 001 also explains the pre-processing steps. 
 
 
 ```{r setup, include=FALSE}

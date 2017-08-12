@@ -28,7 +28,7 @@ To prepare the data for the differential binding analysis the data had to be ali
 
 ```
 
-As macs2 cannot differentiate between a peak arising from CTCF binding or ER binding we used two samples were squence to establish a CTCF binding consensus. One treated and one untreated. These peaks were then merged as follows.
+As macs2 cannot differentiate between a peak arising from CTCF binding or ER binding we used samples with only CTCF antibody to establish a CTCF binding consensus. One treated and one untreated. These peaks were then merged as follows.
 
 ```{bash, eval=FALSE}
  
@@ -62,7 +62,7 @@ done
 
 ```
 
-These were then used to write two DiffBind samplesheets as described in the DiffBind vignette. One using the CTCF peak list generated from the above scripts, this is the control sample sheet. The second uses the ER peaks, this is the experimetnal sample sheet. These two sample sheets are then provided as the input in the analysis below. 
+The peak list files were then used as the basis for two DiffBind samplesheets as described in the DiffBind vignette. One using the CTCF peak list generated from the above scripts, this is the control sample sheet. The second uses the ER peaks, this is the experimetnal sample sheet. These two sample sheets are then provided as the input in the analysis below. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -70,7 +70,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Load convience functions
 
-Brundle provies a series of functions we developed for this pipeline that are used to normalizing ChIP-seq data. The usage of these functions are explained in the example that follows.
+Brundle provies a series of functions we developed for this pipeline that are used to normalize ChIP-seq data. The usage of these functions are explained in the example that follows.
 
 ```{r brundle,results='hide', message=FALSE, warning=FALSE}
 source('../package/brundle.R')
@@ -91,9 +91,9 @@ jg.untreatedCondition     =  "none"
 
 ## Load control and experimental DiffBind object
 
-Typically we would load the raw data using Diffbind as we are plan to return our normalized data as a Diffbind object. 
+Typically we would load the raw data using Diffbind as we are planning to return our normalized data as a Diffbind object. 
 
-In this example, as the BAM files which are greater in size than the github filesize limit, we have included the data as the Diffbind object these function would output and instead load that directly. If the code doesn't find the R data object it will try to regenerate if from the raw data.  
+In this example, as the BAM files which are greater in size than the github filesize limit, we have included the data as the Diffbind object these function would output and instead of  loading that directly. If the code doesn't find the R data object it will try to regenerate if from the raw data.  
 
 ```{r}
 filename<-"Rdata/example_001_SLX-14438_dba_human_ER_CTCF.rda"
@@ -176,7 +176,7 @@ jg.experimentPeaksetNormalised<-jg.applyNormalisation(jg.experimentPeakset,
                                                       jg.treatedNames)
 ```
 
-Finally we return the correct values into the DiffBind object. This requires a modificed version Diffbind as included in the original manuscript. It is expected that this will be supported natively by furture versions of Diffind. 
+Finally we return the correct values into the DiffBind object. This requires a modified version Diffbind as included in the original manuscript. It is expected that this will be supported natively by furture versions of Diffind. 
 
 ```{r}
 #Return values to Diffbind and plot normalised result.
