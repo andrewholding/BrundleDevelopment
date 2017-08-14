@@ -1,20 +1,20 @@
 ---
-title: "Normalization Example using internal CTCF peaks as a standard (no-linear fit)"
+title: "Normalisation Example using Internal CTCF Peaks as a Standard (No-linear Fit)"
 author: "Andrew Holding"
-date: "8/7/2017"
+date: "7/8/2017"
 output: pdf_document
 ---
 
 ## Introduction
 
-This is a worked example of our alternative method to normalize ER ChIP-seq data using CTCF binding to provide an internal control. Unlike our previous example this normalisation is using only DESeq Size Factors. This method was found to be less effective but was used for comparision in the supporting publication. This markdown builds on Example 001 and therefore that should be read first. Example 001 also explains the pre-processing steps. 
+This is a worked example of our alternative method to normalise ER ChIP-seq data using CTCF binding to provide an internal control. Unlike our previous example, this normalisation is using only DESeq Size Factors. This method was found to be less effective but was used for comparision in the supporting publication. This markdown builds on Example 001 and therefore that should be read first. Example 001 also explains the pre-processing steps. 
 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Load convience functions
+## Load convenience functions
 
 These functions facilitate the normalisation of data.
 
@@ -33,9 +33,9 @@ jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX14438_hs_ER_DBA.csv"
 
 ## Load control and experimental counts from Example 001
 
-In this example Diffbind was simply used as a convient way to extract peak counts and provided consitancy for comparision between methods. 
+In this example DiffBind was simply used as a convenient way to extract peak counts and provided consisteancy for comparision between methods. 
 
-To keep file size down counts are provided as a Rdata file rather than as raw data.
+To keep file sizes down, counts are provided as a Rdata file rather than as raw data.
 
 ```{r}
 filename<-"Rdata/example_001_SLX-14438_dba_human_ER_CTCF.rda"
@@ -49,7 +49,7 @@ if(!file.exists(filename)){
 
 ```
 
-The actual DESeq Pipeline starts simply needs a matrix so we covert from Diffbind and save as csv to provide a starting point. 
+The actual DESeq Pipeline starts simply needs a matrix so we convert from DiffBind and save as a CSV file to provide a starting point. 
 
 ```{r, message=FALSE}
 
@@ -57,7 +57,7 @@ filename<-"csv/experimentalPeakset.csv"
 if(!file.exists(filename)){
   ## Extract Peak set from DiffBind
   jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
-  #Convert Peakset to DeSeq Workflow
+  #Convert Peakset to DESeq Workflow
   jg.experimentPeaksetDeSeq<-jg.convertPeakset(jg.experimentPeakset)
   #Save to CSV
 
@@ -81,7 +81,7 @@ write.csv(jg.controlPeaksetDeSeq,   file=filename)
 
 ## Load CSV dataset in DESeq format
 
-Here we use the CSV files the example code above generated; however, it is possible to generate the input data through a wide variety of methods and we have provided only one.
+Here we use the CSV files that the example code above generated; however, it is possible to generate the input data through a wide variety of methods and we have provided only one.
 
 ```{r}
 jg.controlPeaksetDeSeq <- read.csv( file="csv/controlPeakset.csv"
@@ -90,11 +90,11 @@ jg.experimentPeaksetDeSeq<- read.csv(file="csv/experimentalPeakset.csv"
                                      ,check.names=FALSE, row.names = 1)
 ```
 
-To normalize the data we use the DESeq2 function to estimate the size factors. This is a very simple method, and it provides some degree of normalization. We also use the original sample sheet to get the different conditions.
+To normalize the data, we use the DESeq2 function to estimate the size factors. This is a very simple method, and it provides some degree of normalization. We also use the original sample sheet to get the different conditions.
 
 ```{r,message=FALSE}
 
-#Establish size factors directly from Control data
+#Establish size factors directly from control data
 jg.controlSizeFactors = estimateSizeFactorsForMatrix(jg.controlPeaksetDeSeq)
 
 #Get conditions dataframe for DeSeq
@@ -123,7 +123,7 @@ write.csv(file="results/Example_002.csv", jg.experimentResultsDeseq)
 
 ## Plots
 
-The Brundle package also contains some convience functions for plotting the output of DESeq2 inplace of DiffBind. These generate the following figures. 
+The Brundle package also contains some convenience functions for plotting the output of DESeq2 in place of DiffBind. These generate the following figures. 
 
 ```{r}
 
