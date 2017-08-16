@@ -39,7 +39,7 @@ A<-apply(hsrpm,1,function(x){
   return(log10(sum(x)))
 })
 png("plots/016_SLX-12998_MA_RPMpeaks.png")
-plot(A,M,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM reads in peaks")
+plot(A,M,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM reads in peaks",ylim=c(-6.25,4.25))
 abline(h=0)
 dev.off()
 
@@ -69,7 +69,7 @@ A<-apply(hsrpm,1,function(x){
   return(log10(sum(x)))
 })
 png("plots/016_SLX-12998_MA_RPMaligned.png")
-plot(A,M,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM aligned reads")
+plot(A,M,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM aligned reads",ylim=c(-6.25,4.25))
 abline(h=0)
 dev.off()
 
@@ -98,7 +98,7 @@ A<-apply(hsrpm,1,function(x){
   return(log10(sum(x)))
 })
 png("plots/016_SLX-12998_MA_RPMtotal.png")
-plot(A,M,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM total reads")
+plot(A,M,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM total reads",ylim=c(-6.25,4.25))
 abline(h=0)
 dev.off()
 
@@ -117,7 +117,7 @@ A<-apply(hscounts,1,function(x){
   return(log10(sum(x)))
 })
 png("plots/016_SLX-12998_MA_counts.png")
-plot(A,M,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="Raw counts in peaks")
+plot(A,M,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="Raw counts in peaks", ylim=c(-6.25,4.25))
 abline(h=0)
 dev.off()
 
