@@ -186,9 +186,9 @@ plot(
 dba.report(jg.dba_analysis_SLX8047)
 dba.report(jg.dba_analysis_SLX14229)
 
-nearestPeak <- nearest(dba.report(jg.dba_analysis_SLX8047),dba.report(jg.dba_analysis_SLX14229))
-SLX8047_fc<-dba.report(jg.dba_analysis_SLX8047,bFlip=TRUE)$Fold
-SLX14229_fc<-dba.report(jg.dba_analysis_SLX14229)[nearestPeak]$Fold
+nearestPeak <- nearest(dba.report(jg.dba_analysis_SLX8047, th=1),dba.report(jg.dba_analysis_SLX14229, th=1))
+SLX8047_fc<-dba.report(jg.dba_analysis_SLX8047,bFlip=TRUE, th=1)$Fold
+SLX14229_fc<-dba.report(jg.dba_analysis_SLX14229,th=1)[nearestPeak]$Fold
 
 
 png("plots/032_normalization_comparision.png")
@@ -200,9 +200,26 @@ abline(h=0, col="grey",lty=2)
 abline(v=0, col="grey",lty=2)
 coef<-lm( SLX8047_fc ~ SLX14229_fc + 0 )
 abline(coef, col="navyblue")
-text(3.1,-0.25, expression( "gradient = 0.96, r = 0.503, p-value < 2.2 x" ~ 10^{-16}))
+text(3.1,-0.25, expression( "gradient = 0.96, r = 0.557, p-value < 2.2 x" ~ 10^{-16}))
 dev.off()     
 
 
 result<-cor.test(SLX8047_fc,SLX14229_fc, method="pearson")
+nearestPeak <- nearest(dba.report(jg.dba_analysis_SLX8047,th=1),dba.report(jg.dba_analysis_SLX14229,th=1))
+SLX8047_pv<-dba.report(jg.dba_analysis_SLX8047,bFlip=TRUE,th=1)$"p-value"
+SLX14229_pv<-dba.report(jg.dba_analysis_SLX14229, th=1)[nearestPeak]$"p-value"
+
+
+png("plots/032_normalization_pvalue_comparision.png")
+smoothScatter(-log(SLX8047_pv),-log(SLX14229_pv),pch=20, col="#00000055",
+              xlab="-log(p-value) after normalization using Drosophila/H2av spike-in",
+              ylab="-log(p-value) after normalization using CTCF control peaks",
+              main="Comparision of normalisation methods")
+abline(h=0, col="grey",lty=2)
+abline(v=0, col="grey",lty=2)
+coef<-lm(  SLX8047_pv  ~ SLX14229_pv+ 0 )
+abline(coef, col="navyblue")
+dev.off()     
+
+cor.test(SLX8047_pv,SLX14229_pv, method="pearson")
 
