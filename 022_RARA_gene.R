@@ -98,3 +98,12 @@ dev.off()
 pdf("plots/022_RARA_locus_min.pdf",pointsize=3)
 plotTracks(list(ideoTrack, axisTrack,dTrack1a,dTrack1b,CTCFa,  txTranscripts_v1), from =  windowStart, to = windowEnd)
 dev.off()
+
+
+dTrack1a_scaled <- DataTrack(range = bamFile, genome = "hg19", type = "l", name = "ICI1", window = -1, chromosome = chromosome, col="red", ylim=c(0,96),showAxis=F)
+CTCFa_scaled <- DataTrack(range = bamFile, genome = "hg19", type = "l", name = "CTCF", window = -1, chromosome = chromosome, col="purple",ylim=c(0,96),showAxis=F)
+pdf("plots/022_RARA_locus_min_scaled.pdf",pointsize=3)
+plotTracks(list(ideoTrack, axisTrack,dTrack1a_scaled,dTrack1b,CTCFa_scaled,  txTranscripts_v1), from =  windowStart, to = windowEnd)
+dev.off()
+
+
