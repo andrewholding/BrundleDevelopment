@@ -158,4 +158,4 @@ nrow(jg.controlResultsDeseq[jg.DeSeqSignificant,][jg.DeSeqSignificantUp,])
 jg.DeSeqSignificantDown <- jg.controlResultsDeseq[jg.DeSeqSignificant,]$"log2FoldChange" > 0
 nrow(jg.controlResultsDeseq[jg.DeSeqSignificant,][jg.DeSeqSignificantDown,])
 
-write.csv(jg.controlResultsDeseq, file="csv/02_SLX14229_controlResultsDeseq.csv")
+write.csv(jg.controlResultsDeseq, file="csv/029_SLX14229_controlResultsDeseq.csv")

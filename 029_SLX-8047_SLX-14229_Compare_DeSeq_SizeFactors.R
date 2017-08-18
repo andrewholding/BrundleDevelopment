@@ -7,6 +7,7 @@
 
 source('package/brundle.R')
 
+
 ######################
 #
 # Settings
@@ -14,10 +15,9 @@ source('package/brundle.R')
 ######################
 
 setwd("/Volumes/FlyPeaks/FlyPeaks")
-dbaSummits                <- 200
 jg.controlMinOverlap      <- 5
 jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX8047_dm.csv"
-jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX8047_hs.csv"
+jg.experimentSampleSheet  <- "samplesheet/test_dm.csv"
 
 
 ######################
@@ -26,10 +26,10 @@ jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX8047_hs.csv"
 #
 ######################
 
-filename<-"Rdata/029_SLX-8047_dba_human_drosophila.rda"
+filename<-"Rdata/029_SLX-8047_SLX14229_dba_human_drosophila.rda"
 if(!file.exists(filename)){
-  dbaExperiment <- jg.getDba(jg.experimentSampleSheet,   dbaSummits)
-  dbaControl    <- jg.getDba(jg.controlSampleSheet,   dbaSummits)
+  dbaExperiment <- jg.getDba(jg.experimentSampleSheet)
+  dbaControl    <- jg.getDba(jg.controlSampleSheet)
   save(dbaExperiment,dbaControl,file=filename)
 } else {
   load(filename)
@@ -39,6 +39,7 @@ if(!file.exists(filename)){
 ## Extract Peak set from DiffBind
 jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
 jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl)
+
 
 #Convert Peakset to DeSeq Workflow
 jg.controlPeaksetDeSeq<-jg.convertPeakset(jg.controlPeakset)
@@ -67,23 +68,29 @@ png("plots/029_SLX-8047_SLX-14229_DeSeq_Analysis_ER.png")
 jg.plotDeSeq(jg.experimentResultsDeseq_SLX8047,
              p=0.01,
              title.main="Fold-change in ER binding",
-             flip=T
-             )
+             flip=T)
 dev.off()
 
-#Now run for SLX-14229
+#Export Consensus
+report <- dba.report(dba.analyze(dbaExperiment), th=1, 
+                     DataType=DBA_DATA_FRAME)
+score <- -10*(log10(report$FDR))
+write.table(cbind(report[,1:3],rownames(report),score),
+              "csv/slx-8047-consenus.bed", quote=FALSE, sep="\t",
+              row.names=FALSE, col.names=FALSE)
+
+#Now run for SLX-14229 
 
 jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX14229_hs_CTCF_DBA.csv"
-jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX14229_hs_ER_DBA.csv"
+#Using the consensus peak set from above 
+jg.experimentSampleSheet  <- "samplesheet/test.csv"
 
 
-filename<-"Rdata/028_SLX-14229_dba_human_ER_CTCF.rda"
-#As there seems to be seed involved in counting which gives
-#a small variance to the the results which is best avoided.
+filename<-"Rdata/029_SLX-8047_SLX-14229_dba_human_ER_CTCF_consensus.rda"
 
 if(!file.exists(filename)){
-    dbaExperiment <- jg.getDba(jg.experimentSampleSheet,   dbaSummits)
-    dbaControl    <- jg.getDba(jg.controlSampleSheet,   dbaSummits)
+    dbaExperiment <- jg.getDba(jg.experimentSampleSheet)
+    dbaControl    <- jg.getDba(jg.controlSampleSheet)
     save(dbaExperiment,dbaControl,file=filename)
 } else {
     load(filename)
@@ -93,6 +100,11 @@ if(!file.exists(filename)){
 ## Extract Peak set from DiffBind
 jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
 jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl)
+
+
+#set -values to 1
+#jg.controlPeakset[jg.controlPeakset<1] <- 1
+#jg.experimentPeakset[jg.experimentPeakset<1]<- 1
 
 #Convert Peakset to DeSeq Workflow
 jg.controlPeaksetDeSeq<-jg.convertPeakset(jg.controlPeakset)
@@ -129,24 +141,32 @@ dev.off()
 library(latticeExtra)
 
 ma.df<-jg.experimentResultsDeseq_SLX14229
-#Overlaid by hand for speed. For formal matching see Figure 15.
-a<-    xyplot(-ma.df$log2FoldChange-0.65 ~ log(ma.df$baseMean, base=10)*0.95,
+
+a<-    xyplot((-ma.df$log2FoldChange+0.2) ~ log(ma.df$baseMean, base=10),
            col=c("deepskyblue4"), ylim=c(-6,2), main="Comparision between CTCF and H2av", scales="free", aspect=1, pch=20, cex=0.5,
            ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),
            par.settings=list(par.xlab.text=list(cex=1.1,font=2), par.ylab.text=list(cex=1.1,font=2)));
     
-ma.df<-jg.experimentResultsDeseq_SLX8047
-
-b<-    xyplot(-ma.df$log2FoldChange ~ log(ma.df$baseMean, base=10),
+ma.df_2<-jg.experimentResultsDeseq_SLX8047
+#Note this has been manually addjusted to be more illustrative.
+b<-    xyplot(-(ma.df_2$log2FoldChange*1.1-0.1) ~ (log(ma.df_2$baseMean, base=10)*1.1+0.2),
+              panel=function(...) {
+                  panel.xyplot(...)
+                  panel.abline(h=0, lty = "dotted", col = "black")
+                  panel.segments(3.25,0,1,1.75, col="red",lwd=2)
+                  panel.segments(3.25,0,1,-1.75, col="red")
+                  panel.segments(1,1.75,1,-1.75, col="red")
+              },
               col=c("palegreen3"), main="Comparision between CTCF and H2av", scales="free", aspect=1, pch=20, cex=0.5,
               ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),
               par.settings=list(par.xlab.text=list(cex=1.1,font=2), par.ylab.text=list(cex=1.1,font=2)));
 
 png("plots/029_SLX-8047-SLX-14229_Overlay_CTCF_bottom.png")
-a + as.layer(b)
+a + as.layer(b) 
 dev.off()
 
 
 png("plots/029_SLX-8047-SLX-14229_Overlay_CTCF_top.png")
 b + as.layer(a)
 dev.off()
+
