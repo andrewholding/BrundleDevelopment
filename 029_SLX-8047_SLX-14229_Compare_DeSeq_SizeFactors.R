@@ -17,7 +17,9 @@ source('package/brundle.R')
 setwd("/Volumes/FlyPeaks/FlyPeaks")
 jg.controlMinOverlap      <- 5
 jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX8047_dm.csv"
-jg.experimentSampleSheet  <- "samplesheet/test_dm.csv"
+#ER peakset of 10,000 most significant ER peaks as scored by macs2 from 
+#SLX-12998.D707_D505
+jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX8047_consensus.csv"
 
 
 ######################
@@ -82,8 +84,8 @@ write.table(cbind(report[,1:3],rownames(report),score),
 #Now run for SLX-14229 
 
 jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX14229_hs_CTCF_DBA.csv"
-#Using the consensus peak set from above 
-jg.experimentSampleSheet  <- "samplesheet/test.csv"
+#Using the same consensus peak set from above 
+jg.experimentSampleSheet  <- "samplesheet_SLX14229_hs_ER_consensus.csv"
 
 
 filename<-"Rdata/029_SLX-8047_SLX-14229_dba_human_ER_CTCF_consensus.rda"
@@ -143,6 +145,13 @@ library(latticeExtra)
 ma.df<-jg.experimentResultsDeseq_SLX14229
 
 a<-    xyplot((-ma.df$log2FoldChange+0.2) ~ log(ma.df$baseMean, base=10),
+              panel=function(...) {
+                  panel.xyplot(...)
+                  panel.abline(h=0, lty = "dotted", col = "black")
+                  panel.segments(3.0,0,1,1.6, col="red",lwd=2)
+                  panel.segments(3.0,0,1,-1.6, col="red",lwd=2)
+                  panel.segments(1,1.6,1,-1.6, col="red",lwd=2)
+              },
            col=c("deepskyblue4"), ylim=c(-6,2), main="Comparision between CTCF and H2av", scales="free", aspect=1, pch=20, cex=0.5,
            ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),
            par.settings=list(par.xlab.text=list(cex=1.1,font=2), par.ylab.text=list(cex=1.1,font=2)));
@@ -153,9 +162,9 @@ b<-    xyplot(-(ma.df_2$log2FoldChange*1.1-0.1) ~ (log(ma.df_2$baseMean, base=10
               panel=function(...) {
                   panel.xyplot(...)
                   panel.abline(h=0, lty = "dotted", col = "black")
-                  panel.segments(3.25,0,1,1.75, col="red",lwd=2)
-                  panel.segments(3.25,0,1,-1.75, col="red")
-                  panel.segments(1,1.75,1,-1.75, col="red")
+                  panel.segments(3.0,0,1,1.6, col="red",lwd=2)
+                  panel.segments(3.0,0,1,-1.6, col="red",lwd=2)
+                  panel.segments(1,1.6,1,-1.6, col="red",lwd=2)
               },
               col=c("palegreen3"), main="Comparision between CTCF and H2av", scales="free", aspect=1, pch=20, cex=0.5,
               ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),
@@ -170,3 +179,36 @@ png("plots/029_SLX-8047-SLX-14229_Overlay_CTCF_top.png")
 b + as.layer(a)
 dev.off()
 
+png("plots/029_SLX-8047-SLX-14229_consensus_padj_compared.png")
+plot(-10*log(jg.experimentResultsDeseq_SLX14229$padj),
+     -10*log(jg.experimentResultsDeseq_SLX8047$padj),
+     pch=20,
+     main="Comparision of p-values between datasets",
+     xlab="Adjusted p-value ER normalised to CTCF",
+     ylab="Adjusted p-value ER normalised to H2av")
+dev.off()
+
+lm(jg.experimentResultsDeseq_SLX14229$padj ~
+       jg.experimentResultsDeseq_SLX8047$padj  )
+#Result Gradient 0.7471, intercept 0.1054
+cor.test(jg.experimentResultsDeseq_SLX14229$padj,
+         jg.experimentResultsDeseq_SLX8047$padj)
+#cor = 0.4773432
+#p-value = 0
+
+png("plots/029_SLX-8047-SLX-14229_consensus_fold_change_compared.png")
+plot(jg.experimentResultsDeseq_SLX14229$log2FoldChange,
+     jg.experimentResultsDeseq_SLX8047$log2FoldChange,
+     pch=20,
+     main="Comparision of fold change between datasets",
+     xlab=expression("log"[2]~" ER ChIP fold change CTCF normalised"),
+     ylab=expression("log"[2]~" ER ChIP fold change H2av normalised"))
+dev.off()
+
+lm(jg.experimentResultsDeseq_SLX14229$log2FoldChange ~
+       jg.experimentResultsDeseq_SLX8047$log2FoldChange  )
+#Result Gradient 0.9401, intercept -0.3579
+cor.test(jg.experimentResultsDeseq_SLX14229$log2FoldChange,
+         jg.experimentResultsDeseq_SLX8047$log2FoldChange)
+#cor = 0.765245 
+#p-value = 0
