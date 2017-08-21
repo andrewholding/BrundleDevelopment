@@ -1,0 +1,1 @@
+cmd = ../csv/044_significantCTCFPeaks.bed hg19 ctcfBinding
