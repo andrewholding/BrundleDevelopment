@@ -20,6 +20,77 @@ jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX8047_dm.csv"
 jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX8047_hs.csv"
 
 
+## Changing font sizes for manuscript
+
+jg.plotDeSeq<-function(ma.df, filename = 'file.name', p = 0.01, title.main = "Differential ChIP",log2fold =0.5, flip=FALSE)
+{;
+    
+    if (flip == TRUE)
+    {
+        ma.df$log2FoldChange <- -ma.df$log2FoldChange
+    }
+    par(mar=c(5.1,5.1,4.1,2.1))
+    xyplot(ma.df$log2FoldChange ~ log(ma.df$baseMean, base=10),
+           groups=(ma.df$padj < p & abs(ma.df$log2FoldChange) > log2fold & !is.na(ma.df$padj)),
+           col=c("black","red"), main=title.main, scales="free", aspect=1, pch=20, cex=0.5,
+           ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),
+           par.settings=list(par.main.text=list(cex=1.5,font=2),par.xlab.text=list(cex=1.5,font=2), par.ylab.text=list(cex=1.5,font=2),axis.text=list(cex=1.0,font=2)));
+    
+}
+
+jg.plotDeSeqCombined <- function(jg.controlResultsDeseq,jg.experimentResultsDeseq,title.main,padjX,flip=FALSE)
+{
+    jg.controlResultsDeseq$group = 'a'
+    jg.experimentResultsDeseq$group = 'b'
+    
+    if (flip == TRUE)
+    {
+        jg.controlResultsDeseq$log2FoldChange <- -jg.controlResultsDeseq$log2FoldChange
+        jg.experimentResultsDeseq$log2FoldChange <- -jg.experimentResultsDeseq$log2FoldChange
+    }
+    
+    for (i in 1:length(jg.experimentResultsDeseq$group)) {
+        if (!is.na(jg.experimentResultsDeseq$padj[i]) & !is.na(jg.experimentResultsDeseq$log2FoldChange[i]) & jg.experimentResultsDeseq$padj[i] < padjX & jg.experimentResultsDeseq$log2FoldChange[i] < 0) {
+            jg.experimentResultsDeseq$group[i] <- 'd'
+        }
+        else if (!is.na(jg.experimentResultsDeseq$padj[i]) & !is.na(jg.experimentResultsDeseq$log2FoldChange[i]) & jg.experimentResultsDeseq$padj[i] < padjX & jg.experimentResultsDeseq$log2FoldChange[i] > 0) {
+            jg.experimentResultsDeseq$group[i] <- 'c'
+        }
+    }
+    
+    for (i in 1:length(jg.controlResultsDeseq$group)) {
+        if (!is.na(jg.controlResultsDeseq$padj[i]) & !is.na(jg.controlResultsDeseq$log2FoldChange[i]) & jg.controlResultsDeseq$padj[i] < padjX & jg.controlResultsDeseq$log2FoldChange[i] < 0) {
+            jg.controlResultsDeseq$group[i] <- 'f'
+        }
+        else if (!is.na(jg.controlResultsDeseq$padj[i]) & !is.na(jg.controlResultsDeseq$log2FoldChange[i]) & jg.controlResultsDeseq$padj[i] < padjX & jg.controlResultsDeseq$log2FoldChange[i] > 0) {
+            jg.controlResultsDeseq$group[i] <- 'e'
+        }
+    }
+    
+    full.res = rbind(jg.controlResultsDeseq, jg.experimentResultsDeseq)
+    par(mar=c(5.1,5.1,4.1,2.1))
+    xyplot(full.res$log2FoldChange ~ log(full.res$baseMean, base=10), data = full.res,
+           groups=full.res$group,
+           col=c("grey40","grey80",  "#ff5454","#5480ff",  "#08298a","#750505"),
+           ylab = expression('log'[2]*' Differential ChIP'),
+           xlab = expression("log"[10]~"Mean of Normalized Counts"),
+           aspect=1.0,
+           pch=16,
+           cex=0.5,
+           main=title.main,
+           scales=list(x=list(cex=1.0, relation = "free"), y =list(cex=1.0, relation="free")),
+           between=list(y=0.5, x=0.5),
+           auto.key = TRUE,
+           par.settings=list(par.main.text=list(cex=1.5,font=2),par.xlab.text=list(cex=1.5,font=2), par.ylab.text=list(cex=1.5,font=2),axis.text=list(cex=0.7,font=2)),
+           key=list(corner=c(1,0),
+                    cex=1.0,
+                    points=list(col=c( "gray80","gray40", "#ff5454", "#5480ff", "#750505", "#08298a","white"), pch=20),
+                    text=list(c("Target Binding","Control Binding", "Target Decreased","Target Increased","Control Decreased","Control Increased", " "))
+           ))
+          
+        
+}
+
 ######################
 #
 # Main Code

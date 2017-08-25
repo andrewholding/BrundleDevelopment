@@ -99,7 +99,8 @@ A_RPM_ER<-apply(hsrpm_ER,1,function(x){
 
 
 png("plots/019_SLX-14229_MA_RPM_HsMm_ER.png")
-plot(A_RPM_ER,M_RPM_ER,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="RPM aligned reads")
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(A_RPM_ER,M_RPM_ER,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="RPM aligned reads")
 abline(h=0)
 
 dev.off()
@@ -121,7 +122,8 @@ A_RPM_CTCF<-apply(hsrpm_CTCF,1,function(x){
 })
 
 png("plots/019_SLX-14229_MA_RPM_HsMm_ER_CTCF.png")
-plot(A_RPM_ER,M_RPM_ER,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="RPM aligned reads")
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(A_RPM_ER,M_RPM_ER,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="RPM aligned reads")
 points(A_RPM_CTCF,M_RPM_CTCF,pch=20,col="gray")
 lm1<-lm(M_RPM_CTCF~A_RPM_CTCF)
 abline(lm1$coef,col="blue")
@@ -129,13 +131,15 @@ abline(h=0)
 dev.off()
 
 png("plots/019_SLX-14229_MA_counts_HsMm_ERonly.png")
-plot(Ahs_ER,Mhs_ER,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Raw counts in peaks")
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(Ahs_ER,Mhs_ER,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Raw counts in peaks")
 abline(h=0)
 
 dev.off()
 
 png("plots/019_SLX-14229_MA_counts_HsMm.png")
-plot(Ahs_ER,Mhs_ER,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Raw counts in peaks")
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(Ahs_ER,Mhs_ER,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="RPM aligned reads")
 points(Ahs_CTCF,Mhs_CTCF,pch=20,col="gray")
 abline(h=0)
 legend("topright",legend=c("Human ER",  "Human CTCF"),pch=20,col=c("black","gray"), cex=1)
@@ -162,7 +166,8 @@ MmmFit_CTCF<-Mmm_CTCF-(Amm_CTCF*angularcoeff)-intercept
 
 
 png("plots/019_SLX-14229_MA_counts_HsMm_Normalised.png")
-plot(Ahs_ER,MhsFit_ER,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Normalised to Human CTCF")
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(Ahs_ER,MhsFit_ER,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Normalised to Human CTCF")
 points(Ahs_CTCF,MhsFit_CTCF,pch=20,col="gray")
 
 abline(h=0)
@@ -177,8 +182,8 @@ legend("bottomright",legend=c("Human ER", "Human CTCF"),pch=20,col=c("purple","b
 dev.off()
 
 png("plots/019_SLX-14229_MA_counts_HsMm_Normalised_Alpha.png")
-
-plot(Ahs_ER,MhsFit_ER,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Normalised to Human CTCF",col=alpha("black",0.2))
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(Ahs_ER,MhsFit_ER,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Normalised to Human CTCF",col=alpha("black",0.2))
 points(Ahs_CTCF,MhsFit_CTCF,pch=20,col=alpha("gray",0.2))
 
 abline(h=0)
@@ -193,7 +198,8 @@ legend("bottomright",legend=c("Human ER", "Human CTCF"),pch=20,col=c("purple","b
 dev.off()
 
 png("plots/019_SLX-14229_Mm_MA_counts_HsMm.png")
-plot(Ahs_ER,Mhs_ER,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Raw counts in peaks")
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(Ahs_ER,Mhs_ER,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Raw counts in peaks")
 points(Ahs_CTCF,Mhs_CTCF,pch=20,col="gray")
 points(Amm_ER,Mmm_ER,pch=20,col="darkolivegreen3")
 points(Amm_CTCF,Mmm_CTCF,pch=20,col="darkolivegreen")
@@ -225,7 +231,8 @@ MmmFit_CTCF<-Mmm_CTCF-(Amm_CTCF*angularcoeff)-intercept
 
 
 png("plots/019_SLX-14229_Mm_MA_counts_HsMm_Normalised.png")
-plot(Ahs_ER,MhsFit_ER,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Normalised to Human CTCF")
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(Ahs_ER,MhsFit_ER,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Normalised to Human CTCF")
 points(Ahs_CTCF,MhsFit_CTCF,pch=20,col="gray")
 points(Amm_ER,MmmFit_ER,pch=20,col="darkolivegreen3")
 points(Amm_CTCF,MmmFit_CTCF,pch=20,col="darkolivegreen")
@@ -244,8 +251,8 @@ legend("bottomright",legend=c("Mouse ER","Human ER", "Mouse CTCF", "Human CTCF")
 dev.off()
 
 png("plots/019_SLX-14229_Mm_MA_counts_HsMm_Normalised_Alpha.png")
-
-plot(Ahs_ER,MhsFit_ER,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Normalised to Human CTCF",col=alpha("black",0.2))
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(Ahs_ER,MhsFit_ER,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Normalised to Human CTCF",col=alpha("black",0.2))
 points(Ahs_CTCF,MhsFit_CTCF,pch=20,col=alpha("gray",0.2))
 points(Amm_ER,MmmFit_ER,pch=20,col=alpha("darkolivegreen3",0.2))
 points(Amm_CTCF,MmmFit_CTCF,pch=20,col=alpha("darkolivegreen",0.2))

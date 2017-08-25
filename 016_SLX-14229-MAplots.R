@@ -40,7 +40,8 @@ A<-apply(hsrpm,1,function(x){
   return(log10(sum(x)))
 })
 png("plots/016_SLX-14229_MA_RPMpeaks.png",w=1000,h=1000,p=30)
-plot(A,M,pch=20,xlab="A, log10(RPM)",ylab="M, log2FC(fulvestrant)",main="RPM reads in peaks")
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(A,M,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,xlab="A, log10(RPM)",ylab="M, log2FC(fulvestrant)",main="RPM reads in peaks")
 abline(h=0)
 dev.off()
 
@@ -75,7 +76,8 @@ A<-apply(hsrpm,1,function(x){
   return(log10(sum(x)))
 })
 png("plots/016_SLX-14229_MA_RPMaligned.png",w=1000,h=1000,p=30)
-plot(A,M,pch=20,xlab="A, log10(RPM)",ylab="M, log2FC(fulvestrant)",main="RPM aligned reads")
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(A,M,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,xlab="A, log10(RPM)",ylab="M, log2FC(fulvestrant)",main="RPM aligned reads")
 abline(h=0)
 dev.off()
 
@@ -108,7 +110,8 @@ A<-apply(hsrpm,1,function(x){
   return(log10(sum(x)))
 })
 png("plots/016_SLX-14229_MA_RPMtotal.png",w=1000,h=1000,p=30)
-plot(A,M,pch=20,xlab="A, log10(RPM)",ylab="M, log2FC(fulvestrant)",main="RPM total reads")
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(A,M,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,xlab="A, log10(RPM)",ylab="M, log2FC(fulvestrant)",main="RPM total reads")
 abline(h=0)
 dev.off()
 
@@ -127,7 +130,8 @@ A<-apply(hscounts,1,function(x){
   return(log10(sum(x)))
 })
 png("plots/016_SLX-14229_MA_counts.png",w=1000,h=1000,p=30)
-plot(A,M,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)",main="Raw counts in peaks")
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(A,M,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)",main="Raw counts in peaks")
 abline(h=0)
 dev.off()
 
@@ -156,7 +160,8 @@ Amm<-apply(mmcounts,1,function(x){
   return(log10(sum(x)))
 })
 png("plots/016_SLX-14229_MA_counts_HsMm.png",w=1000,h=1000,p=30)
-plot(Ahs,Mhs,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)",main="Raw counts in peaks")
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(Ahs,Mhs,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)",main="Raw counts in peaks")
 points(Amm,Mmm,pch=20,col="darkolivegreen3")
 abline(h=0)
 legend("topright",legend=c("Mouse","Human"),pch=20,col=c("darkolivegreen3","black"))
@@ -174,7 +179,8 @@ MhsFit<-Mhs-(Ahs*angularcoeff)-intercept
 MmmFit<-Mmm-(Amm*angularcoeff)-intercept
 
 png("plots/016_SLX-14229-MA_counts_HsMm_Fit.png",w=1000,h=1000,p=30)
-plot(Ahs,MhsFit,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)",main="Counts normalized by Mouse Distribution")
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(Ahs,MhsFit,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)",main="Counts normalized by Mouse Distribution")
 points(Amm,MmmFit,pch=20,col="darkolivegreen3")
 abline(h=0)
 legend("topright",legend=c("Mouse","Human"),pch=20,col=c("darkolivegreen3","black"))

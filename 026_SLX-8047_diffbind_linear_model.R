@@ -1,4 +1,4 @@
-#This has been replaced with 027, so may have been have unfixed bugs.
+#This has been replaced with 027.
 
 setwd("/Volumes/FlyPeaks/FlyPeaks")
 library(DiffBind)
@@ -24,7 +24,8 @@ if(!file.exists(filename)){
 
 dba_analysis<-dba.analyze(dba)
 png("plots/026_diffbindMA_import.png")
-dba.plotMA(dba_analysis)
+par(mar=c(5.1,5.1,4.1,2.1))
+dba.plotMA(dba_analysis,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5)
 dev.off()
 
 
@@ -177,7 +178,9 @@ A_dm_corrected<-apply(dmcounts,1,function(x){
 
 
 png("plots/026_MAplot_dm_fit.png")
-plot(A_corrected,M_corrected,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Raw aligned reads - Dm Fit")
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(A_corrected,M_corrected,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)", main="Raw aligned reads - Dm Fit",
+      cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5)
 points(A_dm_corrected,M_dm_corrected,pch=20,col="cornflowerblue")
 lm1<-lm(M_dm_corrected~A_dm_corrected)
 abline(lm1$coef,col="red4")
@@ -208,6 +211,7 @@ newDBA_analysis<-dba.analyze(newDBA)
 
 
 png("plots/026_diffbindMA_reimported_dm_fit.png")
-dba.plotMA(newDBA_analysis)
+par(mar=c(5.1,5.1,4.1,2.1))
+dba.plotMA(newDBA_analysis, cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5)
 dev.off()
 
