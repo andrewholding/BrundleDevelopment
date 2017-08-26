@@ -34,7 +34,8 @@ jg.plotDeSeq<-function(ma.df, filename = 'file.name', p = 0.01, title.main = "Di
            groups=(ma.df$padj < p & abs(ma.df$log2FoldChange) > log2fold & !is.na(ma.df$padj)),
            col=c("black","red"), main=title.main, scales="free", aspect=1, pch=20, cex=0.5,
            ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),
-           par.settings=list(par.main.text=list(cex=1.5,font=2),par.xlab.text=list(cex=1.5,font=2), par.ylab.text=list(cex=1.5,font=2),axis.text=list(cex=1.0,font=2)));
+           par.settings=list(axis.text=list(cex=1.5,font=1),par.main.text=list(cex=1.5,font=2),par.xlab.text=list(cex=1.5,font=2), par.ylab.text=list(cex=1.5,font=2))
+           );
     
 }
 
@@ -78,10 +79,10 @@ jg.plotDeSeqCombined <- function(jg.controlResultsDeseq,jg.experimentResultsDese
            pch=16,
            cex=0.5,
            main=title.main,
-           scales=list(x=list(cex=1.0, relation = "free"), y =list(cex=1.0, relation="free")),
+           scales=list(x=list(cex=1.5, relation = "free"), y =list(cex=1.5, relation="free")),
            between=list(y=0.5, x=0.5),
            auto.key = TRUE,
-           par.settings=list(par.main.text=list(cex=1.5,font=2),par.xlab.text=list(cex=1.5,font=2), par.ylab.text=list(cex=1.5,font=2),axis.text=list(cex=0.7,font=2)),
+           par.settings=list(axis.text=list(cex=1.5,font=1),par.main.text=list(cex=1.5,font=2),par.xlab.text=list(cex=1.5,font=2), par.ylab.text=list(cex=1.5,font=2)),
            key=list(corner=c(1,0),
                     cex=1.0,
                     points=list(col=c( "gray80","gray40", "#ff5454", "#5480ff", "#750505", "#08298a","white"), pch=20),
@@ -150,6 +151,7 @@ jg.experimentResultsDeseq   = results(jg.experimentDeSeq)
 
 #Plot results
 png("plots/029_SLX-8047_DeSeq_Analysis_H2av.png")
+par(mar=c(5.1,5.1,4.1,2.1))
   jg.plotDeSeq(jg.controlResultsDeseq,
                p=0.01, 
                title.main="Fold-change in H2av binding",
@@ -157,6 +159,7 @@ png("plots/029_SLX-8047_DeSeq_Analysis_H2av.png")
                )
 dev.off()
 png("plots/029_SLX-8047_DeSeq_Analysis_ER.png")
+par(mar=c(5.1,5.1,4.1,2.1))
 jg.plotDeSeq(jg.experimentResultsDeseq,
              p=0.01,
              title.main="Fold-change in ER binding",
@@ -169,6 +172,7 @@ jg.experimentDeSeqInternal<-jg.runDeSeq(jg.experimentPeaksetDeSeq, jg.conditions
 jg.experimentResultsDeseqInternal   = results(jg.experimentDeSeqInternal)
 
 png("plots/029_SLX-8047_DeSeq_Analysis_ER_nocorrection.png")
+    par(mar=c(5.1,5.1,4.1,2.1))
   jg.plotDeSeq(jg.experimentResultsDeseqInternal,
                title.main="Fold-change in ER binding (no correction)",
                p=0.01,
@@ -179,6 +183,7 @@ dev.off()
 
 #Draw Combined figure.
 png("plots/029_SLX-8047_DeSeq_Analysis_HsDm.png")
+    par(mar=c(5.1,5.1,4.1,2.1))
   jg.plotDeSeqCombined(jg.controlResultsDeseq,
                        jg.experimentResultsDeseq,
                        title.main="ER and H2av Binding Folding changes on ER treatment",

@@ -192,15 +192,17 @@ SLX14229_fc<-dba.report(jg.dba_analysis_SLX14229,th=1)[nearestPeak]$Fold
 
 
 png("plots/032_normalization_comparision.png")
+par(mar=c(5.1,5.1,4.1,3.1))
 smoothScatter(SLX8047_fc,SLX14229_fc,pch=20, col="#00000055",
               xlab="Fold change normalized using Drosophila/H2av spike-in",
               ylab="Fold change normalized using CTCF control peaks",
-              main="Comparision of normalisation methods")
+              main="Comparision of normalisation methods",
+              cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5)
 abline(h=0, col="grey",lty=2)
 abline(v=0, col="grey",lty=2)
 coef<-lm( SLX8047_fc ~ SLX14229_fc + 0 )
 abline(coef, col="navyblue")
-text(3.1,-0.25, expression( "gradient = 0.96, r = 0.557, p-value < 2.2 x" ~ 10^{-16}))
+text(3.25,-0.25, expression( "gradient = 0.96, r = 0.557, p-value < 2.2 x" ~ 10^{-16}), cex=1.25)
 dev.off()     
 
 

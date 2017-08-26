@@ -7,6 +7,28 @@
 
 source("package/brundle.R")
 
+
+## Modifying plot for publication
+
+jg.plotNormalization <- function(jg.controlCountsTreated,jg.controlCountsUntreated) {
+    plot(rowMeans(jg.controlCountsTreated),rowMeans(jg.controlCountsUntreated),
+         cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5, pch=20,
+         xlab="Counts in peak after treatment" ,  ylab="Counts in peak before treatment" ,
+         main="Comparision of Counts in peaks",)
+    lm1<-lm(rowMeans(jg.controlCountsUntreated) ~ 0 + rowMeans(jg.controlCountsTreated))
+    
+    abline(c(0,lm1$coef),col="red3")
+    print(lm1$coefficients)
+    angularcoeff<-lm1$coef[1]
+    
+    points(rowMeans(jg.controlCountsTreated)*angularcoeff,rowMeans(jg.controlCountsUntreated),pch=20, col="royalblue3" )
+    treatment_fit<-rowMeans(jg.controlCountsTreated)*angularcoeff
+    lm1<-lm(treatment_fit ~ 0 + rowMeans(jg.controlCountsUntreated))
+    abline(c(0,lm1$coef),col="purple")
+    legend("topleft",legend=c("Raw", "Normalised"),pch=20,col=c("black","royalblue3"))
+}
+
+
 ######################
 #
 # Settings
@@ -94,7 +116,7 @@ for (jg.titration in c("A1","A2","A5","A10","A15", "A20","A30","A40","A50")) {
                                               )
   
   #Apply coefficent and control factor
-  jg.experimentPeaksetNormalised<-jd.applyNormalisation(jg.experimentPeakset,
+  jg.experimentPeaksetNormalised<-jg.applyNormalisation(jg.experimentPeakset,
                                                         jg.coefficient,
                                                         jg.correctionFactor,
                                                         jg.treatedNames
@@ -109,11 +131,13 @@ for (jg.titration in c("A1","A2","A5","A10","A15", "A20","A30","A40","A50")) {
   #Analyze and plot with Diffbind                                                           
   jg.dba_analysis<-dba.analyze(jg.dba)
   png (paste0("plots/031_DBA_corrected_",jg.titration,".png"))
-    dba.plotMA(jg.dba_analysis)
+    par(mar=c(5.1,5.1,4.1,2.1))
+    dba.plotMA(jg.dba_analysis,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5)
   dev.off()
 } 
 #Unnormalised data for comparison
 dba_analysis<-dba.analyze(dbaExperiment)
 png (paste0("plots/031_DBA_uncorrected.png"))
-  dba.plotMA(dba_analysis)
+  par(mar=c(5.1,5.1,4.1,2.1))
+  dba.plotMA(dba_analysis,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5)
 dev.off()

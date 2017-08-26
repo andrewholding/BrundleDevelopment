@@ -84,13 +84,16 @@ unnormalised <-
 normalised <- as.data.frame(dba.report(jg.dba_analysis_SLX14229, th = 1))
 
 png("plots/041_SLX-14229_p-value_comparision.png", width=480, height=480)
+par(mar=c(5.1,5.1,4.1,2.1))
 plot(
+ 
     unnormalised$p.value,
     normalised$p.value,
     pch = 20,
     xlab = "Unnormalised p-value",
     ylab = "Normalised p-value",
-    main = "Effect of Normalisation on p-value"
+    main = "Effect of Normalisation on p-value",
+    cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5
 )
 dev.off()
 

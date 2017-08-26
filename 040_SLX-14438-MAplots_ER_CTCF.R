@@ -6,6 +6,27 @@
 
 source('package/brundle.R')
 
+## Modifying plot for publication
+
+jg.plotNormalization <- function(jg.controlCountsTreated,jg.controlCountsUntreated) {
+    plot(rowMeans(jg.controlCountsTreated),rowMeans(jg.controlCountsUntreated),
+         cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5, pch=20,
+         xlab="Counts in peak after treatment" ,  ylab="Counts in peak before treatment" ,
+         main="Comparision of Counts in peaks",)
+    lm1<-lm(rowMeans(jg.controlCountsUntreated) ~ 0 + rowMeans(jg.controlCountsTreated))
+    
+    abline(c(0,lm1$coef),col="red3")
+    print(lm1$coefficients)
+    angularcoeff<-lm1$coef[1]
+    
+    points(rowMeans(jg.controlCountsTreated)*angularcoeff,rowMeans(jg.controlCountsUntreated),pch=20, col="royalblue3" )
+    treatment_fit<-rowMeans(jg.controlCountsTreated)*angularcoeff
+    lm1<-lm(treatment_fit ~ 0 + rowMeans(jg.controlCountsUntreated))
+    abline(c(0,lm1$coef),col="purple")
+    legend("topleft",legend=c("Raw", "Normalised"),pch=20,col=c("black","royalblue3"))
+}
+
+
 ######################
 #
 # Settings
@@ -58,6 +79,11 @@ jg.untreatedNames <- names(jg.controlCountsUntreated)
 jg.treatedNames   <- names(jg.controlCountsTreated)
 
 ##Get Normalization Coefficient
+png("plots/040_SLX-14438_Normalization_c.png")
+par(mar=c(5.1,5.1,4.1,2.1))
+    jg.plotNormalization(jg.controlCountsTreated, jg.controlCountsUntreated)
+dev.off()
+
 jg.coefficient<-jg.getNormalizationCoefficient(jg.controlCountsTreated,
                                                jg.controlCountsUntreated)
 jg.correctionFactor<-jg.getCorrectionFactor(jg.experimentSampleSheet,
@@ -77,13 +103,15 @@ jg.dba <- DiffBind:::pv.resetCounts(dbaExperiment,
 #Analyze and plot with Diffbind      
 jg.dba_analysis<-dba.analyze(jg.dba)
 png("plots/040_SLX-14438_DiffBind_Analysis.png")
-dba.plotMA(jg.dba_analysis,bFlip=TRUE)
+par(mar=c(5.1,5.1,4.1,4.1))
+dba.plotMA(jg.dba_analysis,bFlip=TRUE, cex.lab=1.5, cex.axis=1.5, cex.main=1.25, cex.sub=1.5)
 dev.off()
 
 #Analyze and plot with Diffbind no correction     
 dba_analysis<-dba.analyze(dbaExperiment)
 png("plots/040_SLX-14438_DiffBind_Analysis_no_correction.png")
-dba.plotMA(dba_analysis,bFlip=TRUE)
+par(mar=c(5.1,5.1,4.1,4.1))
+dba.plotMA(dba_analysis,bFlip=TRUE,cex.lab=1.5, cex.axis=1.5, cex.main=1.25, cex.sub=1.5)
 dev.off()
 
 
@@ -103,8 +131,8 @@ dev.off()
 #Original vs Normalised data for comparison
 png("plots/040_SLX-14438_DiffBind_Analysis_Before_After.png")
 par(mfrow=c(1,2))
-dba.plotMA(dba_analysis,bFlip=TRUE)
-dba.plotMA(jg.dba_analysis,bFlip=TRUE)
+dba.plotMA(dba_analysis,bFlip=TRUE, cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5)
+dba.plotMA(jg.dba_analysis,bFlip=TRUE,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5)
 par(mfrow=c(1,1))
 dev.off()
 

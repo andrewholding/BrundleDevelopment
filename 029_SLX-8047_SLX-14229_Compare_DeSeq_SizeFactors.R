@@ -154,7 +154,7 @@ a<-    xyplot((-ma.df$log2FoldChange+0.2) ~ log(ma.df$baseMean, base=10),
               },
            col=c("deepskyblue4"), ylim=c(-6,2), main="Comparision between CTCF and H2av", scales="free", aspect=1, pch=20, cex=0.5,
            ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),
-           par.settings=list(par.xlab.text=list(cex=1.1,font=2), par.ylab.text=list(cex=1.1,font=2)));
+           par.settings=list(par.main.text=list(cex=1.57,font=2),axis.text=list(cex=1.57,font=1),par.xlab.text=list(cex=1.57,font=2), par.ylab.text=list(cex=1.57,font=2)));
     
 ma.df_2<-jg.experimentResultsDeseq_SLX8047
 #Note this has been manually addjusted to be more illustrative.
@@ -171,6 +171,7 @@ b<-    xyplot(-(ma.df_2$log2FoldChange*1.1-0.1) ~ (log(ma.df_2$baseMean, base=10
               par.settings=list(par.xlab.text=list(cex=1.1,font=2), par.ylab.text=list(cex=1.1,font=2)));
 
 png("plots/029_SLX-8047-SLX-14229_Overlay_CTCF_bottom.png")
+par(mar=c(5.1,5.1,4.1,2.1))
 a + as.layer(b) 
 dev.off()
 
@@ -197,9 +198,12 @@ cor.test(jg.experimentResultsDeseq_SLX14229$padj,
 #p-value = 0
 
 png("plots/029_SLX-8047-SLX-14229_consensus_fold_change_compared.png")
+par(mar=c(5.1,5.1,4.1,2.1))
+
 plot(jg.experimentResultsDeseq_SLX14229$log2FoldChange,
      jg.experimentResultsDeseq_SLX8047$log2FoldChange,
      pch=20,
+     cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,
      main="Comparision of fold change between datasets",
      xlab=expression("log"[2]~" ER ChIP fold change CTCF normalised"),
      ylab=expression("log"[2]~" ER ChIP fold change H2av normalised"))

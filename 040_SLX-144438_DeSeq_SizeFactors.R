@@ -106,13 +106,15 @@ dbaExperimentCorrected<-jg.correctDBASizeFactors(dbaExperiment,
 
 #Plot DiffBind MA - Before and After
 png("plots/040_SLX-14438_DiffBind_DeSeq_Analysis_ER_nocorrection.png")
+  par(mar=c(5.1,5.1,4.1,4.1))
   dbaExperimentAnalysis<-dba.analyze(dbaExperiment)
-  dba.plotMA(dbaExperimentAnalysis,bFlip=TRUE)
+  dba.plotMA(dbaExperimentAnalysis,bFlip=TRUE,cex.lab=1.5, cex.axis=1.5, cex.main=1.25, cex.sub=1.5)
 dev.off()
   
 png("plots/040_SLX-14438_DiffBind_DeSeq_Analysis_ER.png")
+  par(mar=c(5.1,5.1,4.1,4.1))
   dbaExperimentAnalysisCorrected<-dba.analyze(dbaExperimentCorrected)
-  dba.plotMA(dbaExperimentAnalysisCorrected,bFlip=TRUE)
+  dba.plotMA(dbaExperimentAnalysisCorrected,bFlip=TRUE,cex.lab=1.5, cex.axis=1.5, cex.main=1.25, cex.sub=1.5)
 dev.off()
 
 
