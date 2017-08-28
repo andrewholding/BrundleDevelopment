@@ -147,8 +147,8 @@ legend("topright",legend=c("Human ER",  "Human CTCF"),pch=20,col=c("black","gray
 lm1<-lm(Mhs_CTCF~Ahs_CTCF)
 abline(lm1$coef,col="blue")
 lm1<-lm(Mhs_ER~Ahs_ER)
-abline(lm1$coef,col="purple")
-legend("bottomright",legend=c("Human ER", "Human CTCF"),pch=20,col=c("purple","blue"), cex=1)
+#abline(lm1$coef,col="purple")
+#legend("bottomright",legend=c("Human ER", "Human CTCF"),pch=20,col=c("purple","blue"), cex=1)
 
 dev.off()
 
@@ -176,8 +176,8 @@ legend("topright",legend=c("Human ER",  "Human CTCF"),pch=20,col=c("black","gray
 lm1<-lm(MhsFit_CTCF~Ahs_CTCF)
 abline(lm1$coef,col="blue")
 lm1<-lm(MhsFit_ER~Ahs_ER)
-abline(lm1$coef,col="purple")
-legend("bottomright",legend=c("Human ER", "Human CTCF"),pch=20,col=c("purple","blue"), cex=1)
+#abline(lm1$coef,col="purple")
+#legend("bottomright",legend=c("Human ER", "Human CTCF"),pch=20,col=c("purple","blue"), cex=1)
 
 dev.off()
 
@@ -192,8 +192,8 @@ legend("topright",legend=c("Human ER",  "Human CTCF"),pch=20,col=c("black","gray
 lm1<-lm(MhsFit_CTCF~Ahs_CTCF)
 abline(lm1$coef,col="blue")
 lm1<-lm(MhsFit_ER~Ahs_ER)
-abline(lm1$coef,col="purple")
-legend("bottomright",legend=c("Human ER", "Human CTCF"),pch=20,col=c("purple","blue"), cex=1)
+#abline(lm1$coef,col="purple")
+#legend("bottomright",legend=c("Human ER", "Human CTCF"),pch=20,col=c("purple","blue"), cex=1)
 
 dev.off()
 

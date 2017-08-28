@@ -16,11 +16,12 @@ jg.plotDeSeq<-function(ma.df, filename = 'file.name', p = 0.01, title.main = "Di
         ma.df$log2FoldChange <- -ma.df$log2FoldChange
     }
     par(mar=c(5.1,5.1,4.1,2.1))
-    xyplot(ma.df$log2FoldChange ~ log(ma.df$baseMean, base=10),
+    xyplot(ma.df$log2FoldChange ~ log(ma.df$baseMean, base=10),#xlim=c(0,4),ylim=c(-3,1.25),
            groups=(ma.df$padj < p & abs(ma.df$log2FoldChange) > log2fold & !is.na(ma.df$padj)),
            col=c("black","red"), main=title.main, scales="free", aspect=1, pch=20, cex=0.5,
            ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),
-           par.settings=list(axis.text=list(cex=1.5,font=1),par.main.text=list(cex=1.5,font=2),par.xlab.text=list(cex=1.5,font=2), par.ylab.text=list(cex=1.5,font=2))
+           par.settings=list(axis.text=list(cex=1.5,font=1),par.main.text=list(cex=1.5,font=2),par.xlab.text=list(cex=1.5,font=2), par.ylab.text=list(cex=1.5,font=2)
+           )
     );
     
 }
