@@ -114,20 +114,6 @@ par(mar=c(5.1,5.1,4.1,4.1))
 dba.plotMA(dba_analysis,bFlip=TRUE,cex.lab=1.5, cex.axis=1.5, cex.main=1.25, cex.sub=1.5)
 dev.off()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #Original vs Normalised data for comparison
 png("plots/040_SLX-14438_DiffBind_Analysis_Before_After.png")
 par(mfrow=c(1,2))
@@ -136,8 +122,7 @@ dba.plotMA(jg.dba_analysis,bFlip=TRUE,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, c
 par(mfrow=c(1,1))
 dev.off()
 
-#FRiP Comparision for manuscript
-
-mean(as.numeric(dbaExperiment$SN))    #2.5%  Reads in ER Peaks 
-mean(as.numeric(dbaControl$SN))       #46% Reads in CTCF Peaks
-
+#Comparison of Reads in Peaks between data sets
+boxplot(list(rowMeans(jg.experimentPeakset[-c(1:3)]),rowMeans(jg.controlPeakset[-c(1:3)])))
+boxplot(list(rowMeans(jg.experimentPeakset[c(4,6,8)]),rowMeans(jg.controlPeakset[-c(1:3)])))
+boxplot(list(rowMeans(jg.experimentPeakset[c(5,6,7)]),rowMeans(jg.controlPeakset[-c(1:3)])))
