@@ -4,3 +4,8 @@ cd ..
 mkdir motifAnalysis
 cd motifAnalysis
 findMotifsGenome.pl ../csv/044_significantCTCFPeaks.bed hg19 ctcfBinding
+
+mkdir bed
+cd bed
+scanMotifGenomeWide.pl ../ctcfBinding/homerMotifs.all.motifs hg19 -bed -int -keepAll > output.bed
+

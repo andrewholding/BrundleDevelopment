@@ -42,5 +42,6 @@ ENCODE/*.fq
 ENCODE/*.bam
 ENCODE/*.bai
 
+motifAnalysis/bed/output.bed
 
 
