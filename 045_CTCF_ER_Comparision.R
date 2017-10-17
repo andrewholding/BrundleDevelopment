@@ -43,7 +43,7 @@ symbol(txTranscripts_v1) <- symbols[gene(txTranscripts_v1)]
 
 plotTracks(txTranscripts_v1, from = windowStart, to = windowEnd)
 
-<<<<<<< HEAD
+
 #Sequence
 #library(BSgenome.Hsapiens.UCSC.hg19)
 #seqTrack <- SequenceTrack(Hsapiens)
@@ -84,19 +84,11 @@ motifTrack <- AnnotationTrack(start = c(windowStart+504, windowStart+192,
                            genome = "hg19", name = "")
 feature(motifTrack)<-c("CTCF","ERE","ERE","ERE","ERE","ERE","ERE")
 plotTracks(motifTrack,featureAnnotation = "id", ERE = "blue", CTCF = "purple")
-=======
->>>>>>> 7d77fa9ac960256ed80cbb9be70a306f39110b3d
-
-
 
 pdf("plots/045_RARA_locus_min.pdf",pointsize=3,width=8,height=2)
-<<<<<<< HEAD
 plotTracks(list(ideoTrack,dTrack1b,dTrack2a,CTCFb,motifTrack),
            from =  windowStart, to = windowEnd, #featureAnnotation = "id"
             ERE = "blue", CTCF = "purple")
-=======
-plotTracks(list(ideoTrack,dTrack1b,dTrack2a,CTCFb), from =  windowStart, to = windowEnd)
->>>>>>> 7d77fa9ac960256ed80cbb9be70a306f39110b3d
 dev.off()
 
 

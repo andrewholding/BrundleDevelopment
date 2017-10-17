@@ -85,7 +85,7 @@ jg.correctionFactor<-jg.getCorrectionFactor(jg.experimentSampleSheet,
                                             )
 
 #Apply coefficent and control factor
-jg.experimentPeaksetNormalised<-jd.applyNormalisation(jg.experimentPeakset,
+jg.experimentPeaksetNormalised<-jg.applyNormalisation(jg.experimentPeakset,
                                                       jg.coefficient,
                                                       jg.correctionFactor,
                                                       jg.treatedNames
@@ -108,3 +108,12 @@ dba.plotMA(dba_analysis)
 dba.plotMA(jg.dba_analysis)
 par(mfrow=c(1,1))
 
+#Export for Downstream analysi
+dba.SLX8047<-jg.dba
+dba.SLX8047_report<-dba.report(jg.dba_analysis,th=1)
+save(dba.SLX8047_report,dba.SLX8047, file="Rdata/027_SLX-8047_dba_report.Rda")
+
+#Vulcan export, but not normalised
+library(vulcan)
+vobj<-vulcan.import(jg.experimentSampleSheet)
+save(vobj,file="Rdata/027_SLX-8047_vobj.Rda")
