@@ -82,6 +82,14 @@ abline(h=0)
 dev.off()
 
 
+pdf("plots/pdf/016_SLX-14229_MA_RPMaligned.pdf",point=15)
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(A,M,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,xlab="A, log10(RPM)",ylab="M, log2FC(fulvestrant)",main="RPM aligned reads")
+abline(h=0)
+dev.off()
+
+
+
 ### MA RPM total reads
 load("Rdata/012_SLX-14229_nrreads.rda")
 nrreads<-nrreads[grep("SLX-14229.D",names(nrreads))]
@@ -169,6 +177,16 @@ lm1<-lm(Mmm~Amm)
 abline(lm1$coef,col="red")
 dev.off()
 
+pdf("plots/pdf/016_SLX-14229_MA_counts_HsMm.pdf",point=15)
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(Ahs,Mhs,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)",main="Raw counts in peaks")
+points(Amm,Mmm,pch=20,col="darkolivegreen3")
+abline(h=0)
+legend("topright",legend=c("Mouse","Human"),pch=20,col=c("darkolivegreen3","black"))
+lm1<-lm(Mmm~Amm)
+abline(lm1$coef,col="red")
+dev.off()
+
 
 ### 20th century normalization
 # Residuals of the Drosophila fit
@@ -187,6 +205,17 @@ legend("topright",legend=c("Mouse","Human"),pch=20,col=c("darkolivegreen3","blac
 lm1<-lm(MmmFit~Amm)
 abline(lm1$coef,col="red")
 dev.off()
+
+pdf("plots/pdf/016_SLX-14229-MA_counts_HsMm_Fit.pdf",point=15)
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(Ahs,MhsFit,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,xlab="A, log10(counts)",ylab="M, log2FC(fulvestrant)",main="Counts normalized by Mouse Distribution")
+points(Amm,MmmFit,pch=20,col="darkolivegreen3")
+abline(h=0)
+legend("topright",legend=c("Mouse","Human"),pch=20,col=c("darkolivegreen3","black"))
+lm1<-lm(MmmFit~Amm)
+abline(lm1$coef,col="red")
+dev.off()
+
 
 
 

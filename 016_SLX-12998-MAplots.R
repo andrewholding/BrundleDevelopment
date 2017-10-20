@@ -46,6 +46,12 @@ plot(A,M,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expres
 abline(h=0)
 dev.off()
 
+pdf("plots/pdf/016_SLX-12998_MA_RPMpeaks.pdf",pointsize=15)
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(A,M,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM reads in peaks",ylim=c(-6.25,4.25))
+abline(h=0)
+dev.off()
+
 
 ### MA RPM aligned reads
 load("Rdata/012_SLX-12998_aligned.rda")
@@ -77,6 +83,11 @@ plot(A,M,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,cex.lab=1.5, cex.a
 abline(h=0)
 dev.off()
 
+pdf("plots/pdf/016_SLX-12998_MA_RPMaligned.pdf",pointsize=15)
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(A,M,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM aligned reads",ylim=c(-6.25,4.25))
+abline(h=0)
+dev.off()
 
 ### MA RPM total reads
 load("Rdata/012_SLX-12998_nrreads.rda")
@@ -127,6 +138,12 @@ plot(A,M,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expres
 abline(h=0)
 dev.off()
 
+pdf("plots/pdf/016_SLX-12998_MA_counts.pdf", point=15)
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(A,M,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="Raw counts in peaks", ylim=c(-6.25,4.25))
+abline(h=0)
+dev.off()
+
 
 
 ### MA for Mouse + Human Counts
@@ -161,6 +178,15 @@ lm1<-lm(Mmm~Amm)
 abline(lm1$coef,col="red")
 dev.off()
 
+pdf("plots/pdf/016_SLX-12998_MA_counts_HsMm.pdf", point=15)
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(Ahs,Mhs,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM aligned reads",ylim=c(-6.25,4))
+points(Amm,Mmm,pch=20,col="darkolivegreen3")
+abline(h=0)
+legend("topright",legend=c("Mouse","Human"),pch=20,col=c("darkolivegreen3","black"))
+lm1<-lm(Mmm~Amm)
+abline(lm1$coef,col="red")
+dev.off()
 
 ### 20th century normalization
 # Residuals of the Drosophila fit
@@ -180,7 +206,15 @@ lm1<-lm(MmmFit~Amm)
 abline(lm1$coef,col="red")
 dev.off()
 
-
+pdf("plots/pdf/016_SLX-12998-MA_counts_HsMm_Fit.pdf", point=15)
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(Ahs,MhsFit,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="Counts normalized to Mouse ER",ylim=c(-16,2))
+points(Amm,MmmFit,pch=20,col="darkolivegreen3")
+abline(h=0)
+legend("topright",legend=c("Mouse","Human"),pch=20,col=c("darkolivegreen3","black"))
+lm1<-lm(MmmFit~Amm)
+abline(lm1$coef,col="red")
+dev.off()
 
 
 

@@ -76,6 +76,12 @@ plot(A,M,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expres
 abline(h=0)
 dev.off()
 
+pdf("plots/pdf/016_SLX-8047_MA_RPMaligned.pdf",point=15)
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(A,M,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM aligned reads")
+abline(h=0)
+dev.off()
+
 
 ### MA RPM total reads
 load("Rdata/012_SLX-8047_nrreads.rda")
@@ -161,6 +167,16 @@ lm1<-lm(Mdm~Adm)
 abline(lm1$coef,col="red")
 dev.off()
 
+pdf("plots/pdf/016_SLX-8047_MA_counts_HsDm.pdf", point=15)
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(Ahs,Mhs,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM aligned reads",ylim=c(-6.25,2))
+points(Adm,Mdm,col="cornflowerblue",pch=20)
+abline(h=0)
+legend("topright",legend=c("Drosophila","Human"),pch=20,col=c("cornflowerblue","black"))
+lm1<-lm(Mdm~Adm)
+abline(lm1$coef,col="red")
+dev.off()
+
 
 ### 20th century normalization
 # Residuals of the Drosophila fit
@@ -173,6 +189,16 @@ MdmFit<-Mdm-(Adm*angularcoeff)-intercept
 png("plots/016_SLX-8047-MA_counts_HsDm_Fit.png") 
 par(mar=c(5.1,5.1,4.1,2.1))
 plot(Ahs,MhsFit,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="Counts normalized by Drosophila Distribution",ylim=c(-6.25,2))
+points(Adm,MdmFit,pch=20,col="cornflowerblue")
+abline(h=0)
+legend("topright",legend=c("Drosophila","Human"),pch=20,col=c("cornflowerblue","black"))
+lm1<-lm(MdmFit~Adm)
+abline(lm1$coef,col="red")
+dev.off()
+
+pdf("plots/pdf/016_SLX-8047-MA_counts_HsDm_Fit.pdf", point=15) 
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(Ahs,MhsFit,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="Counts normalized by H2av Distribution",ylim=c(-6.25,2))
 points(Adm,MdmFit,pch=20,col="cornflowerblue")
 abline(h=0)
 legend("topright",legend=c("Drosophila","Human"),pch=20,col=c("cornflowerblue","black"))

@@ -106,6 +106,14 @@ abline(h=0)
 dev.off()
 
 
+pdf("plots/pdf/019_SLX-14229_MA_RPM_HsMm_ER.pdf",point=15)
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(A_RPM_ER,M_RPM_ER,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="RPM aligned reads")
+abline(h=0)
+
+dev.off()
+
+
 hsrpm_CTCF<-hscounts_CTCF
 for(i in 1:length(hsrpm_CTCF)){
   hsrpm_CTCF[i]<-hscounts_CTCF[i]/aligned[i]
@@ -153,6 +161,21 @@ lm1<-lm(Mhs_ER~Ahs_ER)
 dev.off()
 
 
+pdf("plots/pdf/019_SLX-14229_MA_counts_HsMm.pdf", point=15)
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(Ahs_ER,Mhs_ER,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="RPM aligned reads")
+points(Ahs_CTCF,Mhs_CTCF,pch=20,col="gray")
+abline(h=0)
+legend("topright",legend=c("Human ER",  "Human CTCF"),pch=20,col=c("black","gray"), cex=1)
+
+lm1<-lm(Mhs_CTCF~Ahs_CTCF)
+abline(lm1$coef,col="blue")
+lm1<-lm(Mhs_ER~Ahs_ER)
+#abline(lm1$coef,col="purple")
+#legend("bottomright",legend=c("Human ER", "Human CTCF"),pch=20,col=c("purple","blue"), cex=1)
+
+dev.off()
+
 ### 20th century normalization
 # Residuals  fit
 lm1<-lm(Mhs_CTCF~Ahs_CTCF)
@@ -166,6 +189,22 @@ MmmFit_CTCF<-Mmm_CTCF-(Amm_CTCF*angularcoeff)-intercept
 
 
 png("plots/019_SLX-14229_MA_counts_HsMm_Normalised.png")
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(Ahs_ER,MhsFit_ER,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Normalised to Human CTCF")
+points(Ahs_CTCF,MhsFit_CTCF,pch=20,col="gray")
+
+abline(h=0)
+legend("topright",legend=c("Human ER",  "Human CTCF"),pch=20,col=c("black","gray"), cex=1)
+
+lm1<-lm(MhsFit_CTCF~Ahs_CTCF)
+abline(lm1$coef,col="blue")
+lm1<-lm(MhsFit_ER~Ahs_ER)
+#abline(lm1$coef,col="purple")
+#legend("bottomright",legend=c("Human ER", "Human CTCF"),pch=20,col=c("purple","blue"), cex=1)
+
+dev.off()
+
+pdf("plots/pdf/019_SLX-14229_MA_counts_HsMm_Normalised.pdf", point=15)
 par(mar=c(5.1,5.1,4.1,2.1))
 plot(Ahs_ER,MhsFit_ER,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Normalised to Human CTCF")
 points(Ahs_CTCF,MhsFit_CTCF,pch=20,col="gray")

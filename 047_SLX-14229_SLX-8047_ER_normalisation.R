@@ -170,4 +170,56 @@ jg.ERNormalisationRatio<-jg.ERratio/jg.EROnlyExperimentRatio
 
 jg.plotMA(jg.EROnlyExperimentPeakset,jg.EROnlyExperimentPeakset,jg.treatedNames,jg.untreatedNames,1)
 jg.plotMA(jg.EROnlyExperimentPeakset,jg.EROnlyExperimentPeakset,jg.treatedNames,jg.untreatedNames,1/jg.ERNormalisationRatio)
+#Value=0.8453127 
 
+pdf("plots/pdf/047_ER-ERnormalised.pdf", points=15)
+jg.plotMA(jg.EROnlyExperimentPeakset,jg.EROnlyExperimentPeakset,jg.treatedNames,jg.untreatedNames,1/jg.ERNormalisationRatio)
+dev.off()
+
+
+x<-jg.EROnlyExperimentPeakset
+    fulvestrant<-rowMeans(x[c(4,6,8,10)])
+    fulvestrant<-fulvestrant/jg.ERNormalisationRatio
+    untreated<-rowMeans(x[c(5,7,9,11)])
+    fc<-untreated/fulvestrant
+    log2fc<- -log2(fc)
+Mhs<-log2fc
+
+Ahs<-log10(rowSums(jg.EROnlyExperimentPeakset[4:11]))
+
+pdf("plots/pdf/047_ER-ER_normalised.pdf", points=15)
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(Ahs,Mhs,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="Counts normalized",ylim=c(-6.25,2))
+abline(h=0)
+dev.off()
+
+jg.correctionFactor<-jg.getCorrectionFactor(jg.EROnlyExperimentSampleSheet,
+                                            jg.treatedNames,
+                                            jg.untreatedNames
+)
+
+jg.ERexperimentPeaksetNormalised<-jg.applyNormalisation(jg.EROnlyExperimentPeakset,
+                                                      jg.ERNormalisationRatio,
+                                                      jg.correctionFactor,
+                                                      jg.treatedNames
+)
+
+#Return values to Diffbind object
+dbaERonlyExperimentNormalised <- DiffBind:::pv.resetCounts(dbaERonlyExperiment,
+                                    jg.ERexperimentPeaksetNormalised
+)
+
+jg.dba_analysisNormalised<-dba.analyze(dbaERonlyExperimentNormalised)
+dba.plotMA(jg.dba_analysisNormalised)
+false_postive_normalised<-dba.report(jg.dba_analysisNormalised, th=0.05)
+false_postive_normalised<-length(false_postive_normalised[false_postive_normalised$Fold>0])
+
+
+jg.dba_analysis<-dba.analyze(dbaERonlyExperiment)
+dba.plotMA(jg.dba_analysis)
+
+false_postive<-dba.report(jg.dba_analysis, th=0.05)
+false_postive<-length(false_postive[false_postive$Fold>0])
+
+
+false_postive_normalised/false_postive*100 #5.9%

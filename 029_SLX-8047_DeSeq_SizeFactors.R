@@ -167,6 +167,15 @@ jg.plotDeSeq(jg.experimentResultsDeseq,
              )
 dev.off()
 
+pdf("plots/pdf/029_SLX-8047_DeSeq_Analysis_ER.pdf",point=15)
+par(mar=c(5.1,5.1,4.1,2.1))
+jg.plotDeSeq(jg.experimentResultsDeseq,
+             p=0.01,
+             title.main="Fold-change in ER binding",
+             flip=T
+)
+dev.off()
+
 #Repeat not using out control
 jg.experimentDeSeqInternal<-jg.runDeSeq(jg.experimentPeaksetDeSeq, jg.conditions, NULL)
 jg.experimentResultsDeseqInternal   = results(jg.experimentDeSeqInternal)
@@ -180,6 +189,15 @@ png("plots/029_SLX-8047_DeSeq_Analysis_ER_nocorrection.png")
                )
 dev.off()
 
+pdf("plots/pdf/029_SLX-8047_DeSeq_Analysis_ER_nocorrection.pdf", point=15)
+par(mar=c(5.1,5.1,4.1,2.1))
+jg.plotDeSeq(jg.experimentResultsDeseqInternal,
+             title.main="Fold-change in ER binding (no correction)",
+             p=0.01,
+             flip=T
+)
+dev.off()
+
 
 #Draw Combined figure.
 png("plots/029_SLX-8047_DeSeq_Analysis_HsDm.png")
@@ -190,6 +208,13 @@ png("plots/029_SLX-8047_DeSeq_Analysis_HsDm.png")
                        p=0.01, flip=T)
 dev.off()
 
+pdf("plots/pdf/029_SLX-8047_DeSeq_Analysis_HsDm.pdf")
+par(mar=c(5.1,5.1,4.1,2.1))
+jg.plotDeSeqCombined(jg.controlResultsDeseq,
+                     jg.experimentResultsDeseq,
+                     title.main="ER and H2av Binding Folding changes on ER treatment",
+                     p=0.01, flip=T)
+dev.off()
 
 #Correct in DiffBind
 dbaExperimentCorrected<-jg.correctDBASizeFactors(dbaExperiment,
