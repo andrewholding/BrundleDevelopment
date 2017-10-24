@@ -33,10 +33,10 @@ rept <- report.peak(dat)
 rept
 
 
-###CAn also use BAM
+###Can also use BAM
 
 library(ShortRead)
-aln <- readAligned("./", pattern="emb.bam", type="Bowtie")
+aln <- readAligned("./", pattern="emb.bam", type="BAM")
 chip.data.list[["emb"]] <- aln
 chip.data.list <- list()
 chip.data.list[["emb"]] <- "/path/emb.bed.file"

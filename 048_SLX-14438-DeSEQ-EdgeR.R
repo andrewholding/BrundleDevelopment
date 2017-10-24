@@ -98,3 +98,30 @@ par(mfrow=c(1,1))
 boxplot(list(rowMeans(jg.experimentPeakset[-c(1:3)]),rowMeans(jg.controlPeakset[-c(1:3)])))
 boxplot(list(rowMeans(jg.experimentPeakset[c(4,6,8)]),rowMeans(jg.controlPeakset[-c(1:3)])))
 boxplot(list(rowMeans(jg.experimentPeakset[c(5,6,7)]),rowMeans(jg.controlPeakset[-c(1:3)])))
+
+
+
+plotForComparision<-function(countSet, MethodName) {
+c1<-countSet$Conc_none
+c0<-countSet$Conc_Fulvestrant
+#c1<-c1[]
+
+M<-log(c1*c0)
+A<- -log(c1/c0,base=2)
+
+png(paste0("plots/048_",MethodName,".png"), pointsize=20)
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(M[countSet$FDR>0.05],A[countSet$FDR>0.05],pch=20,
+     main=MethodName,
+     ylab = expression('log'[2]*' Differential ChIP'),
+     xlab = expression("log"[10]~"Mean of Normalized Counts"),cex=0.05,
+     ylim = c(-3,3), xlim=c(0,5))
+points(M[countSet$FDR<0.05],A[countSet$FDR<0.05],pch=20,col="red",cex=0.05)
+abline(h=0)
+dev.off()
+}
+
+plotForComparision(dba.report(dba_analysis_EDGER, method=DBA_EDGER, th=1), "EdgeR")
+plotForComparision(dba.report(dba_analysis_DeSEQ2, th=1), "DeSEQ2")
+plotForComparision(dba.report(dba_analysis_DiffBind, th=1), "DiffBind")
+plotForComparision(dba.report(jg.dba_analysis, th=1), "Brundle")

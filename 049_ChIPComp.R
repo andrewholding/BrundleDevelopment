@@ -49,12 +49,13 @@ c1<-c1[]
 M<-log(c1*c0)
 A<- -log(c1/c0,base=2)
 
-png("plots/049_ChIPComp.png")
+png("plots/049_ChIPComp.png", pointsize=20)
 par(mar=c(5.1,5.1,4.1,2.1))
 plot(M[countSet$db$pvalue.wald>0.05],A[countSet$db$pvalue.wald>0.05],pch=20,
         main="ChIPComp",
         ylab = expression('log'[2]*' Differential ChIP'),
-        xlab = expression("log"[10]~"Mean of Normalized Counts"))
-points(M[countSet$db$pvalue.wald<0.05],A[countSet$db$pvalue.wald<0.05],pch=20,col="red")
+        xlab = expression("log"[10]~"Mean of Normalized Counts"),cex=0.05)
+points(M[countSet$db$pvalue.wald<0.05],A[countSet$db$pvalue.wald<0.05],pch=20,col="red",cex=0.05)
 abline(h=0)
 dev.off()
+
