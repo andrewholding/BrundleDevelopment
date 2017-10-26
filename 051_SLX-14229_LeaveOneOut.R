@@ -95,3 +95,5 @@ if (!file.exists(filename)) {
 } else{
     load(filename)
 }
+
+system("git add . && git commit -m "auto commit" && git push")

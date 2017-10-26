@@ -263,9 +263,13 @@ jg.normalize <-
         jg.treatedCondition,
         jg.untreatedCondition
     ) {
+        
+    message("Load Experimental Data")
     dbaExperiment <- jg.getDba(jg.experimentSampleSheet, dbaSummits)
+    message("Load Control Data")
     dbaControl    <- jg.getDba(jg.controlSampleSheet,   dbaSummits)
     
+    message("Normalize Data")    
     
     #Load Sample Ids from control sample sheet.
     jg.sampleIds <- jg.getSampleIds(jg.controlSampleSheet)
