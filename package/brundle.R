@@ -254,6 +254,66 @@ jg.correctDBASizeFactors<-function(dba,jg.controlSizeFactors)
 }
 
 
+
+jg.normalize <-
+    function(
+        jg.experimentSampleSheet,
+        jg.controlSampleSheet,
+        dbaSummits,
+        jg.treatedCondition,
+        jg.untreatedCondition
+    ) {
+    dbaExperiment <- jg.getDba(jg.experimentSampleSheet, dbaSummits)
+    dbaControl    <- jg.getDba(jg.controlSampleSheet,   dbaSummits)
+    
+    
+    #Load Sample Ids from control sample sheet.
+    jg.sampleIds <- jg.getSampleIds(jg.controlSampleSheet)
+    
+    
+    ## Extract Peak set from DiffBind
+    jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
+    jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl)
+    
+    
+    #Get counts for each condition
+    jg.controlCountsTreated <- jg.getControlCounts(jg.controlPeakset,
+                                                   jg.controlSampleSheet,
+                                                   jg.treatedCondition)
+    jg.controlCountsUntreated <-
+        jg.getControlCounts(jg.controlPeakset,
+                            jg.controlSampleSheet,
+                            jg.untreatedCondition)
+    
+    #Get sample names for conditions
+    jg.untreatedNames <- names(jg.controlCountsUntreated)
+    jg.treatedNames   <- names(jg.controlCountsTreated)
+    
+    ##Get Normalization Coefficient
+    jg.coefficient <-
+        jg.getNormalizationCoefficient(jg.controlCountsTreated,
+                                       jg.controlCountsUntreated)
+    
+    jg.correctionFactor <-
+        jg.getCorrectionFactor(jg.experimentSampleSheet,
+                               jg.treatedNames,
+                               jg.untreatedNames)
+    
+    #Apply coefficent and control factor
+    jg.experimentPeaksetNormalised <-
+        jg.applyNormalisation(jg.experimentPeakset,
+                              jg.coefficient,
+                              jg.correctionFactor,
+                              jg.treatedNames)
+    
+    #Return values to Diffbind and plot normalised result.
+    jg.dba <- DiffBind:::pv.resetCounts(dbaExperiment,
+                                        jg.experimentPeaksetNormalised)
+    return(jg.dba)
+    }
+
+
+
 #Check Functions
 checkUsage(jg.countAlignedMReads)
 checkUsage(jg.getControlCounts)
@@ -270,3 +330,5 @@ checkUsage(jg.plotDeSeqCombined)
 checkUsage(jg.convertPeakset)
 checkUsage(jg.runDeSeq)
 checkUsage(jg.correctDBASizeFactors)
+checkUsage(jg.normalize)
+

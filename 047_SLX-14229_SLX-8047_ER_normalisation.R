@@ -57,7 +57,7 @@ jg.untreatedNames <- names(jg.controlCountsUntreated)
 jg.treatedNames   <- names(jg.controlCountsTreated)
 
 ##Plot showing normalization calculation (Optional)
-  jg.plotNormalization(jg.controlCountsTreated,
+jg.plotNormalization(jg.controlCountsTreated,
                      jg.controlCountsUntreated)
 
  ##Get Normalization Coefficient
@@ -223,3 +223,39 @@ false_postive<-length(false_postive[false_postive$Fold>0])
 
 
 false_postive_normalised/false_postive*100 #5.9%
+
+#Open H2Av normalised
+load(file="Rdata/027_SLX-8047_dba_report.Rda")
+dba.SLX8047<-dba.analyze(dba.SLX8047)
+
+peaks<-as.character(sort(as.numeric(row.names(as.data.frame(dba.report(dba.SLX8047, th=1))))))
+
+
+png("plots/047_Crossnormalised.png",point=15)
+plot(
+    dba.report(dba.SLX8047, th=1)[peaks]$Fold,
+    dba.report(jg.dba_analysisNormalised,th=1)[peaks]$Fold,
+    pch=20,
+    xlab="Log(FoldChange) in ER Binding Normalised to H2av",
+    ylab="Log(FoldChange) in ER Binding Cross-Normalised to CTCF",
+    cex=0.05,
+    main="Comparision of Fold-Change between\nCross-Normalised to Xenogenic Spike-in"
+)
+#points(
+#    (dba.report(dba.SLX8047, th=1)[peaks])[
+#        dba.report(dba.SLX8047, th=1)[peaks]$Conc_Fulvestrant< -0.5
+#        dba.report(dba.SLX8047, th=1)[peaks]$Conc_Fulvestrant< -0.5
+#    (dba.report(jg.dba_analysisNormalised, th=1)[peaks])[
+#                                           ]$Fold,
+#                                            ]$Fold,
+#    pch=20,
+#    col="red",
+#    cex=0.5
+#)
+dev.off()
+
+
+cor.test(dba.report(dba.SLX8047, th=1)[peaks]$Fold, dba.report(jg.dba_analysisNormalised,th=1)[peaks]$Fold)
+
+
+
