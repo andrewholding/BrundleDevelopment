@@ -54,6 +54,8 @@ jg.dba_analysis <- dba.analyze(jg.dba)
 dba.plotMA(jg.dba_analysis, bFlip = TRUE)
 #dev.off()
 
+system("git add . && git commit -m 'auto commit' && git push")
+
 filename <- "Rdata/051_dba_1.rda"
 if (!file.exists(filename)) {
     jg.dba_1 <- jg.normalize(
@@ -82,6 +84,8 @@ if (!file.exists(filename)) {
     load(filename)
 }
 
+system("git add . && git commit -m 'auto commit' && git push")
+
 filename <- "Rdata/051_dba_3.rda"
 if (!file.exists(filename)) {
     jg.dba_3 <- jg.normalize(
@@ -96,4 +100,4 @@ if (!file.exists(filename)) {
     load(filename)
 }
 
-system("git add . && git commit -m "auto commit" && git push")
+system("git add . && git commit -m 'auto commit' && git push")

@@ -4,7 +4,7 @@
 # Functions 
 #
 ######################
-
+setwd("/Volumes/FlyPeaks/FlyPeaks")
 source('package/brundle.R')
 
 ######################
@@ -13,7 +13,7 @@ source('package/brundle.R')
 #
 ######################
 
-setwd("/Volumes/FlyPeaks/FlyPeaks")
+
 dbaSummits                <- 200
 jg.controlMinOverlap      <- 5
 jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX8047_dm.csv"
