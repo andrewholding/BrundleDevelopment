@@ -134,7 +134,7 @@ idr.samplesheets=c(
     "samplesheet/samplesheet_SLX8047.csv",
     "samplesheet/samplesheet_SLX12998.csv",
     "samplesheet/samplesheet_SLX14229.csv",
-    "samplesheet_SLX14438_hs_DBA.csv")
+    "samplesheet/samplesheet_SLX14438_hs_DBA.csv")
 
 for (idr.samplesheet in idr.samplesheets) {
 
