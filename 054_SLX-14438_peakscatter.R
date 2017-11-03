@@ -59,13 +59,14 @@ if(!file.exists(filename)){
     load(filename)
 }
 
+
+### SLX14438
+
 jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
+
 librarySize<-as.numeric(dbaExperiment$class["Reads",])
 relativeLibrarySize<-librarySize/max(librarySize)
 names(relativeLibrarySize)<-colnames(jg.experimentPeakset[c(-1:-3)])
-
-
-
 
 
 par(mar=c(0.5, 0.5, 0.2, 0.2), mfrow=c(2,3),
@@ -86,4 +87,66 @@ for (samples in seq(1,length(samplesCombinations)/2))  {
     peaks[2]<-round(peaks[2]/peaksLibrarySize[2])
     jg.plotScatter(peaks,samples,T,samplesCombinations)
 }
+
+### SLX8047
+filename<-"Rdata/026_SLX-8047_dba.counts_human.rda"
+load(filename)
+dbaExperiment<-dba
+jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
+
+librarySize<-as.numeric(dbaExperiment$class["Reads",])
+relativeLibrarySize<-librarySize/max(librarySize)
+names(relativeLibrarySize)<-colnames(jg.experimentPeakset[c(-1:-3)])
+controlNames<-c("1b","2b","3b","4b")
+treatmentNames<-c("1a","2a","3a","4a")
+
+par(mar=c(0.5, 0.5, 0.2, 0.2), mfrow=c(2,6),
+    oma = c(4, 4, 0.2, 0.2))
+samplesCombinations<-combn(c(controlNames),2)
+for (samples in seq(1,length(samplesCombinations)/2))  {
+    peaksLibrarySize<-relativeLibrarySize[samplesCombinations[,samples]]
+    peaks<-jg.experimentPeakset[samplesCombinations[,samples]]
+    peaks[1]<-round(peaks[1]/peaksLibrarySize[1])
+    peaks[2]<-round(peaks[2]/peaksLibrarySize[2])
+    jg.plotScatter(peaks,samples, F,samplesCombinations)
+}
+samplesCombinations<-combn(c(treatmentNames),2)
+for (samples in seq(1,length(samplesCombinations)/2))  {
+    peaksLibrarySize<-relativeLibrarySize[samplesCombinations[,samples]]
+    peaks<-jg.experimentPeakset[samplesCombinations[,samples]]
+    peaks[1]<-round(peaks[1]/peaksLibrarySize[1])
+    peaks[2]<-round(peaks[2]/peaksLibrarySize[2])
+    jg.plotScatter(peaks,samples,T,samplesCombinations)
+}    
+
+### SLX-12998
+filename<-"Rdata/047_SLX-12998_dba_human.rda"
+load(filename)
+dbaExperiment<-dbaFullExperiment
+jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
+
+librarySize<-as.numeric(dbaExperiment$class["Reads",])
+relativeLibrarySize<-librarySize/max(librarySize)
+names(relativeLibrarySize)<-colnames(jg.experimentPeakset[c(-1:-3)])
+controlNames<-c("1b","2b","3b","4b")
+treatmentNames<-c("1a","2a","3a","4a")
+
+par(mar=c(0.5, 0.5, 0.2, 0.2), mfrow=c(2,6),
+    oma = c(4, 4, 0.2, 0.2))
+samplesCombinations<-combn(c(controlNames),2)
+for (samples in seq(1,length(samplesCombinations)/2))  {
+    peaksLibrarySize<-relativeLibrarySize[samplesCombinations[,samples]]
+    peaks<-jg.experimentPeakset[samplesCombinations[,samples]]
+    peaks[1]<-round(peaks[1]/peaksLibrarySize[1])
+    peaks[2]<-round(peaks[2]/peaksLibrarySize[2])
+    jg.plotScatter(peaks,samples, F,samplesCombinations)
+}
+samplesCombinations<-combn(c(treatmentNames),2)
+for (samples in seq(1,length(samplesCombinations)/2))  {
+    peaksLibrarySize<-relativeLibrarySize[samplesCombinations[,samples]]
+    peaks<-jg.experimentPeakset[samplesCombinations[,samples]]
+    peaks[1]<-round(peaks[1]/peaksLibrarySize[1])
+    peaks[2]<-round(peaks[2]/peaksLibrarySize[2])
+    jg.plotScatter(peaks,samples,T,samplesCombinations)
+}    
 
