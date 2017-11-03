@@ -255,19 +255,14 @@ jg.correctDBASizeFactors<-function(dba,jg.controlSizeFactors)
 
 
 
-jg.normalize <-
-    function(
-        jg.experimentSampleSheet,
-        jg.controlSampleSheet,
-        dbaSummits,
-        jg.treatedCondition,
-        jg.untreatedCondition
-    ) {
-        
-    message("Load Experimental Data")
-    dbaExperiment <- jg.getDba(jg.experimentSampleSheet, dbaSummits)
-    message("Load Control Data")
-    dbaControl    <- jg.getDba(jg.controlSampleSheet,   dbaSummits)
+jg.normalize<-function(
+    dbaExperiment,
+    dbaControl,
+    jg.treatedCondition,
+    jg.untreatedCondition
+) {
+    
+    
     
     message("Normalize Data")    
     
@@ -314,8 +309,7 @@ jg.normalize <-
     jg.dba <- DiffBind:::pv.resetCounts(dbaExperiment,
                                         jg.experimentPeaksetNormalised)
     return(jg.dba)
-    }
-
+}
 
 
 #Check Functions
