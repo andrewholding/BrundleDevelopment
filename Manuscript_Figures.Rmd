@@ -1,0 +1,1268 @@
+---
+title: "Brundle Development"
+author: "Andrew Holding"
+date: "11/7/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, messages=FALSE)
+```
+
+## Comparison of simple normalisation methods
+
+
+```{r}
+library(DiffBind)
+#setwd("/Volumes/FlyPeaks/FlyPeaks")
+
+hsconsensus<-readRDS("Rdata/015_SLX-12998_hsconsensus.rds")
+mmconsensus<-readRDS("Rdata/015_SLX-12998_mmconsensus.rds")
+hscounts<-hsconsensus[,-c(1:3)]
+mmcounts<-mmconsensus[,-c(1:3)]
+### MA RPM in peaks
+hsrpm<-apply(hscounts,2,function(x){
+  1E6*x/sum(x)
+})
+mmrpm<-apply(mmcounts,2,function(x){
+  1E6*x/sum(x)
+})
+M<-apply(hsrpm,1,function(x){
+  fulvestrant<-mean(x[c(1,2,4,5)])
+  untreated<-mean(x[c(3,6,7,8)])
+  fc<-mean(fulvestrant)/mean(untreated)
+  log2fc<-log2(fc)
+  return(log2fc)
+})
+A<-apply(hsrpm,1,function(x){
+  return(log10(sum(x)))
+})
+
+
+
+plot(A,M,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM reads in peaks",ylim=c(-6.25,4.25))
+abline(h=0)
+
+```
+
+```{r}
+
+load("Rdata/012_SLX-12998_aligned.rda")
+aligned<-aligned[grep("SLX-12998.D",names(aligned))]
+aligned<-sapply(aligned,sum)/1E6
+aligned<-aligned[c(4,7,8,9,2,3,6,5)]
+
+
+hsrpm<-hscounts
+for(i in 1:length(hsrpm)){
+  hsrpm[i]<-hscounts[i]/aligned[i]
+}
+mmrpm<-mmcounts
+for(i in 1:length(mmrpm)){
+  mmrpm[i]<-mmcounts[i]/aligned[i]
+}
+M<-apply(hsrpm,1,function(x){
+  fulvestrant<-mean(x[c(1,2,4,5)])
+  untreated<-mean(x[c(3,6,7,8)])
+  fc<-mean(fulvestrant)/mean(untreated)
+  log2fc<-log2(fc)
+  return(log2fc)
+})
+A<-apply(hsrpm,1,function(x){
+  return(log10(sum(x)))
+})
+
+plot(A,M,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM aligned reads",ylim=c(-6.25,4.25))
+abline(h=0)
+
+```
+
+```{r}
+
+load("Rdata/012_SLX-12998_nrreads.rda")
+nrreads<-nrreads[grep("SLX-12998.D",names(nrreads))]
+nrreads<-nrreads/1E6
+nrreads<-nrreads[c(4,7,8,9,2,3,6,5)]
+hsrpm<-hscounts
+for(i in 1:length(hsrpm)){
+  hsrpm[i]<-hscounts[i]/nrreads[i]
+}
+mmrpm<-mmcounts
+for(i in 1:length(mmrpm)){
+  mmrpm[i]<-mmcounts[i]/nrreads[i]
+}
+M<-apply(hsrpm,1,function(x){
+  fulvestrant<-mean(x[c(1,2,4,5)])
+  untreated<-mean(x[c(3,6,7,8)])
+  fc<-mean(fulvestrant)/mean(untreated)
+  log2fc<-log2(fc)
+  return(log2fc)
+})
+A<-apply(hsrpm,1,function(x){
+  return(log10(sum(x)))
+})
+
+plot(A,M,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM total reads",ylim=c(-6.25,4.25))
+abline(h=0)
+
+
+```
+
+```{r}
+### MA Counts human
+# a is treated, b is not treated
+M<-apply(hscounts,1,function(x){
+  fulvestrant<-mean(x[c(1,2,4,5)])
+  untreated<-mean(x[c(3,6,7,8)])
+  fc<-mean(fulvestrant)/mean(untreated)
+  log2fc<-log2(fc)
+  return(log2fc)
+})
+A<-apply(hscounts,1,function(x){
+  return(log10(sum(x)))
+})
+
+par(mar=c(5.1,5.1,4.1,2.1))
+plot(A,M,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="Raw counts in peaks", ylim=c(-6.25,4.25))
+abline(h=0)
+
+```
+
+## MA Plot of H2AV normalization
+```{r}
+# Read consensus peaks
+hsconsensus<-readRDS("Rdata/015_SLX-8047_hsconsensus.rds")
+dmconsensus<-readRDS("Rdata/015_SLX-8047_dmconsensus.rds")
+
+# Get counts
+hscounts<-hsconsensus[,-c(1:3)]
+dmcounts<-dmconsensus[,-c(1:3)]
+
+### MA for Drosophila + Human Counts
+# a is treated, b is not treated
+Mhs<-apply(hscounts,1,function(x){
+  fulvestrant<-mean(x[c(1,3,5,7)])
+  untreated<-mean(x[c(2,4,6,8)])
+  fc<-mean(fulvestrant)/mean(untreated)
+  log2fc<-log2(fc)
+  return(log2fc)
+})
+Ahs<-apply(hscounts,1,function(x){
+  return(log10(sum(x)))
+})
+Mdm<-apply(dmcounts,1,function(x){
+  fulvestrant<-mean(x[c(1,3,5,7)])
+  untreated<-mean(x[c(2,4,6,8)])
+  fc<-mean(fulvestrant)/mean(untreated)
+  log2fc<-log2(fc)
+  return(log2fc)
+})
+Adm<-apply(dmcounts,1,function(x){
+  return(log10(sum(x)))
+})
+
+plot(Ahs,Mhs,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM aligned reads",ylim=c(-6.25,2))
+points(Adm,Mdm,col="cornflowerblue",pch=20)
+abline(h=0)
+legend("topright",legend=c("Drosophila","Human"),pch=20,col=c("cornflowerblue","black"))
+lm1<-lm(Mdm~Adm)
+abline(lm1$coef,col="red")
+```
+
+```{r}
+### 20th century normalization
+# Residuals of the Drosophila fit
+lm1<-lm(Mdm~Adm)
+intercept<-lm1$coef[1]
+angularcoeff<-lm1$coef[2]
+MhsFit<-Mhs-(Ahs*angularcoeff)-intercept
+MdmFit<-Mdm-(Adm*angularcoeff)-intercept
+
+
+plot(Ahs,MhsFit,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="Counts normalized by H2av Distribution",ylim=c(-6.25,2))
+points(Adm,MdmFit,pch=20,col="cornflowerblue")
+abline(h=0)
+legend("topright",legend=c("Drosophila","Human"),pch=20,col=c("cornflowerblue","black"))
+lm1<-lm(MdmFit~Adm)
+abline(lm1$coef,col="red")
+
+```
+
+## DeSeq Results
+
+```{r}
+
+source('package/brundle.R')
+## Changing font sizes for manuscript
+
+jg.plotDeSeq<-function(ma.df, filename = 'file.name', p = 0.01, title.main = "Differential ChIP",log2fold =0.5, flip=FALSE)
+{;
+    
+    if (flip == TRUE)
+    {
+        ma.df$log2FoldChange <- -ma.df$log2FoldChange
+    }
+    par(mar=c(5.1,5.1,4.1,2.1))
+    xyplot(ma.df$log2FoldChange ~ log(ma.df$baseMean, base=10),#xlim=c(0,4),ylim=c(-3,1.25),
+           groups=(ma.df$padj < p & abs(ma.df$log2FoldChange) > log2fold & !is.na(ma.df$padj)),
+           col=c("black","red"), main=title.main, scales="free", aspect=1, pch=20, cex=0.5,
+           ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),
+           par.settings=list(axis.text=list(cex=1.5,font=1),par.main.text=list(cex=1.5,font=2),par.xlab.text=list(cex=1.5,font=2), par.ylab.text=list(cex=1.5,font=2)
+           )
+    );
+    
+}
+
+jg.plotDeSeqCombined <- function(jg.controlResultsDeseq,jg.experimentResultsDeseq,title.main,padjX,flip=FALSE)
+{
+    jg.controlResultsDeseq$group = 'a'
+    jg.experimentResultsDeseq$group = 'b'
+    
+    if (flip == TRUE)
+    {
+        jg.controlResultsDeseq$log2FoldChange <- -jg.controlResultsDeseq$log2FoldChange
+        jg.experimentResultsDeseq$log2FoldChange <- -jg.experimentResultsDeseq$log2FoldChange
+    }
+    
+    for (i in 1:length(jg.experimentResultsDeseq$group)) {
+        if (!is.na(jg.experimentResultsDeseq$padj[i]) & !is.na(jg.experimentResultsDeseq$log2FoldChange[i]) & jg.experimentResultsDeseq$padj[i] < padjX & jg.experimentResultsDeseq$log2FoldChange[i] < 0) {
+            jg.experimentResultsDeseq$group[i] <- 'd'
+        }
+        else if (!is.na(jg.experimentResultsDeseq$padj[i]) & !is.na(jg.experimentResultsDeseq$log2FoldChange[i]) & jg.experimentResultsDeseq$padj[i] < padjX & jg.experimentResultsDeseq$log2FoldChange[i] > 0) {
+            jg.experimentResultsDeseq$group[i] <- 'c'
+        }
+    }
+    
+    for (i in 1:length(jg.controlResultsDeseq$group)) {
+        if (!is.na(jg.controlResultsDeseq$padj[i]) & !is.na(jg.controlResultsDeseq$log2FoldChange[i]) & jg.controlResultsDeseq$padj[i] < padjX & jg.controlResultsDeseq$log2FoldChange[i] < 0) {
+            jg.controlResultsDeseq$group[i] <- 'f'
+        }
+        else if (!is.na(jg.controlResultsDeseq$padj[i]) & !is.na(jg.controlResultsDeseq$log2FoldChange[i]) & jg.controlResultsDeseq$padj[i] < padjX & jg.controlResultsDeseq$log2FoldChange[i] > 0) {
+            jg.controlResultsDeseq$group[i] <- 'e'
+        }
+    }
+    
+    full.res = rbind(jg.controlResultsDeseq, jg.experimentResultsDeseq)
+    par(mar=c(5.1,5.1,4.1,2.1))
+    xyplot(full.res$log2FoldChange ~ log(full.res$baseMean, base=10), data = full.res,
+           groups=full.res$group,
+           col=c("grey40","grey80",  "#5480ff", "#ff5454", "#08298a","#750505"),
+           ylab = expression('log'[2]*' Differential ChIP'),
+           xlab = expression("log"[10]~"Mean of Normalized Counts"),
+           aspect=1.0,
+           pch=16,
+           cex=0.5,
+           main=title.main,
+           scales=list(x=list(cex=1.5, relation = "free"), y =list(cex=1.5, relation="free")),
+           between=list(y=0.5, x=0.5),
+           auto.key = TRUE,
+           par.settings=list(axis.text=list(cex=1.5,font=1),par.main.text=list(cex=1.5,font=2),par.xlab.text=list(cex=1.5,font=2), par.ylab.text=list(cex=1.5,font=2)),
+           key=list(corner=c(1,0),
+                    cex=1.0,
+                    points=list(col=c( "gray80","gray40", "#ff5454", "#5480ff", "#750505", "#08298a","white"), pch=20),
+                    text=list(c("Target Binding","Control Binding", "Target Decreased","Target Increased","Control Decreased","Control Increased", " "))
+           ))
+    
+    
+}
+
+######################
+#
+# Settings
+#
+######################
+
+setwd("/Volumes/FlyPeaks/FlyPeaks")
+dbaSummits                <- 200
+jg.controlMinOverlap      <- 5
+jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX14229_hs_CTCF_DBA.csv"
+jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX14229_hs_ER_DBA.csv"
+
+filename<-"Rdata/028_SLX-14229_dba_human_ER_CTCF.rda"
+load(filename)
+
+
+## Extract Peak set from DiffBind
+jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
+jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl)
+
+#Convert Peakset to DeSeq Workflow
+jg.controlPeaksetDeSeq<-jg.convertPeakset(jg.controlPeakset)
+
+#Establish size factors directly from Control data
+jg.controlSizeFactors = estimateSizeFactorsForMatrix(jg.controlPeaksetDeSeq)
+
+#Get conditions dataframe for DeSeq
+jg.conditions <- read.csv(file=jg.controlSampleSheet, header=TRUE, sep=",")['Condition']
+
+#Run DeSeq on control
+jg.controlDeSeq<-jg.runDeSeq(jg.controlPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
+jg.controlResultsDeseq   = results(jg.controlDeSeq)
+
+#Repeat for experimental conditions
+
+#Convert experiment Peakset to DeSeq Workflow
+jg.experimentPeaksetDeSeq<-jg.convertPeakset(jg.experimentPeakset)
+
+#Run DeSeq on experiment
+jg.experimentDeSeq<-jg.runDeSeq(jg.experimentPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
+jg.experimentResultsDeseq   = results(jg.experimentDeSeq)
+
+  jg.plotDeSeq(jg.controlResultsDeseq,
+               p=0.01, 
+               title.main="Fold-change in CTCF binding",
+               flip=T
+               )
+
+```
+
+```{r}
+jg.plotDeSeq(jg.experimentResultsDeseq,
+             p=0.01,
+             title.main="Fold-change in ER binding",
+             flip=T
+             )
+```
+
+#CTCF Binding 
+
+```{r}
+
+jg.experimentDeSeqInternal<-jg.runDeSeq(jg.experimentPeaksetDeSeq, jg.conditions, NULL)
+jg.experimentResultsDeseqInternal   = results(jg.experimentDeSeqInternal)
+
+ jg.plotDeSeq(jg.experimentResultsDeseqInternal,
+               title.main="Fold-change in ER binding (no correction)",
+               p=0.01,
+               flip=T
+               )
+```
+
+#H2av With Diff Bind
+```{r}
+jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX8047_dm.csv"
+jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX8047_hs.csv"
+filename<-"Rdata/029_SLX-8047_dba_human_drosophila.rda"
+
+load(filename)
+
+
+## Extract Peak set from DiffBind
+jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
+jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl)
+
+#Convert Peakset to DeSeq Workflow
+jg.controlPeaksetDeSeq<-jg.convertPeakset(jg.controlPeakset)
+
+#Establish size factors directly from Control data
+jg.controlSizeFactors = estimateSizeFactorsForMatrix(jg.controlPeaksetDeSeq)
+
+#Get conditions dataframe for DeSeq
+jg.conditions <- read.csv(file=jg.controlSampleSheet, header=TRUE, sep=",")['Condition']
+
+#Run DeSeq on control
+jg.controlDeSeq<-jg.runDeSeq(jg.controlPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
+jg.controlResultsDeseq   = results(jg.controlDeSeq)
+
+#Repeat for experimental conditions
+
+#Convert experiment Peakset to DeSeq Workflow
+jg.experimentPeaksetDeSeq<-jg.convertPeakset(jg.experimentPeakset)
+
+#Run DeSeq on experiment
+jg.experimentDeSeq<-jg.runDeSeq(jg.experimentPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
+jg.experimentResultsDeseq   = results(jg.experimentDeSeq)
+
+jg.experimentDeSeqInternal<-jg.runDeSeq(jg.experimentPeaksetDeSeq, jg.conditions, NULL)
+jg.experimentResultsDeseqInternal   = results(jg.experimentDeSeqInternal)
+
+dbaExperimentCorrected<-jg.correctDBASizeFactors(dbaExperiment,
+                                                 jg.controlSizeFactors
+                                                 )
+
+dbaExperimentAnalysis<-dba.analyze(dbaExperiment)
+  dba.plotMA(dbaExperimentAnalysis)
+
+```
+
+```{r}
+  dbaExperimentAnalysisCorrected<-dba.analyze(dbaExperimentCorrected)
+  dba.plotMA(dbaExperimentAnalysisCorrected)
+```
+```{r}
+
+filename<-"Rdata/040_SLX-14438_dba_human_ER_CTCF.rda"
+  load(filename)
+  jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX14438_hs_CTCF_DBA.csv"
+jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX14438_hs_ER_DBA.csv"
+jg.treatedCondition       =  "Fulvestrant"
+jg.untreatedCondition     =  "none"
+
+#Get counts for each condition
+jg.controlCountsTreated<-jg.getControlCounts(jg.controlPeakset, 
+                                             jg.controlSampleSheet,
+                                             jg.treatedCondition)
+jg.controlCountsUntreated<-jg.getControlCounts(jg.controlPeakset,
+                                               jg.controlSampleSheet,
+                                               jg.untreatedCondition)
+
+#Get sample names for conditions
+jg.untreatedNames <- names(jg.controlCountsUntreated)
+jg.treatedNames   <- names(jg.controlCountsTreated)
+
+jg.plotNormalization(jg.controlCountsTreated, jg.controlCountsUntreated)
+```
+```{r}
+
+jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX8047_dm.csv"
+jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX8047_consensus.csv"
+
+filename<-"Rdata/029_SLX-8047_SLX14229_dba_human_drosophila.rda"
+load(filename)
+
+## Extract Peak set from DiffBind
+jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
+jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl)
+
+
+#Convert Peakset to DeSeq Workflow
+jg.controlPeaksetDeSeq<-jg.convertPeakset(jg.controlPeakset)
+
+#Establish size factors directly from Control data
+jg.controlSizeFactors = estimateSizeFactorsForMatrix(jg.controlPeaksetDeSeq)
+
+#Get conditions dataframe for DeSeq
+jg.conditions <- read.csv(file=jg.controlSampleSheet, header=TRUE, sep=",")['Condition']
+
+#Run DeSeq on control
+jg.controlDeSeq<-jg.runDeSeq(jg.controlPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
+jg.controlResultsDeseq   = results(jg.controlDeSeq)
+
+#Repeat for experimental conditions
+
+#Convert experiment Peakset to DeSeq Workflow
+jg.experimentPeaksetDeSeq<-jg.convertPeakset(jg.experimentPeakset)
+
+#Run DeSeq on experiment
+jg.experimentDeSeq<-jg.runDeSeq(jg.experimentPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
+jg.experimentResultsDeseq_SLX8047   = results(jg.experimentDeSeq)
+
+
+
+#Now run for SLX-14229 
+
+jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX14229_hs_CTCF_DBA.csv"
+#Using the same consensus peak set from above 
+jg.experimentSampleSheet  <- "samplesheet_SLX14229_hs_ER_consensus.csv"
+
+
+filename<-"Rdata/029_SLX-8047_SLX-14229_dba_human_ER_CTCF_consensus.rda"
+load(filename)
+
+## Extract Peak set from DiffBind
+jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
+jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl)
+
+
+#Convert Peakset to DeSeq Workflow
+jg.controlPeaksetDeSeq<-jg.convertPeakset(jg.controlPeakset)
+
+#Establish size factors directly from Control data
+jg.controlSizeFactors = estimateSizeFactorsForMatrix(jg.controlPeaksetDeSeq)
+
+#Get conditions dataframe for DeSeq
+jg.conditions <- read.csv(file=jg.controlSampleSheet, header=TRUE, sep=",")['Condition']
+
+#Run DeSeq on control
+jg.controlDeSeq<-jg.runDeSeq(jg.controlPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
+jg.controlResultsDeseq   = results(jg.controlDeSeq)
+
+#Repeat for experimental conditions
+
+#Convert experiment Peakset to DeSeq Workflow
+jg.experimentPeaksetDeSeq<-jg.convertPeakset(jg.experimentPeakset)
+
+#Run DeSeq on experiment
+jg.experimentDeSeq<-jg.runDeSeq(jg.experimentPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
+jg.experimentResultsDeseq_SLX14229   = results(jg.experimentDeSeq)
+
+library(latticeExtra)
+
+ma.df<-jg.experimentResultsDeseq_SLX14229
+
+a<-    xyplot((-ma.df$log2FoldChange+0.2) ~ log(ma.df$baseMean, base=10),
+              panel=function(...) {
+                  panel.xyplot(...)
+                  panel.abline(h=0, lty = "dotted", col = "black")
+                  panel.segments(3.0,0,1,1.6, col="red",lwd=2)
+                  panel.segments(3.0,0,1,-1.6, col="red",lwd=2)
+                  panel.segments(1,1.6,1,-1.6, col="red",lwd=2)
+              },
+           col=c("deepskyblue4"), ylim=c(-6,2), main="Comparision between CTCF and H2av", scales="free", aspect=1, pch=20, cex=0.5,
+           ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),
+           par.settings=list(par.main.text=list(cex=1.57,font=2),axis.text=list(cex=1.57,font=1),par.xlab.text=list(cex=1.57,font=2), par.ylab.text=list(cex=1.57,font=2)));
+    
+ma.df_2<-jg.experimentResultsDeseq_SLX8047
+#Note this has been manually addjusted to be more illustrative.
+b<-    xyplot(-(ma.df_2$log2FoldChange*1.1-0.1) ~ (log(ma.df_2$baseMean, base=10)*1.1+0.2),
+              panel=function(...) {
+                  panel.xyplot(...)
+                  panel.abline(h=0, lty = "dotted", col = "black")
+                  panel.segments(3.0,0,1,1.6, col="red",lwd=2)
+                  panel.segments(3.0,0,1,-1.6, col="red",lwd=2)
+                  panel.segments(1,1.6,1,-1.6, col="red",lwd=2)
+              },
+              col=c("palegreen3"), main="Comparision between CTCF and H2av", scales="free", aspect=1, pch=20, cex=0.5,
+              ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),
+              par.settings=list(par.xlab.text=list(cex=1.1,font=2), par.ylab.text=list(cex=1.1,font=2)));
+
+a + as.layer(b) 
+
+
+
+  
+```
+```{r}
+
+
+
+plot(jg.experimentResultsDeseq_SLX14229$log2FoldChange,
+     jg.experimentResultsDeseq_SLX8047$log2FoldChange,
+     pch=20,
+     cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,
+     main="Comparision of fold change between datasets",
+     xlab=expression("log"[2]~" ER ChIP fold change CTCF normalised"),
+     ylab=expression("log"[2]~" ER ChIP fold change H2av normalised"))
+
+
+```
+
+```{r}
+
+jg.plotScatter<-function(peaks,samples,yaxis,samplesCombinations,noYLabel=FALSE)
+{
+    peaks$count <- 1
+    peaks_aggregate <- aggregate(count ~ ., peaks, FUN = sum)
+    colormap<-rainbow(255,start=0,end=4/6)
+    colormap<-rev(colormap)
+    peaks_aggregate$Col <- colormap[as.numeric(cut(log(peaks_aggregate$count,2),breaks=255))]
+    peaks_aggregate<-peaks_aggregate[order(peaks_aggregate$count),]
+    plot(log(peaks_aggregate[,c(1,2)]), col=peaks_aggregate$Col,pch=20, cex=0.3, xlim=c(0,7),ylim=c(0,7),axes=FALSE)
+    if (samples > 1|| noYLabel==TRUE) {Axis(side=2, labels=FALSE)} else {
+        Axis(side=2, labels=TRUE)
+        mtext("log(Counts)", side=2, line=3)
+    }
+    if (yaxis !=TRUE ) {Axis(side=1, labels=FALSE)} else {
+        Axis(side=1, labels=TRUE,ylab="Log(Counts)")
+        mtext("log(Counts)", side=1, line=3)
+    }
+    text(1.5,6.5,paste0(samplesCombinations[,samples][1],"-",samplesCombinations[,samples][2]),cex=1.5)
+    sampleCor<-cor(log(peaks[1]),log(peaks[2]))
+    text(2,6.0,paste0("Correlation = ",signif(sampleCor,3)),cex=1.0)
+        abline(a=0,b=1,col="grey")
+    return(cor(log(peaks_aggregate[,c(1,2)])))
+}
+
+
+jg.plotMargins<-function(a,b)
+{
+    par(mar=c(0.5, 0.5, 0.2, 0.2), mfrow=c(a,b),
+        oma = c(4, 4, 0.2, 0.2))
+}
+jg.plotPanelsPlot<-function(treatmentNames,controlNames,dbaExperiment,noYLabel=FALSE)
+{
+    
+    jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
+    relativeLibrarySize<-jg.getLibrarySize(dbaExperiment,
+                                            jg.experimentPeakset)
+    
+    samplesCombinations<-combn(controlNames,2)
+    for (samples in seq(1,length(samplesCombinations)/2))  {
+        peaksLibrarySize<-relativeLibrarySize[samplesCombinations[,samples]]
+        peaks<-jg.experimentPeakset[samplesCombinations[,samples]]
+        peaks[1]<-round(peaks[1]/peaksLibrarySize[1])
+        peaks[2]<-round(peaks[2]/peaksLibrarySize[2])
+        jg.plotScatter(peaks,samples, F,samplesCombinations,noYLabel)
+    }
+    samplesCombinations<-combn(treatmentNames,2)
+    for (samples in seq(1,length(samplesCombinations)/2))  {
+        peaksLibrarySize<-relativeLibrarySize[samplesCombinations[,samples]]
+        peaks<-jg.experimentPeakset[samplesCombinations[,samples]]
+        peaks[1]<-round(peaks[1]/peaksLibrarySize[1])
+        peaks[2]<-round(peaks[2]/peaksLibrarySize[2])
+        jg.plotScatter(peaks,samples,T,samplesCombinations,noYLabel)
+    }
+ }
+
+
+jg.getLibrarySize<-function(dbaExperiment,jg.experimentPeakset) {
+    librarySize<-as.numeric(dbaExperiment$class["Reads",])
+    relativeLibrarySize<-librarySize/max(librarySize)
+    names(relativeLibrarySize)<-colnames(jg.experimentPeakset[c(-1:-3)])
+    return(relativeLibrarySize)
+}
+
+
+jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX14438_hs_CTCF_DBA.csv"
+jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX14438_hs_ER_DBA.csv"
+
+
+filename<-"Rdata/048_SLX-14438_dba_human_ER_CTCF.rda"
+load(filename)
+
+controlNames<-c("1a","2a","3a")
+treatmentNames<-c("1b","2b","3b")
+
+filename<-"Rdata/026_SLX-8047_dba.counts_human.rda"
+load(filename)
+dbaExperiment_SLX8047<-dba
+
+controlNames_SLX8047<-c("1b","2b","3b","4b")
+treatmentNames_SLX8047<-c("1a","2a","3a","4a")
+
+filename<-"Rdata/047_SLX-12998_dba_human.rda"
+load(filename)
+dbaExperiment_SLX12998<-dbaFullExperiment
+
+
+controlNames_SLX12998<-c("1b","2b","3b","4b")
+treatmentNames_SLX12998<-c("1a","2a","3a","4a")
+
+jg.plotMargins(2,3)
+par(mfcol=c(2,3))
+
+#SLX-14438
+#2a-3a and 1b-3b
+controlNames<-c("2a","3a")
+treatmentNames<-c("1b","3b")
+jg.plotPanelsPlot(treatmentNames,
+                  controlNames,
+                  dbaExperiment)
+
+#SLX-8047
+#3b-4b and 1a-4a
+controlNames<-c("3b","4b")
+treatmentNames<-c("1a","4a")
+jg.plotPanelsPlot(treatmentNames,
+                  controlNames,
+                  dbaExperiment_SLX8047, TRUE)
+
+#SLX-12998
+#3b-4b and 1a-4a
+controlNames<-c("3b","4b")
+treatmentNames<-c("1a","4a")
+jg.plotPanelsPlot(treatmentNames,
+                  controlNames,
+                  dbaExperiment_SLX12998,TRUE)
+```
+
+```{r}
+filename<-"Rdata/040_SLX-14438_dba_human_ER_CTCF.rda"
+load(filename)
+
+dba.plotVenn(dbaControl,dbaControl$masks$Fulvestrant, label1="Rep1", label2="Rep2", label3="Rep3", main="CTCF Peaks Fulvestrant")
+dba.plotVenn(dbaControl,dbaControl$masks$none, label1="Rep1", label2="Rep2", label3="Rep3", main="CTCF Peaks Control")
+dba.plotVenn(dbaExperiment,dbaExperiment$masks$Fulvestrant, label1="Rep1", label2="Rep2", label3="Rep3", main="ER Peaks Fulvestrant")
+dba.plotVenn(dbaExperiment,dbaExperiment$masks$none,label1="Rep1", label2="Rep2", label3="Rep3", main="ER Peaks Control")
+```
+```{r}
+
+
+
+filename<-"Rdata/026_SLX-8047_dba_drosophila.rda"
+load(filename)
+filename<-"Rdata/026_SLX-8047_dba_human.rda"
+load(filename)
+
+
+
+dba.plotVenn(dba_dm,dba_dm$masks$Fulvestrant, label1="Rep1", label2="Rep2", label3="Rep3",label4="Rep4", main="H2av Peaks Fulvestrant")
+dba.plotVenn(dba_dm,dba_dm$masks$none,label1="Rep1", label2="Rep2", label3="Rep3",label4="Rep4", main="H2av Peaks Control")
+dba.plotVenn(dba,dba$masks$Fulvestrant, label1="Rep1", label2="Rep2", label3="Rep3", label4="Rep4",main="ER Peaks Fulvestrant")
+dba.plotVenn(dba,dba$masks$none,label1="Rep1", label2="Rep2", label3="Rep3",label4="Rep4", main="ER Peaks Control")
+```
+
+
+```{r}
+filename<-"Rdata/014_SLX-12998_dba_mouse.rda"
+load(filename)
+
+dba.plotVenn(dba,dba$masks$Fulvestrant, label1="Rep1", label2="Rep2", label3="Rep3", label4="Rep4",main="Mouse ER Peaks Fulvestrant")
+dba.plotVenn(dba,dba$masks$none,label1="Rep1", label2="Rep2", label3="Rep3",label4="Rep4", main="Mouse ER Peaks Control")
+
+filename<-"Rdata/015_SLX-12998_dba_human.rda"
+load(filename)
+
+dba.plotVenn(dba,dba$masks$Fulvestrant, label1="Rep1", label2="Rep2", label3="Rep3", label4="Rep4",main="ER Peaks Fulvestrant")
+dba.plotVenn(dba,dba$masks$none,label1="Rep1", label2="Rep2", label3="Rep3",label4="Rep4", main="ER Peaks Control")
+```
+
+```{r}
+
+# Read consensus peaks
+hsconsensus<-readRDS("Rdata/015_SLX-12998_hsconsensus.rds")
+mmconsensus<-readRDS("Rdata/015_SLX-12998_mmconsensus.rds")
+
+# Get counts
+hscounts<-hsconsensus[,-c(1:3)]
+mmcounts<-mmconsensus[,-c(1:3)]
+head(hscounts)
+head(mmcounts)
+
+### MA RPM in peaks
+hsrpm<-apply(hscounts,2,function(x){
+  1E6*x/sum(x)
+})
+mmrpm<-apply(mmcounts,2,function(x){
+  1E6*x/sum(x)
+})
+M<-apply(hsrpm,1,function(x){
+  fulvestrant<-mean(x[c(1,2,4,5)])
+  untreated<-mean(x[c(3,6,7,8)])
+  fc<-mean(fulvestrant)/mean(untreated)
+  log2fc<-log2(fc)
+  return(log2fc)
+})
+A<-apply(hsrpm,1,function(x){
+  return(log10(sum(x)))
+})
+
+load("Rdata/012_SLX-12998_aligned.rda")
+aligned<-aligned[grep("SLX-12998.D",names(aligned))]
+aligned<-sapply(aligned,sum)/1E6
+aligned<-aligned[c(4,7,8,9,2,3,6,5)]
+
+hsrpm<-hscounts
+for(i in 1:length(hsrpm)){
+  hsrpm[i]<-hscounts[i]/aligned[i]
+}
+mmrpm<-mmcounts
+for(i in 1:length(mmrpm)){
+  mmrpm[i]<-mmcounts[i]/aligned[i]
+}
+M<-apply(hsrpm,1,function(x){
+  fulvestrant<-mean(x[c(1,2,4,5)])
+  untreated<-mean(x[c(3,6,7,8)])
+  fc<-mean(fulvestrant)/mean(untreated)
+  log2fc<-log2(fc)
+  return(log2fc)
+})
+A<-apply(hsrpm,1,function(x){
+  return(log10(sum(x)))
+})
+plot(A,M,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM aligned reads",ylim=c(-6.25,4.25))
+abline(h=0)
+
+
+```
+
+
+
+```{r}
+
+### MA for Mouse + Human Counts
+# a is treated, b is not treated
+Mhs<-apply(hscounts,1,function(x){
+  fulvestrant<-mean(x[c(1,2,4,5)])
+  untreated<-mean(x[c(3,6,7,8)])
+  fc<-mean(fulvestrant)/mean(untreated)
+  log2fc<-log2(fc)
+  return(log2fc)
+})
+Ahs<-apply(hscounts,1,function(x){
+  return(log10(sum(x)))
+})
+Mmm<-apply(mmcounts,1,function(x){
+  fulvestrant<-mean(x[c(1,2,4,5)])
+  untreated<-mean(x[c(3,6,7,8)])
+  fc<-mean(fulvestrant)/mean(untreated)
+  log2fc<-log2(fc)
+  return(log2fc)
+})
+Amm<-apply(mmcounts,1,function(x){
+  return(log10(sum(x)))
+})
+
+plot(Ahs,Mhs,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM aligned reads",ylim=c(-6.25,4))
+points(Amm,Mmm,pch=20,col="darkolivegreen3")
+abline(h=0)
+legend("topright",legend=c("Mouse","Human"),pch=20,col=c("darkolivegreen3","black"))
+lm1<-lm(Mmm~Amm)
+abline(lm1$coef,col="red")
+
+```
+
+```{r}
+
+# Residuals of the Drosophila fit
+lm1<-lm(Mmm~Amm)
+intercept<-lm1$coef[1]
+angularcoeff<-lm1$coef[2]
+MhsFit<-Mhs-(Ahs*angularcoeff)-intercept
+MmmFit<-Mmm-(Amm*angularcoeff)-intercept
+
+plot(Ahs,MhsFit,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="Counts normalized by Mouse Distribution",ylim=c(-16,2))
+points(Amm,MmmFit,pch=20,col="darkolivegreen3")
+abline(h=0)
+legend("topright",legend=c("Mouse","Human"),pch=20,col=c("darkolivegreen3","black"))
+lm1<-lm(MmmFit~Amm)
+abline(lm1$coef,col="red")
+```
+
+```{r}
+hsconsensus_ER<-readRDS("Rdata/018_SLX-14229_hsconsensus_ER.rds")
+hsconsensus_CTCF<-readRDS("Rdata/018_SLX-14229_hsconsensus_CTCF.rds")
+hscounts_ER<-hsconsensus_ER[,-c(1:3)]
+hscounts_CTCF<-hsconsensus_CTCF[,-c(1:3)]
+
+load("Rdata/012_SLX-14229_aligned.rda")
+aligned<-aligned[grep("SLX-14229.D",names(aligned))]
+aligned<-sapply(aligned,sum)/1E6
+
+
+#remove inputs/controls to match samples here
+aligned<-aligned[c(1,2,5,7,8,10)]
+
+hsrpm_ER<-hscounts_ER
+for(i in 1:length(hsrpm_ER)){
+  hsrpm_ER[i]<-hscounts_ER[i]/aligned[i]
+}
+M_RPM_ER<-apply(hsrpm_ER,1,function(x){
+  fulvestrant<-mean(x[c(2,4,5)])
+  untreated<-mean(x[c(1,3,6)])
+  fc<-mean(fulvestrant)/mean(untreated)
+  log2fc<-log2(fc)
+  return(log2fc)
+})
+A_RPM_ER<-apply(hsrpm_ER,1,function(x){
+  return(log10(sum(x)))
+})
+plot(A_RPM_ER,M_RPM_ER,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="RPM aligned reads")
+abline(h=0)
+
+
+```
+
+```{r}
+
+
+hsrpm_CTCF<-hscounts_CTCF
+for(i in 1:length(hsrpm_CTCF)){
+  hsrpm_CTCF[i]<-hscounts_CTCF[i]/aligned[i]
+}
+M_RPM_CTCF<-apply(hsrpm_CTCF,1,function(x){
+  fulvestrant<-mean(x[c(2,4,5)])
+  untreated<-mean(x[c(1,3,6)])
+  fc<-mean(fulvestrant)/mean(untreated)
+  log2fc<-log2(fc)
+  return(log2fc)
+})
+A_RPM_CTCF<-apply(hsrpm_CTCF,1,function(x){
+  return(log10(sum(x)))
+})
+
+plot(A_RPM_ER,M_RPM_ER,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="RPM aligned reads")
+points(A_RPM_CTCF,M_RPM_CTCF,pch=20,col="gray")
+lm1<-lm(M_RPM_CTCF~A_RPM_CTCF)
+abline(lm1$coef,col="blue")
+abline(h=0)
+
+
+```
+
+```{r}
+
+Mhs_CTCF<-apply(hscounts_CTCF,1,function(x){
+  fulvestrant<-mean(x[c(2,4,5)])
+  untreated<-mean(x[c(1,3,6)])
+  fc<-mean(fulvestrant)/mean(untreated)
+  log2fc<-log2(fc)
+  return(log2fc)
+})
+Ahs_CTCF<-apply(hscounts_CTCF,1,function(x){
+  return(log10(sum(x)))
+})
+
+Mhs_ER<-apply(hscounts_ER,1,function(x){
+  fulvestrant<-mean(x[c(2,4,5)])
+  untreated<-mean(x[c(1,3,6)])
+  fc<-mean(fulvestrant)/mean(untreated)
+  log2fc<-log2(fc)
+  return(log2fc)
+})
+Ahs_ER<-apply(hscounts_ER,1,function(x){
+  return(log10(sum(x)))
+})
+
+lm1<-lm(Mhs_CTCF~Ahs_CTCF)
+intercept<-lm1$coef[1]
+angularcoeff<-lm1$coef[2]
+MhsFit_ER<-Mhs_ER-(Ahs_ER*angularcoeff)-intercept
+MhsFit_CTCF<-Mhs_CTCF-(Ahs_CTCF*angularcoeff)-intercept
+plot(Ahs_ER,MhsFit_ER,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"), main="Normalised to Human CTCF")
+points(Ahs_CTCF,MhsFit_CTCF,pch=20,col="gray")
+
+abline(h=0)
+legend("topright",legend=c("Human ER",  "Human CTCF"),pch=20,col=c("black","gray"), cex=1)
+
+```
+```{r}
+filename<-"Rdata/012_SLX-12998_nrreads.rda"
+load(filename)
+
+filename<-"Rdata/012_SLX-12998_aligned.rda"
+load(filename)
+
+nrreads<-nrreads[1:10]#Remove lost reads
+aligned<-aligned[1:10]
+
+### Prepare relative alignments
+samples<-names(nrreads)
+toplot<-matrix(nrow=length(samples),ncol=5)
+colnames(toplot)<-c("MmTot","HsTot","Tot","MmRel","HsRel")
+rownames(toplot)<-samples
+
+mms<-sapply(aligned,function(x){
+  sum(x[grep("mm_",names(x))])
+})
+hss<-sapply(aligned,function(x){
+  sum(x[grep("hs_",names(x))])
+})
+toplot[,1]<-mms
+toplot[,2]<-hss
+toplot[,3]<-mms+hss
+toplot[,4]<-mms/(mms+hss)
+toplot[,5]<-hss/(mms+hss)
+
+toplot<-toplot[grep('SLX-12998.D', sort(rownames(toplot)), value=TRUE),]
+
+## Barplot of relative alignments
+# Convert sample names to informative ones
+
+rownames(toplot)<-c(
+  "Input ICI",
+  "2 ICI",
+  "1 Control",
+  "4 ICI",
+  "2 Control",
+  "3 Control",
+  "1 ICI",
+  "4 Control",
+  "3 ICI",
+  "Input Control"
+)
+
+
+
+# Sort by total reads aligned
+
+toplot<-toplot[order(-toplot[,3]),]
+
+par(las=2,mar=c(7,4,3,5))
+bp<-barplot(t(toplot[,4:5]),beside=TRUE,main="Relative Read Alignment in samples",
+            ylab="Fraction of total aligned",col=c("royalblue2","tomato"),ylim=c(-0.05,1.05))
+grid()
+legend("topright",legend=c("Mouse","Human"),col=c("royalblue2","tomato"),pch=15)
+bpx<-apply(bp,2,mean)
+
+raxis<-(toplot[,3])/(max(toplot[,3]))
+lines(bpx,raxis,type="b",lwd=3,pch=16)
+axis(4,at=seq(0,1,0.2),
+     labels=round((seq(0,1,0.2) * max(toplot[,3])/10**6))
+     )
+par(las=3)
+mtext("Reads aligned (Millions)",side=4,line=4)
+
+```
+```{r}
+filename<-"Rdata/015_SLX-14229_dbacounts_human.rda"
+load(filename)
+plot(dbacounts)
+
+filename<-"Rdata/018_SLX-14229_dba.counts_human_CTCF.rda"
+load(filename)
+plot(dba)
+
+filename<-"Rdata/018_SLX-14229_dba.counts_human_ER.rda"
+load(filename)
+plot(dba)
+```
+
+```{r}
+jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX14438_hs_CTCF_DBA.csv"
+jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX14438_hs_ER_DBA.csv"
+
+filename<-"Rdata/040_SLX-14438_dba_human_ER_CTCF.rda"
+load(filename)
+
+jg.sampleIds <- jg.getSampleIds(jg.controlSampleSheet)
+
+## Extract Peak set from DiffBind
+jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
+jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl)
+
+
+#Get counts for each condition
+jg.controlCountsTreated<-jg.getControlCounts(jg.controlPeakset, 
+                                             jg.controlSampleSheet,
+                                             jg.treatedCondition)
+jg.controlCountsUntreated<-jg.getControlCounts(jg.controlPeakset,
+                                               jg.controlSampleSheet,
+                                               jg.untreatedCondition)
+
+#Get sample names for conditions
+jg.untreatedNames <- names(jg.controlCountsUntreated)
+jg.treatedNames   <- names(jg.controlCountsTreated)
+
+jg.coefficient<-jg.getNormalizationCoefficient(jg.controlCountsTreated,
+                                               jg.controlCountsUntreated)
+jg.correctionFactor<-jg.getCorrectionFactor(jg.experimentSampleSheet,
+                                            jg.treatedNames,
+                                            jg.untreatedNames)
+
+#Apply coefficent and control factor
+jg.experimentPeaksetNormalised<-jg.applyNormalisation(jg.experimentPeakset,
+                                                      jg.coefficient,
+                                                      jg.correctionFactor,
+                                                      jg.treatedNames)
+#Return values to Diffbind and plot normalised result.
+jg.dba <- DiffBind:::pv.resetCounts(dbaExperiment,
+                                    jg.experimentPeaksetNormalised)
+jg.dba_analysis<-dba.analyze(jg.dba)
+
+dba.plotMA(jg.dba_analysis,bFlip=TRUE, cex.lab=1.5, cex.axis=1.5, cex.main=1.25, cex.sub=1.5)
+dba_analysis<-dba.analyze(dbaExperiment)
+dba.plotMA(dba_analysis,bFlip=TRUE,cex.lab=1.5, cex.axis=1.5, cex.main=1.25, cex.sub=1.5)
+#Note exact numbers change depending on the machine DiffBind is run.
+  
+```
+```{r}
+filename<-"Rdata/040_SLX-14438_dba_human_ER_CTCF.rda"
+load(filename)
+
+
+## Extract Peak set from DiffBind
+jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
+jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl)
+
+#Convert Peakset to DeSeq Workflow
+jg.controlPeaksetDeSeq<-jg.convertPeakset(jg.controlPeakset)
+
+#Establish size factors directly from Control data
+jg.controlSizeFactors = estimateSizeFactorsForMatrix(jg.controlPeaksetDeSeq)
+
+#Get conditions dataframe for DeSeq
+jg.conditions <- read.csv(file=jg.controlSampleSheet, header=TRUE, sep=",")['Condition']
+
+#Run DeSeq on control
+jg.controlDeSeq<-jg.runDeSeq(jg.controlPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
+jg.controlResultsDeseq   = results(jg.controlDeSeq)
+
+#Repeat for experimental conditions
+
+#Convert experiment Peakset to DeSeq Workflow
+jg.experimentPeaksetDeSeq<-jg.convertPeakset(jg.experimentPeakset)
+
+#Run DeSeq on experiment
+jg.experimentDeSeq<-jg.runDeSeq(jg.experimentPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
+jg.experimentResultsDeseq   = results(jg.experimentDeSeq)
+dbaExperimentCorrected<-jg.correctDBASizeFactors(dbaExperiment,
+                                                 jg.controlSizeFactors
+                                                 )
+
+dbaExperimentAnalysisCorrected<-dba.analyze(dbaExperimentCorrected)
+  dba.plotMA(dbaExperimentAnalysisCorrected,bFlip=TRUE,cex.lab=1.5, cex.axis=1.5, cex.main=1.25, cex.sub=1.5)
+  
+  #Again numbers similar but not exact due to DiffBind
+```
+```{r}
+filename<-"Rdata/032_SLX-14229_dba_human_ER_CTCF_normalised.rda"
+load(filename)
+
+
+filename<-"Rdata/032_SLX-8047_dba_normalised.rda"
+load(filename)
+
+jg.dba_analysis_SLX8047<-dba.analyze(jg.dba_SLX8047)
+jg.dba_analysis_SLX14229<-dba.analyze(jg.dba_SLX14229)
+
+nearestPeak <- nearest(dba.report(jg.dba_analysis_SLX8047, th=1),dba.report(jg.dba_analysis_SLX14229, th=1))
+SLX8047_fc<-dba.report(jg.dba_analysis_SLX8047,bFlip=TRUE, th=1)$Fold
+SLX14229_fc<-dba.report(jg.dba_analysis_SLX14229,th=1)[nearestPeak]$Fold
+
+
+smoothScatter(SLX8047_fc,SLX14229_fc,pch=20, col="#00000055",
+              xlab="Fold change normalized using Drosophila/H2av spike-in",
+              ylab="Fold change normalized using CTCF control peaks",
+              main="Comparision of normalisation methods",
+              cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5)
+abline(h=0, col="grey",lty=2)
+abline(v=0, col="grey",lty=2)
+coef<-lm( SLX8047_fc ~ SLX14229_fc + 0 )
+abline(coef, col="navyblue")
+text(3.25,-0.25, expression( "gradient = 0.96, r = 0.557, p-value < 2.2 x" ~ 10^{-16}), cex=1.25)
+
+```
+```{r}
+
+```
+
+```{r}
+filename<-"Rdata/047_SLX-14438_dba_human_ER_CTCF.rda"
+load(filename)
+
+
+#Load Sample Ids from control sample sheet.
+jg.sampleIds <- jg.getSampleIds(jg.controlSampleSheet)
+
+## Extract Peak set from DiffBind
+jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
+jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl)
+
+
+#Get counts for each condition
+jg.controlCountsTreated<-jg.getControlCounts(jg.controlPeakset, 
+                                             jg.controlSampleSheet,
+                                             jg.treatedCondition)
+jg.controlCountsUntreated<-jg.getControlCounts(jg.controlPeakset,
+                                               jg.controlSampleSheet,
+                                               jg.untreatedCondition)
+
+#Get sample names for conditions
+jg.untreatedNames <- names(jg.controlCountsUntreated)
+jg.treatedNames   <- names(jg.controlCountsTreated)
+
+
+
+ ##Get Normalization Coefficient
+jg.coefficient<-jg.getNormalizationCoefficient(jg.controlCountsTreated,
+                                               jg.controlCountsUntreated)
+
+
+
+
+#As we're going to normalise a second data set we don't need to use a DiffBind correction factor
+jg.correctionFactor<-1
+
+
+#Apply coefficent and control factor
+jg.experimentPeaksetNormalised<-jg.applyNormalisation(jg.experimentPeakset,
+                                                      jg.coefficient,
+                                                      jg.correctionFactor,
+                                                      jg.treatedNames
+)
+
+
+#Return values to Diffbind object
+jg.dba <- DiffBind:::pv.resetCounts(dbaExperiment,
+                                    jg.experimentPeaksetNormalised
+)
+
+#jg.dba is now normalised a list of ER peaks and their expected ratio
+
+
+#####
+#
+#Rerun the normalisation code to get the ER ratio
+#
+######
+
+
+jg.normalisedExperimentPeakset <- jg.dbaGetPeakset(jg.dba)
+
+
+#Get counts for each condition
+jg.ERCountsTreated<-jg.getControlCounts(jg.normalisedExperimentPeakset, 
+                                             jg.experimentSampleSheet,
+                                             jg.treatedCondition)
+jg.ERCountsUntreated<-jg.getControlCounts(jg.normalisedExperimentPeakset,
+                                          jg.experimentSampleSheet,
+                                               jg.untreatedCondition)
+
+#Get sample names for conditions
+jg.untreatedNames <- names(jg.ERCountsTreated)
+jg.treatedNames   <- names(jg.ERCountsUntreated)
+
+
+
+##Establish normalised ER ratio as we know it isn't 1
+
+jg.ERratio<-jg.getNormalizationCoefficient(jg.ERCountsTreated,
+                                               jg.ERCountsUntreated)
+
+########
+#
+# Apply to ER only data
+#
+########
+
+jg.EROnlyExperimentSampleSheet <- "samplesheet/samplesheet_SLX8047_hs.csv"
+
+filename<-"Rdata/047_SLX-SLX-8047_dba_human_ER.rda"
+load(filename)
+
+
+#Get peakset
+
+jg.EROnlyExperimentPeakset <- jg.dbaGetPeakset(dbaERonlyExperiment)
+
+
+#Get counts for each condition
+jg.EROnlyCountsTreated<-jg.getControlCounts(jg.EROnlyExperimentPeakset, 
+                                            jg.EROnlyExperimentSampleSheet,
+                                        jg.treatedCondition)
+jg.EROnlyCountsUntreated<-jg.getControlCounts(jg.EROnlyExperimentPeakset,
+                                              jg.EROnlyExperimentSampleSheet,
+                                          jg.untreatedCondition)
+
+#Get sample names for conditions
+jg.untreatedNames <- names(jg.EROnlyCountsTreated)
+jg.treatedNames   <- names(jg.EROnlyCountsUntreated)
+
+
+
+jg.EROnlyExperimentRatio<-jg.getNormalizationCoefficient(jg.EROnlyCountsTreated,
+                                           jg.EROnlyCountsUntreated)
+
+#Create new ratio 
+jg.ERNormalisationRatio<-jg.ERratio/jg.EROnlyExperimentRatio
+
+g.correctionFactor<-jg.getCorrectionFactor(jg.EROnlyExperimentSampleSheet,
+                                            jg.treatedNames,
+                                            jg.untreatedNames
+)
+
+jg.ERexperimentPeaksetNormalised<-jg.applyNormalisation(jg.EROnlyExperimentPeakset,
+                                                      jg.ERNormalisationRatio,
+                                                      jg.correctionFactor,
+                                                      jg.treatedNames
+)
+
+#Return values to Diffbind object
+dbaERonlyExperimentNormalised <- DiffBind:::pv.resetCounts(dbaERonlyExperiment,
+                                    jg.ERexperimentPeaksetNormalised
+)
+
+jg.dba_analysisNormalised<-dba.analyze(dbaERonlyExperimentNormalised)
+false_postive_normalised<-dba.report(jg.dba_analysisNormalised, th=0.05)
+false_postive_normalised<-length(false_postive_normalised[false_postive_normalised$Fold>0])
+
+
+jg.dba_analysis<-dba.analyze(dbaERonlyExperiment)
+
+load(file="Rdata/027_SLX-8047_dba_report.Rda")
+dba.SLX8047<-dba.analyze(dba.SLX8047)
+
+peaks<-as.character(sort(as.numeric(row.names(as.data.frame(dba.report(dba.SLX8047, th=1))))))
+
+plot(
+    dba.report(dba.SLX8047, th=1)[peaks]$Fold,
+    dba.report(jg.dba_analysisNormalised,th=1)[peaks]$Fold,
+    pch=20,
+    xlab="Log(FoldChange) in ER Binding Normalised to H2av",
+    ylab="Log(FoldChange) in ER Binding Cross-Normalised to CTCF",
+    cex=0.05,
+    main="Comparision of Fold-Change between\nCross-Normalised to Xenogenic Spike-in"
+)
+```
+

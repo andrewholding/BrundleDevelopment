@@ -26,7 +26,6 @@ jg.plotNormalization <- function(jg.controlCountsTreated,jg.controlCountsUntreat
     legend("topleft",legend=c("Raw", "Normalised"),pch=20,col=c("black","royalblue3"))
 }
 
-
 ######################
 #
 # Settings
@@ -102,6 +101,11 @@ jg.dba <- DiffBind:::pv.resetCounts(dbaExperiment,
 
 #Analyze and plot with Diffbind      
 jg.dba_analysis<-dba.analyze(jg.dba)
+dba.SLX14438_report<-dba.report(jg.dba_analysis, th=1)
+filename<-"Rdata/040_SLX-14438_dba_human_ER_CTCF_normalised_report.rda"
+save(dba.SLX14438_report,file=filename)
+
+
 png("plots/040_SLX-14438_DiffBind_Analysis.png")
 par(mar=c(5.1,5.1,4.1,4.1))
 dba.plotMA(jg.dba_analysis,bFlip=TRUE, cex.lab=1.5, cex.axis=1.5, cex.main=1.25, cex.sub=1.5)
