@@ -2,7 +2,7 @@
 title: "Brundle Development"
 author: "Andrew Holding"
 date: "11/7/2017"
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}

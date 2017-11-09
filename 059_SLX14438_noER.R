@@ -176,8 +176,9 @@ jg.dba <- DiffBind:::pv.resetCounts(dbaExperiment,
 
 #Analyze and plot with Diffbind      
 jg.dba_analysis<-dba.analyze(jg.dba)
-png("plots/059_CTCF_noER_MAplot.png",pointsize=15)
-dba.plotMA(jg.dba_analysis,bFlip=TRUE)
+png("plots/059_CTCF_noER_MAplot.png")
+par(mar=c(5.1,5.1,4.1,4.1))
+dba.plotMA(jg.dba_analysis,bFlip=TRUE,cex.lab=1.5, cex.axis=1.5, cex.main=1.25, cex.sub=1.5)
 dev.off()
 #Check CTCF 
 ctcf.dba.analysis<-dba.analyze(dbaControl_noER)
@@ -195,7 +196,27 @@ jg.conditions <- read.csv(file=jg.controlSampleSheet, header=TRUE, sep=",")['Con
 jg.controlDeSeq<-jg.runDeSeq(jg.controlPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
 jg.controlResultsDeseq   = results(jg.controlDeSeq)
 
-png("plots/059_CTCF_noER_control_MAplot.png",pointsize=15)
+
+
+jg.plotDeSeq<-function(ma.df, filename = 'file.name', p = 0.01, title.main = "Differential ChIP",log2fold =0.5, flip=FALSE)
+{;
+    
+    if (flip == TRUE)
+    {
+        ma.df$log2FoldChange <- -ma.df$log2FoldChange
+    }
+    par(mar=c(5.1,5.1,4.1,2.1))
+    xyplot(ma.df$log2FoldChange ~ log(ma.df$baseMean, base=10),#xlim=c(0,4),ylim=c(-3,1.25),
+           groups=(ma.df$padj < p & abs(ma.df$log2FoldChange) > log2fold & !is.na(ma.df$padj)),
+           col=c("black","red"), main=title.main, scales="free", aspect=1, pch=20, cex=0.5,
+           ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),
+           par.settings=list(axis.text=list(cex=1.5,font=1),par.main.text=list(cex=1.5,font=2),par.xlab.text=list(cex=1.5,font=2), par.ylab.text=list(cex=1.5,font=2)
+           )
+    );
+    
+}
+
+png("plots/059_CTCF_noER_control_MAplot.png",pointsize=35)
 jg.plotDeSeq(jg.controlResultsDeseq,
              p=0.01, 
              title.main="Fold-change in CTCF binding",
