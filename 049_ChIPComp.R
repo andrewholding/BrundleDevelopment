@@ -42,6 +42,10 @@ countSet=makeCountSet(conf,design,filetype="bam", species="hg19")
 countSet=ChIPComp(countSet)
 countSet$db[c(10:15,17)]
 
+filename="Rdata/047_countset.Rda"
+save(countSet,file=filename)
+
+load(filename)
 c1<-rowMeans(countSet$db[c(4,6,9)])
 c0<-rowMeans(countSet$db[c(5,7,8)])
 c1<-c1[]
