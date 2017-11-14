@@ -10,4 +10,4 @@ For key examples https://github.com/andrewholding/Brundle_Example/
 
 For R package see Brundle. https://github.com/andrewholding/Brundle
 
-To reproduce figures in manuscript view Manuscript_Figures.Rmd
+To reproduce figures in manuscript view [Manuscript_Figures.Rmd](https://cdn.rawgit.com/andrewholding/BrundleDevelopment/master/Manuscript_Figures.html)
