@@ -38,6 +38,12 @@ SLX-8047_dmhs/blacklist_filtered/
 /SLX-14438_merged/*
 !SLX-14438_merged/peaks/
 
+/SLX-15090/*
+!SLX-15090/peaks/
+
+/SLX-15091/*
+!SLX-15091/peaks/
+
 ENCODE/*.fq
 ENCODE/*.bam
 ENCODE/*.bai

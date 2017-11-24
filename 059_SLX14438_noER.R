@@ -17,7 +17,7 @@ jg.getDba.linear<-function (jg.experimentSampleSheet,dbaSummits, ...)
     } else {
         dba <- dba.count(dba)
     }
-    dba <- dba.count(dba, peaks=NULL, score=DBA_SCORE_READS)
+    dba <- dba.count(dba, peaks=NULL, score=DBA_SCORE_READS, bParallel=FALSE)
     return(dba)
 }
 
