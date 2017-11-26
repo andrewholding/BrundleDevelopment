@@ -7,8 +7,13 @@ qc.samplesheets=c(
     "samplesheet/samplesheet_SLX8047.csv",
     "samplesheet/samplesheet_SLX12998.csv",
     "samplesheet/samplesheet_SLX14229.csv",
-    "samplesheet/samplesheet_SLX14438_hs_DBA.csv")
+    "samplesheet/samplesheet_SLX14438_hs_DBA.csv",
+    "samplesheet/samplesheet_SLX15090_H4K12ac.csv",
+    "samplesheet/samplesheet_SLX15091_ER.csv")
 
+#library(BiocParallel)
+#register(MulticoreParam())
+#register(SerialParam())
 
 for (qc.samplesheet in qc.samplesheets) {
     dba.ChIPQC<-ChIPQC(qc.samplesheet, "hg19", bCount=T)

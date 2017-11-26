@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Session genome="hg19" hasGeneTrack="true" hasSequenceTrack="true" locus="chr2:11669444-11674619" nextAutoscaleGroup="2" path="/Volumes/FlyPeakCaseStudy/BrundleDevelopment/SLX-15090/peaks/ER/igv_session.xml" version="8">
+    <Resources>
+        <Resource path="/Volumes/FlyPeakCaseStudy/BrundleDevelopment/SLX-15090/SLX-15090.D702_D504.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig"/>
+        <Resource path="/Volumes/FlyPeakCaseStudy/BrundleDevelopment/SLX-15090/SLX-15090.D701_D502.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig"/>
+        <Resource path="/Volumes/FlyPeakCaseStudy/BrundleDevelopment/SLX-15090/peaks/ER/SLX-15090.D702_D502.HMTVKBBXX.s_7.bwa.homo_sapiens_peaks.narrowPeak"/>
+        <Resource path="/Volumes/FlyPeakCaseStudy/BrundleDevelopment/SLX-15090/SLX-15090.D702_D501.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig"/>
+        <Resource path="/Volumes/FlyPeakCaseStudy/BrundleDevelopment/SLX-15090/SLX-15090.D703_D502.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig"/>
+        <Resource path="/Volumes/FlyPeakCaseStudy/BrundleDevelopment/SLX-15090/SLX-15090.D702_D502.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig"/>
+        <Resource path="/Volumes/FlyPeakCaseStudy/BrundleDevelopment/SLX-15090/SLX-15090.D701_D501.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig"/>
+        <Resource path="/Volumes/FlyPeakCaseStudy/BrundleDevelopment/SLX-15090/SLX-15090.D701_D504.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig"/>
+        <Resource path="/Volumes/FlyPeakCaseStudy/BrundleDevelopment/SLX-15090/SLX-15090.D703_D501.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig"/>
+    </Resources>
+    <Panel height="439" name="DataPanel" width="1263">
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="0,0,178" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" id="/Volumes/FlyPeakCaseStudy/BrundleDevelopment/SLX-15090/SLX-15090.D701_D501.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig" name="SLX-15090.D701_D501.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="12.0" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="0,0,178" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" id="/Volumes/FlyPeakCaseStudy/BrundleDevelopment/SLX-15090/SLX-15090.D701_D504.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig" name="SLX-15090.D701_D504.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="12.0" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="0,0,178" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" id="/Volumes/FlyPeakCaseStudy/BrundleDevelopment/SLX-15090/SLX-15090.D703_D502.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig" name="SLX-15090.D703_D502.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="12.0" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="0,0,178" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" id="/Volumes/FlyPeakCaseStudy/BrundleDevelopment/SLX-15090/SLX-15090.D703_D501.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig" name="SLX-15090.D703_D501.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="12.0" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="0,0,178" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" id="/Volumes/FlyPeakCaseStudy/BrundleDevelopment/SLX-15090/SLX-15090.D701_D502.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig" name="SLX-15090.D701_D502.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="12.0" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="0,0,178" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" id="/Volumes/FlyPeakCaseStudy/BrundleDevelopment/SLX-15090/SLX-15090.D702_D502.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig" name="SLX-15090.D702_D502.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="12.0" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="0,0,178" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" id="/Volumes/FlyPeakCaseStudy/BrundleDevelopment/SLX-15090/SLX-15090.D702_D504.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig" name="SLX-15090.D702_D504.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="12.0" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="0,0,178" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" id="/Volumes/FlyPeakCaseStudy/BrundleDevelopment/SLX-15090/SLX-15090.D702_D501.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig" name="SLX-15090.D702_D501.HMTVKBBXX.s_7.bwa.homo_sapiens.bigwig" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="12.0" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="0,0,178" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" id="/Volumes/FlyPeakCaseStudy/BrundleDevelopment/SLX-15090/peaks/ER/SLX-15090.D702_D502.HMTVKBBXX.s_7.bwa.homo_sapiens_peaks.narrowPeak" name="SLX-15090.D702_D502.HMTVKBBXX.s_7.bwa.homo_sapiens_peaks.narrowPeak" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count"/>
+    </Panel>
+    <Panel height="54" name="FeaturePanel" width="1263">
+        <Track altColor="0,0,178" autoScale="false" color="0,0,178" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" id="Reference sequence" name="Reference sequence" sortable="false" visible="true"/>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="0,0,178" colorScale="ContinuousColorScale;0.0;423.0;255,255,255;0,0,178" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="35" id="hg19_genes" name="RefSeq Genes" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="423.0" minimum="0.0" type="LINEAR"/>
+        </Track>
+    </Panel>
+    <PanelLayout dividerFractions="0.882"/>
+    <HiddenAttributes>
+        <Attribute name="DATA FILE"/>
+        <Attribute name="DATA TYPE"/>
+        <Attribute name="NAME"/>
+    </HiddenAttributes>
+</Session>
