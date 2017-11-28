@@ -10,7 +10,7 @@ theme: united
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, messages=FALSE)
+knitr::opts_chunk$set(echo = FALSE, messages=FALSE, cache=TRUE)
 ```
 
 #Main
@@ -1498,6 +1498,8 @@ dba.plotMA(jg.dba_analysis,bFlip=TRUE,th=0.05)
 
 ```
 
+Comparison of fold-change of H4 acetylation (Lys12) before and after treatment with estradiol.  MA plot of H4K12ac after normalisation to CTCF binding displays an increase at 2 hours after treatment with estradiol. 
+
 ```{r,results='hide', message=FALSE, warning=FALSE}
 
 jg.plotScatter<-function(peaks,samples,yaxis,samplesCombinations,noYLabel=FALSE)
@@ -1508,7 +1510,7 @@ jg.plotScatter<-function(peaks,samples,yaxis,samplesCombinations,noYLabel=FALSE)
     colormap<-rev(colormap)
     peaks_aggregate$Col <- colormap[as.numeric(cut(log(peaks_aggregate$count,2),breaks=255))]
     peaks_aggregate<-peaks_aggregate[order(peaks_aggregate$count),]
-    plot(log(peaks_aggregate[,c(1,2)]), col=peaks_aggregate$Col,pch=20, cex=0.3, xlim=c(0,7),ylim=c(0,7),axes=FALSE)
+    plot(log(peaks_aggregate[,c(1,2)]), col=peaks_aggregate$Col,pch=20, cex=0.3, xlim=c(0,7),ylim=c(0,7),axes=FALSE, xlab="",ylab="")
     if (samples > 1|| noYLabel==TRUE) {Axis(side=2, labels=FALSE)} else {
         Axis(side=2, labels=TRUE)
         mtext("log(Counts)", side=2, line=3)
@@ -1577,6 +1579,9 @@ mtext("log(Counts)", side=2, line=3)
 
 ```
 
+Comparison of log(Counts) for binding sites was under taken to confirm reproducibility. The data with the lowest correlation is shown and was seen between Replicate 2 and Repelicate 3 in the control condition.
+ 
+
 ```{r,results='hide', message=FALSE, warning=FALSE}
 
 profile<-read.table("SLX-15090/Homer_Profile.txt",sep="\t")
@@ -1588,6 +1593,9 @@ legend("topright",legend = c("Estrogen", "Control"), col=c("red","blue"),pch = c
 abline(v=0, lty=3)
 
 ```
+
+
+H4k12ac occupancy profile before and after treatment with E2 shows a general increase around transcription start sites (TSS).
 
 ## Activation of ER in MCF7
 
@@ -1620,8 +1628,9 @@ dba.plotMA(jg.dba_analysis,bFlip=TRUE,th=0.05)
 
 ```
 
+Comparison of fold-change of ER binding before and after treatment with estradiol. MA plot of ER binding after normalisation to CTCF binding displays a significant increase in ER binding at 45 minutes after treatment with estradiol. 
+
 ```{r,results='hide', message=FALSE, warning=FALSE}
-#Check CTCF 
 
 controlNames<-c("1a","3b")
 
@@ -1641,4 +1650,4 @@ mtext("log(Counts)", side=2, line=3)
 
 ```
 
-
+Comparison of log(Counts) for binding sites was under taken to confirm reproducibility. The data with the lowest correlation is shown and was seen between Replicate 1 and Replicate 3 in the control condition.
