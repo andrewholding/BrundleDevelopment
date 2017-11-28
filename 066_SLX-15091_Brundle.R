@@ -170,7 +170,7 @@ x["9769",] #RARa
 barplot(2^as.matrix(x["9769",c("Conc_none","Conc_Estrogen")]), main="RARa",xlab="Condition",ylab="Read Depth",names.arg=c("Ctrl","E2"))
 x<-report[report$Chr=='chr21',] 
 x["14816",] #NRIP
-barplot(2^as.matrix(x["14816",c("Conc_none","Conc_Estrogen")]), main="NRIP",xlab="Condition",ylab="Read Depth",names.arg=c("Ctrl","E2"))
+barplot(2^as.matrix(x["14816",c("Conc_none","Conc_Estrogen")]), main="NRIP1",xlab="Condition",ylab="Read Depth",names.arg=c("Ctrl","E2"))
 x<-report[report$Chr=='chr22',] 
 x["15381",] #XBP1
 barplot(2^as.matrix(x["15381",c("Conc_none","Conc_Estrogen")]), main="XBP1",xlab="Condition",ylab="Read Depth",names.arg=c("Ctrl","E2"))

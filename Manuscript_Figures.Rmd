@@ -1471,4 +1471,174 @@ plot(
 )
 ```
 
+## Changes in H4K12ac following E2 treatment
+
+```{r,results='hide', message=FALSE, warning=FALSE}
+filename<-"Rdata/066_SLX-15090_dba_human_ER_CTCF.rda"
+load(filename)
+
+#install_github("andrewholding/Brundle")
+library(Brundle)
+
+jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX15090_CTCF.csv"
+jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX15090_H4K12ac.csv"
+jg.treatedCondition       =  "Estrogen"
+jg.untreatedCondition     =  "none"
+
+jg.dba<-Brundle(
+            dbaExperiment,
+            dbaControl,
+            jg.treatedCondition,
+            jg.untreatedCondition,
+            jg.experimentSampleSheet,
+            jg.controlSampleSheet )
+    
+jg.dba_analysis<-dba.analyze(jg.dba)
+dba.plotMA(jg.dba_analysis,bFlip=TRUE,th=0.05)
+
+```
+
+```{r,results='hide', message=FALSE, warning=FALSE}
+
+jg.plotScatter<-function(peaks,samples,yaxis,samplesCombinations,noYLabel=FALSE)
+{
+    peaks$count <- 1
+    peaks_aggregate <- aggregate(count ~ ., peaks, FUN = sum)
+    colormap<-rainbow(255,start=0,end=4/6)
+    colormap<-rev(colormap)
+    peaks_aggregate$Col <- colormap[as.numeric(cut(log(peaks_aggregate$count,2),breaks=255))]
+    peaks_aggregate<-peaks_aggregate[order(peaks_aggregate$count),]
+    plot(log(peaks_aggregate[,c(1,2)]), col=peaks_aggregate$Col,pch=20, cex=0.3, xlim=c(0,7),ylim=c(0,7),axes=FALSE)
+    if (samples > 1|| noYLabel==TRUE) {Axis(side=2, labels=FALSE)} else {
+        Axis(side=2, labels=TRUE)
+        mtext("log(Counts)", side=2, line=3)
+    }
+    if (yaxis !=TRUE ) {Axis(side=1, labels=FALSE)} else {
+        Axis(side=1, labels=TRUE,ylab="Log(Counts)")
+        mtext("log(Counts)", side=1, line=3)
+    }
+    text(1.5,6.5,paste0(samplesCombinations[,samples][1],"-",samplesCombinations[,samples][2]),cex=1.5)
+    sampleCor<-cor(log(peaks[1]),log(peaks[2]))
+    text(2,6.0,paste0("Correlation = ",signif(sampleCor,3)),cex=1.0)
+    abline(a=0,b=1,col="grey")
+    return(cor(log(peaks_aggregate[,c(1,2)])))
+}
+
+
+jg.plotPanelsPlot<-function(treatmentNames,controlNames,dbaExperiment,noYLabel=FALSE)
+{
+    
+    jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
+    relativeLibrarySize<-jg.getLibrarySize(dbaExperiment,
+                                           jg.experimentPeakset)
+    
+    samplesCombinations<-combn(controlNames,2)
+    for (samples in seq(1,length(samplesCombinations)/2))  {
+        peaksLibrarySize<-relativeLibrarySize[samplesCombinations[,samples]]
+        peaks<-jg.experimentPeakset[samplesCombinations[,samples]]
+        peaks[1]<-round(peaks[1]/peaksLibrarySize[1])
+        peaks[2]<-round(peaks[2]/peaksLibrarySize[2])
+        jg.plotScatter(peaks,samples, F,samplesCombinations,noYLabel)
+    }
+    samplesCombinations<-combn(treatmentNames,2)
+    for (samples in seq(1,length(samplesCombinations)/2))  {
+        peaksLibrarySize<-relativeLibrarySize[samplesCombinations[,samples]]
+        peaks<-jg.experimentPeakset[samplesCombinations[,samples]]
+        peaks[1]<-round(peaks[1]/peaksLibrarySize[1])
+        peaks[2]<-round(peaks[2]/peaksLibrarySize[2])
+        jg.plotScatter(peaks,samples,T,samplesCombinations,noYLabel)
+    }
+}
+
+
+jg.getLibrarySize<-function(dbaExperiment,jg.experimentPeakset) {
+    librarySize<-as.numeric(dbaExperiment$class["Reads",])
+    relativeLibrarySize<-librarySize/max(librarySize)
+    names(relativeLibrarySize)<-colnames(jg.experimentPeakset[c(-1:-3)])
+    return(relativeLibrarySize)
+}
+
+#Worse correlation is 2a-3a (control sample)
+controlNames<-c("2a","3a")
+
+jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
+relativeLibrarySize<-jg.getLibrarySize(dbaExperiment,
+                                       jg.experimentPeakset)
+peaksLibrarySize<-relativeLibrarySize[controlNames]
+peaks<-jg.experimentPeakset[controlNames]
+peaks[1]<-round(peaks[1]/peaksLibrarySize[1])
+peaks[2]<-round(peaks[2]/peaksLibrarySize[2])
+x<-c("Rep2","Rep3")
+names(x)<-controlNames
+x<-as.matrix(x)
+jg.plotScatter(peaks,controlNames, T,t(x),FALSE)
+Axis(side=2, labels=TRUE,ylab="Log(Counts)")
+mtext("log(Counts)", side=2, line=3)
+
+```
+
+```{r,results='hide', message=FALSE, warning=FALSE}
+
+profile<-read.table("SLX-15090/Homer_Profile.txt",sep="\t")
+profile_ER<-as.matrix(profile[,c(1,2)])
+plot(profile_ER,t="l",col="red", xlab="Distance from TSS",ylab="Read Depth",main="H4K12ac Profile")
+profile_Ctrl<-as.matrix(profile[,c(1,5)])
+lines(profile_Ctrl,col="blue")
+legend("topright",legend = c("Estrogen", "Control"), col=c("red","blue"),pch = c(19,19))
+abline(v=0, lty=3)
+
+```
+
+## Activation of ER in MCF7
+
+```{r,results='hide', message=FALSE, warning=FALSE}
+
+jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX15091_CTCF.csv"
+jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX15091_ER.csv"
+jg.treatedCondition       =  "Estrogen"
+jg.untreatedCondition     =  "none"
+
+#####
+#
+# Main Code
+#
+#####
+
+filename<-"Rdata/065_SLX-15091_dba_human_ER_CTCF.rda"
+load(filename)
+
+jg.dba<-Brundle(
+            dbaExperiment,
+            dbaControl,
+            jg.treatedCondition,
+            jg.untreatedCondition,
+            jg.experimentSampleSheet,
+            jg.controlSampleSheet )
+    
+jg.dba_analysis<-dba.analyze(jg.dba)
+dba.plotMA(jg.dba_analysis,bFlip=TRUE,th=0.05)
+
+```
+
+```{r,results='hide', message=FALSE, warning=FALSE}
+#Check CTCF 
+
+controlNames<-c("1a","3b")
+
+jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
+relativeLibrarySize<-jg.getLibrarySize(dbaExperiment,
+                                       jg.experimentPeakset)
+peaksLibrarySize<-relativeLibrarySize[controlNames]
+peaks<-jg.experimentPeakset[controlNames]
+peaks[1]<-round(peaks[1]/peaksLibrarySize[1])
+peaks[2]<-round(peaks[2]/peaksLibrarySize[2])
+x<-c("Rep1","Rep3")
+names(x)<-controlNames
+x<-as.matrix(x)
+jg.plotScatter(peaks,controlNames, T,t(x),FALSE)
+Axis(side=2, labels=TRUE,ylab="Log(Counts)")
+mtext("log(Counts)", side=2, line=3)
+
+```
+
 
