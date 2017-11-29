@@ -41,10 +41,12 @@ png("plots/066__SLX15090_MAplot.png",pointsize=15)
 dba.plotMA(jg.dba_analysis,bFlip=TRUE,th=0.05)
 dev.off()
 
+report<-dba.report(jg.dba_analysis)
+t.test(report$Conc_Estrogen,report$Conc_none,alternative="greater") #p-value = 0.01834
+
 #Check CTCF 
 ctcf.dba.analysis<-dba.analyze(dbaControl)
 dba.plotMA(ctcf.dba.analysis,bFlip=TRUE) 
-
 
 #IDR for manuscript
 
