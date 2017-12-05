@@ -9,3 +9,12 @@ matrixStats
 DelayedArray
 SummarizedExperiment
 DiffBind
+XVector
+Biostrings
+Rsamtools
+codetools
+DESeq2
+lattice
+RColorBrewer
+latticeExtra
+Brundle
