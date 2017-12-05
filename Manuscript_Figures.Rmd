@@ -1496,6 +1496,8 @@ jg.dba<-Brundle(
 jg.dba_analysis<-dba.analyze(jg.dba)
 dba.plotMA(jg.dba_analysis,bFlip=TRUE,th=0.05)
 
+write.csv(dba.report(jg.dba_analysis,th=1),file="csv/H4_normalised_results.csv")
+
 ```
 
 Comparison of fold-change of H4 acetylation (Lys12) before and after treatment with estradiol.  MA plot of H4K12ac after normalisation to CTCF binding displays an increase at 2 hours after treatment with estradiol. 
@@ -1625,6 +1627,8 @@ jg.dba<-Brundle(
     
 jg.dba_analysis<-dba.analyze(jg.dba)
 dba.plotMA(jg.dba_analysis,bFlip=TRUE,th=0.05)
+
+write.csv(dba.report(jg.dba_analysis,th=1),file="csv/E2_normalised_results.csv")
 
 ```
 
