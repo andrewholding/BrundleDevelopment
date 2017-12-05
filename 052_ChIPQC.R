@@ -8,8 +8,8 @@ qc.samplesheets=c(
     "samplesheet/samplesheet_SLX12998.csv",
     "samplesheet/samplesheet_SLX14229.csv",
     "samplesheet/samplesheet_SLX14438_hs_DBA.csv",
-    "samplesheet/samplesheet_SLX15090_H4K12ac.csv",
-    "samplesheet/samplesheet_SLX15091_ER.csv")
+    "samplesheet/samplesheet_SLX15090.csv",
+    "samplesheet/samplesheet_SLX15091.csv")
 
 #library(BiocParallel)
 #register(MulticoreParam())
