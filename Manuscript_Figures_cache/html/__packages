@@ -1,0 +1,11 @@
+base
+BiocGenerics
+S4Vectors
+IRanges
+GenomeInfoDb
+GenomicRanges
+Biobase
+matrixStats
+DelayedArray
+SummarizedExperiment
+DiffBind

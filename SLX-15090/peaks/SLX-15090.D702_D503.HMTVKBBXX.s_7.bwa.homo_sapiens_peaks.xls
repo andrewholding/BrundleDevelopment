@@ -16,14 +16,14 @@
 # Paired-End mode is off
 
 # tag size is determined as 50 bps
-# total tags in treatment: 36890070
-# tags after filtering in treatment: 32146621
+# total tags in treatment: 116646434
+# tags after filtering in treatment: 98924906
 # maximum duplicate tags at the same position in treatment = 1
-# Redundant rate in treatment: 0.13
-# total tags in control: 36890070
-# tags after filtering in control: 32146621
+# Redundant rate in treatment: 0.15
+# total tags in control: 116646434
+# tags after filtering in control: 98924906
 # maximum duplicate tags at the same position in control = 1
-# Redundant rate in control: 0.13
-# d = 282
-# alternative fragment length(s) may be 2,282 bps
+# Redundant rate in control: 0.15
+# d = 238
+# alternative fragment length(s) may be 1,212,215,238,257 bps
 chr	start	end	length	pileup	-log10(pvalue)	fold_enrichment	-log10(qvalue)	name

@@ -1474,7 +1474,7 @@ plot(
 ## Changes in H4K12ac following E2 treatment
 
 ```{r,results='hide', message=FALSE, warning=FALSE}
-filename<-"Rdata/066_SLX-15090_dba_human_ER_CTCF.rda"
+filename<-"Rdata/066_SLX-15090_dba_human_ER_CTCF_merged.rda"
 load(filename)
 
 #install_github("andrewholding/Brundle")

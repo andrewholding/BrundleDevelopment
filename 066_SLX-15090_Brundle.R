@@ -19,7 +19,7 @@ jg.untreatedCondition     =  "none"
 #
 #####
 
-filename<-"Rdata/066_SLX-15090_dba_human_ER_CTCF.rda"
+filename<-"Rdata/066_SLX-15090_dba_human_ER_CTCF_merged.rda"
 if(!file.exists(filename)){
     dbaExperiment <- jg.getDba(jg.experimentSampleSheet, bRemoveDuplicates = TRUE)
     dbaControl    <- jg.getDba(jg.controlSampleSheet, bRemoveDuplicates = TRUE)
@@ -42,7 +42,7 @@ dba.plotMA(jg.dba_analysis,bFlip=TRUE,th=0.05)
 dev.off()
 
 report<-dba.report(jg.dba_analysis)
-t.test(report$Conc_Estrogen,report$Conc_none,alternative="greater") #p-value = 0.01834
+t.test(report$Conc_Estrogen,report$Conc_none,alternative="greater") #p-value = 5.677e-12
 
 #Check CTCF 
 ctcf.dba.analysis<-dba.analyze(dbaControl)
@@ -126,7 +126,7 @@ jg.plotPanelsPlot(treatmentNames,
 )
 
 
-png("plots/066_SLX15091_scatter.png", pointsize = 15)
+png("plots/066_SLX15090_scatter.png", pointsize = 15)
 #Worse correlation is 2a-3a (control sample)
 controlNames<-c("2a","3a")
 jg.plotMargins(1,1)
@@ -150,8 +150,8 @@ dev.off()
 ##Bind at prviously reported sites
 dba.report(jg.dba_analysis)
 countSites<-dba.report(jg.dba_analysis, th=1)
-countSites[countSites$Fold > 0] #3909 sites (Note Fold is flipped this is DOWN)
-countSites[countSites$Fold < 0] #9899 sites
+countSites[countSites$Fold > 0] #4817 sites (Note Fold is flipped this is DOWN)
+countSites[countSites$Fold < 0] #11393 sites
 
 
 report <- dba.report(jg.dba_analysis, th=1,
@@ -159,18 +159,21 @@ report <- dba.report(jg.dba_analysis, th=1,
 scores <- -10*(log10(report$FDR))
 sites  <- cbind(report[,1:3],rownames(report),scores)
 
+#GREB1 chr2;11664454-11665753 FDR=2.71e-04
+#XBP1  chr22:29211349-29217018 FDR=3.01e-06
 
+#Sites are for old data now replaced with qPCR 
 #boxplot
-par(mfrow=c(1,3))
-x<-report[report$Chr=='chr2',] 
-x["6687",] #GREB1
-barplot(2^as.matrix(x["6687",c("Conc_none","Conc_Estrogen")]), main="GREB1",xlab="Condition",ylab="Read Depth",names.arg=c("Ctrl","E2"))
-x<-report[report$Chr=='chr10',] 
-x["1295",] #CXCL12
+#par(mfrow=c(1,3))
+#x<-report[report$Chr=='chr2',] 
+#x["6687",] #GREB1
+#barplot(2^as.matrix(x["6687",c("Conc_none","Conc_Estrogen")]), main="GREB1",xlab="Condition",ylab="Read Depth",names.arg=c("Ctrl","E2"))
+#x<-report[report$Chr=='chr10',] 
+#x["1295",] #CXCL12
+###x<-report[report$Chr=='chr22',] 
 barplot(2^as.matrix(x["1295",c("Conc_none","Conc_Estrogen")]), main="CXCL12",xlab="Condition",ylab="Read Depth",names.arg=c("Ctrl","E2"))
-x<-report[report$Chr=='chr22',] 
-x["8523",] #XBP1
-barplot(2^as.matrix(x["8523",c("Conc_none","Conc_Estrogen")]), main="XBP1",xlab="Condition",ylab="Read Depth",names.arg=c("Ctrl","E2"))
+#x["8523",] #XBP1
+#barplot(2^as.matrix(x["8523",c("Conc_none","Conc_Estrogen")]), main="XBP1",xlab="Condition",ylab="Read Depth",names.arg=c("Ctrl","E2"))
 
 
 
