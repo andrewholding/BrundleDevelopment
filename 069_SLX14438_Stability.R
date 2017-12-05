@@ -58,11 +58,11 @@ plot( rowMeans(jg.coefficient)/jg.coefficient_baseline*100-100,ylim=c(-2,+2),
       type="l",
       xlab="Percent of CTCF sites",
       ylab="Percent Error in Normalisation Coefficient",
-      main="Stablity of Normalisation Coefficient")
-lines( apply(t(jg.coefficient), 2, max) /jg.coefficient_baseline*100-100,col="grey",lty=2) #max=1.956436
-lines( apply(t(jg.coefficient), 2, min)/jg.coefficient_baseline*100-100, col="grey",lty=2) #min=-1.970216
-lines( apply(t(jg.coefficient), 2, quantile)['25%',]/jg.coefficient_baseline*100-100 ,col="grey")#min=-0.4968219
-lines( apply(t(jg.coefficient), 2, quantile)['75%',]/jg.coefficient_baseline*100-100, col="grey")#max=-0.5254374
+      main="Stablity of Normalisation Coefficient",lwd=2)
+lines( apply(t(jg.coefficient), 2, max) /jg.coefficient_baseline*100-100,col="black",lty=2,lwd=2) #max=1.956436
+lines( apply(t(jg.coefficient), 2, min)/jg.coefficient_baseline*100-100, col="black",lty=2,lwd=2) #min=-1.970216
+lines( apply(t(jg.coefficient), 2, quantile)['25%',]/jg.coefficient_baseline*100-100 ,col="black", lwd=2)#min=-0.4968219
+lines( apply(t(jg.coefficient), 2, quantile)['75%',]/jg.coefficient_baseline*100-100, col="black",lwd=2)#max=-0.5254374
 legend("topleft", legend=c("Average", "25%/75% quantile","Max/min error"),
-       col=c("blue", "grey","grey"), lty=1:1:2, cex=0.8)
+       col=c("blue", "black","black"), lty=1:1:2, cex=0.8)
 dev.off()

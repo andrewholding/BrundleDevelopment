@@ -311,6 +311,14 @@ jg.normalize<-function(
     return(jg.dba)
 }
 
+jg.getCorrectionFactorDBA<-function(dbaExperiment,jg.treatedCondition,jg.untreatedCondition)
+{
+
+    untreated<-as.numeric(row.names(dbaExperiment$samples)[dbaExperiment$samples$Condition==jg.untreatedCondition])
+    treated<-as.numeric(row.names(dbaExperiment$samples)[dbaExperiment$samples$Condition==jg.treatedCondition])
+    jg.correctionfactor<-sum(as.numeric(dbaExperiment$class['Reads',c(treated)]))/sum(as.numeric(dbaExperiment$class['Reads',c(untreated)]))
+    return(jg.correctionfactor)
+}
 
 #Check Functions
 checkUsage(jg.countAlignedMReads)

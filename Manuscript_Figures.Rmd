@@ -1214,7 +1214,7 @@ jg.experimentResultsDeseqInternal   = results(jg.experimentDeSeqInternal)
 ```
 Normalisation of ER binding internal CTCF control. Highlighted data points are considered significant fold-changes with a FDR = 0.01. (A) Initial analysis with default DESeq2 parameters gives similar distortion as seen previously. (B) Correction using the CTCF peaks to provide an internal control allows for the data to be corrected.
 
-##Comparison of mormalisation DiffBind plots
+##Comparison of normalisation DiffBind plots
 
 ```{r,results='hide', message=FALSE, warning=FALSE,   out.width = '32%', out.extra='style="float:left"'}
 jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX14438_hs_CTCF_DBA.csv"
