@@ -1485,13 +1485,16 @@ jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX15090_H4K12ac.csv"
 jg.treatedCondition       =  "Estrogen"
 jg.untreatedCondition     =  "none"
 
-jg.dba<-Brundle(
+jg.experimentPeaksetNormalised<-Brundle(
             dbaExperiment,
             dbaControl,
             jg.treatedCondition,
             jg.untreatedCondition,
             jg.experimentSampleSheet,
             jg.controlSampleSheet )
+
+jg.dba <- DiffBind:::pv.resetCounts(dbaExperiment, jg.experimentPeaksetNormalised)
+
     
 jg.dba_analysis<-dba.analyze(jg.dba)
 dba.plotMA(jg.dba_analysis,bFlip=TRUE,th=0.05)
@@ -1617,14 +1620,17 @@ jg.untreatedCondition     =  "none"
 filename<-"Rdata/065_SLX-15091_dba_human_ER_CTCF.rda"
 load(filename)
 
-jg.dba<-Brundle(
+
+jg.experimentPeaksetNormalised<-Brundle(
             dbaExperiment,
             dbaControl,
             jg.treatedCondition,
             jg.untreatedCondition,
             jg.experimentSampleSheet,
             jg.controlSampleSheet )
-    
+
+jg.dba <- DiffBind:::pv.resetCounts(dbaExperiment, jg.experimentPeaksetNormalised)
+
 jg.dba_analysis<-dba.analyze(jg.dba)
 dba.plotMA(jg.dba_analysis,bFlip=TRUE,th=0.05)
 
