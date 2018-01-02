@@ -9,7 +9,7 @@ setwd("/Volumes/FlyPeakCaseStudy/BrundleDevelopment")
 #Tidy naming to ER 
 
 jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX15090_CTCF.csv"
-jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX15090_H4K12ac_ERonly.csv"
+jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX15090_H4K12ac_ERonlyTSS.csv"
 jg.treatedCondition       =  "Estrogen"
 jg.untreatedCondition     =  "none"
 
@@ -40,7 +40,7 @@ jg.dba <- DiffBind:::pv.resetCounts(dbaExperiment, jg.experimentPeaksetNormalise
 
 jg.dba_analysis<-dba.analyze(jg.dba)
 png("plots/071__SLX15090_MAplot.png",pointsize=15)
-dba.plotMA(jg.dba_analysis,bFlip=TRUE,th=0.05)
+dba.plotMA(jg.dba_analysis,bFlip=TRUE,th=0.05, bSmooth=FALSE)
 dev.off()
 
 report<-dba.report(jg.dba_analysis)
@@ -151,9 +151,12 @@ dev.off()
 
 ##Bind at prviously reported sites
 dba.report(jg.dba_analysis)
+countSites<-dba.report(jg.dba_analysis, th=0.05)
+countSites[countSites$Fold > 0] #5 sites (Note Fold is flipped this is DOWN)
+countSites[countSites$Fold < 0] #28 sites
 countSites<-dba.report(jg.dba_analysis, th=1)
-countSites[countSites$Fold > 0] #1149 sites (Note Fold is flipped this is DOWN)
-countSites[countSites$Fold < 0] #1841 sites
+countSites[countSites$Fold > 0] #148 sites (Note Fold is flipped this is DOWN)
+countSites[countSites$Fold < 0] #345 sites
 
 
 report <- dba.report(jg.dba_analysis, th=1,

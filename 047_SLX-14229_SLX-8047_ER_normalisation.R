@@ -108,8 +108,8 @@ jg.ERCountsUntreated<-jg.getControlCounts(jg.normalisedExperimentPeakset,
                                                jg.untreatedCondition)
 
 #Get sample names for conditions
-jg.untreatedNames <- names(jg.ERCountsTreated)
-jg.treatedNames   <- names(jg.ERCountsUntreated)
+jg.treatedNames <- names(jg.ERCountsTreated)
+jg.untreatedNames   <- names(jg.ERCountsUntreated)
 
 jg.plotMA(jg.normalisedExperimentPeakset,jg.normalisedExperimentPeakset,jg.untreatedNames,jg.treatedNames,1)
 
