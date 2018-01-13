@@ -189,11 +189,11 @@ Mhs<-log2fc
 
 Ahs<-log10(rowSums(jg.EROnlyExperimentPeakset[4:11]))
 
-pdf("plots/pdf/074_ER-ER_normalised.pdf", points=15)
+#pdf("plots/pdf/074_ER-ER_normalised.pdf", points=15)
 par(mar=c(5.1,5.1,4.1,2.1))
 plot(Ahs,Mhs,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="Counts normalized",ylim=c(-6.25,2))
 abline(h=0)
-dev.off()
+#dev.off()
 
 
 #NEW CODE
@@ -223,7 +223,7 @@ pfChIPuntreated<-rowMeans(as.matrix(elementMetadata(pfChIPerOverlap)[,jg.untreat
 pfChIPtreated<-rowMeans(as.matrix(elementMetadata(pfChIPerOverlap)[,jg.treatedNamesPF]))
 pfChIPtreated/pfChIPuntreated
 
-png("plots/073_CTCFproximal.png",pointsize=15)
+#png("plots/073_CTCFproximal.png",pointsize=15)
 boxplot(log(erChIPtreated/erChIPuntreated),
         log(pfChIPtreated/pfChIPuntreated),
         xlab="Experiment",
@@ -232,4 +232,4 @@ boxplot(log(erChIPtreated/erChIPuntreated),
         names=c(" Cross-Normalised"," Parrallel Factor"),
         pch=20)
 
-dev.off()
+#dev.off()
