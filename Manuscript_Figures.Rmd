@@ -15,15 +15,494 @@ knitr::opts_chunk$set(echo = FALSE, messages=FALSE, cache=TRUE)
 
 #Main
 
+## MA plot of H2Av normalization
+```{r H2AvNormalisationPlots, fig.cap="MA plots showing ER binding before and after treatment with fulvestrant including matched Dm H2Av spike-in control.} (A) Reads corrected to total aligned reads showed the same off-centre peak density as observed in Figure 1. Putative unchanged ER binding sites are within the red triangle. (B) Overlaying the MA plot combining the changes in chromatin binding of Hs ER (black) and Dm H2Av (blue). Dm peaks overlay the off-centre peak density. (C) Utilising the Dm H2Av binding events as a ground truth for 0-fold change, a linear fit to the log-fold change is generated and the fit is applied to adjust the Hs ER binding events."}
+par(mfrow=c(1,3))
+# Read consensus peaks
+hsconsensus<-readRDS("Rdata/015_SLX-8047_hsconsensus.rds")
+dmconsensus<-readRDS("Rdata/015_SLX-8047_dmconsensus.rds")
+
+# Get counts
+hscounts<-hsconsensus[,-c(1:3)]
+dmcounts<-dmconsensus[,-c(1:3)]
+
+### MA for Drosophila + Human Counts
+# a is treated, b is not treated
+Mhs<-apply(hscounts,1,function(x){
+  fulvestrant<-mean(x[c(1,3,5,7)])
+  untreated<-mean(x[c(2,4,6,8)])
+  fc<-mean(fulvestrant)/mean(untreated)
+  log2fc<-log2(fc)
+  return(log2fc)
+})
+Ahs<-apply(hscounts,1,function(x){
+  return(log10(sum(x)))
+})
+Mdm<-apply(dmcounts,1,function(x){
+  fulvestrant<-mean(x[c(1,3,5,7)])
+  untreated<-mean(x[c(2,4,6,8)])
+  fc<-mean(fulvestrant)/mean(untreated)
+  log2fc<-log2(fc)
+  return(log2fc)
+})
+Adm<-apply(dmcounts,1,function(x){
+  return(log10(sum(x)))
+})
+
+
+plot(Ahs,Mhs,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM aligned reads",ylim=c(-6.25,2))
+abline(h=0)
+
+
+
+plot(Ahs,Mhs,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM aligned reads",ylim=c(-6.25,2))
+points(Adm,Mdm,col="cornflowerblue",pch=20)
+abline(h=0)
+legend("topright",legend=c("Drosophila","Human"),pch=20,col=c("cornflowerblue","black"))
+lm1<-lm(Mdm~Adm)
+abline(lm1$coef,col="red")
+
+### 20th century normalization
+# Residuals of the Drosophila fit
+lm1<-lm(Mdm~Adm)
+intercept<-lm1$coef[1]
+angularcoeff<-lm1$coef[2]
+MhsFit<-Mhs-(Ahs*angularcoeff)-intercept
+MdmFit<-Mdm-(Adm*angularcoeff)-intercept
+
+
+plot(Ahs,MhsFit,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="Counts normalized by H2av Distribution",ylim=c(-6.25,2))
+points(Adm,MdmFit,pch=20,col="cornflowerblue")
+abline(h=0)
+legend("topright",legend=c("Drosophila","Human"),pch=20,col=c("cornflowerblue","black"))
+lm1<-lm(MdmFit~Adm)
+abline(lm1$coef,col="red")
+
+```
+
+## RARA gene locus with CTCF Spike-in
+
+Figure 2 can be viewed interactively on the [USCS track](http://genome.ucsc.edu/cgi-bin/hgTracks?hgS_doOtherUser=submit&hgS_otherUserName=andrewholding&hgS_otherUserSessionName=Brundle).
+
+##H2av with DiffBind
+
+```{r H2avDiffBind, results='hide', message=FALSE, warning=FALSE,   out.width = '49%', out.extra='style="float:left"'}
+jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX8047_dm.csv"
+jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX8047_hs.csv"
+filename<-"Rdata/029_SLX-8047_dba_human_drosophila.rda"
+
+load(filename)
+
+source('package/brundle.R')
+
+## Extract Peak set from DiffBind
+jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
+jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl)
+
+#Convert Peakset to DeSeq Workflow
+jg.controlPeaksetDeSeq<-jg.convertPeakset(jg.controlPeakset)
+
+#Establish size factors directly from Control data
+jg.controlSizeFactors = estimateSizeFactorsForMatrix(jg.controlPeaksetDeSeq)
+
+#Get conditions dataframe for DeSeq
+jg.conditions <- read.csv(file=jg.controlSampleSheet, header=TRUE, sep=",")['Condition']
+
+#Run DeSeq on control
+jg.controlDeSeq<-jg.runDeSeq(jg.controlPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
+jg.controlResultsDeseq   = results(jg.controlDeSeq)
+
+#Repeat for experimental conditions
+
+#Convert experiment Peakset to DeSeq Workflow
+jg.experimentPeaksetDeSeq<-jg.convertPeakset(jg.experimentPeakset)
+
+#Run DeSeq on experiment
+jg.experimentDeSeq<-jg.runDeSeq(jg.experimentPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
+jg.experimentResultsDeseq   = results(jg.experimentDeSeq)
+
+jg.experimentDeSeqInternal<-jg.runDeSeq(jg.experimentPeaksetDeSeq, jg.conditions, NULL)
+jg.experimentResultsDeseqInternal   = results(jg.experimentDeSeqInternal)
+
+dbaExperimentCorrected<-jg.correctDBASizeFactors(dbaExperiment,
+                                                 jg.controlSizeFactors
+                                                 )
+
+dbaExperimentAnalysis<-dba.analyze(dbaExperiment)
+  dba.plotMA(dbaExperimentAnalysis)
+
+```
+
+```{r H2avDiffBindNormalised, results='hide', message=FALSE, warning=FALSE, out.width = '49%', out.extra='style="float:left"'}
+  dbaExperimentAnalysisCorrected<-dba.analyze(dbaExperimentCorrected)
+  dba.plotMA(dbaExperimentAnalysisCorrected)
+```
+
+Comparison of DiffBind output before and after applying the corrected size factors from our pipeline generated from Drosophila spike-in control. (A) Analysis of ER binding before and after treatment with fulvestrant demonstrates that DiffBind’s default normalisation strategy is more effective than the DESeq2 default, but demonstrates a bias between samples. (B) Applying the correct size factors from our DESeq2 pipeline reduces the bias in the analysis (Data: SLX-8047).
+
+
+
+```{r DeSeqCTCFControlPeaks, results='hide', message=FALSE, warning=FALSE, fig.cap="Comparison of the control regions used to normalise ER analysis before and after treatment. Dots highlighted in red are significant (FDR = 0.01). The CTCF peaks used for normalisation show no significant change in the number reads before and after treatment."}
+
+#This is head as otherwise next figure doesn't work.
+
+filename<-"Rdata/040_SLX-14438_dba_human_ER_CTCF.rda"
+load(filename)
+jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
+
+filename<-"Rdata/059_SLX-14438_dba_human_ER_CTCF_noER.rda"
+load(filename)
+jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl_noER)
+
+
+#Get counts for each condition
+jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX14438_hs_CTCF_DBA_noER.csv"
+jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX14438_hs_ER_DBA.csv"
+jg.treatedCondition       =  "Fulvestrant"
+jg.untreatedCondition     =  "none"
+
+jg.controlCountsTreated<-jg.getControlCounts(jg.controlPeakset, 
+                                             jg.controlSampleSheet,
+                                             jg.treatedCondition)
+jg.controlCountsUntreated<-jg.getControlCounts(jg.controlPeakset,
+                                               jg.controlSampleSheet,
+                                               jg.untreatedCondition)
+
+#Get sample names for conditions
+jg.untreatedNames <- names(jg.controlCountsUntreated)
+jg.treatedNames   <- names(jg.controlCountsTreated)
+
+##Get Normalization Coefficient
+jg.coefficient<-jg.getNormalizationCoefficient(jg.controlCountsTreated,
+                                               jg.controlCountsUntreated)
+
+
+
+#DeSeq called by Diffbind will divide though by library size to normalise, 
+#and therefore partially undo our work. Solution is to correct our normalisation
+#factor to with this correction factor to remove library size part of our 
+#NormalisationFactor.
+
+#jg.correctionFactor<-jg.getCorrectionFactor(jg.experimentSampleSheet,
+#                                            jg.treatedNames,
+#                                            jg.untreatedNames
+#)
+
+#Manuscript figure uses the above function, but to enable running of the code without the bam files we 
+#estimate the Factor from diffbind object.
+
+untreated <-
+            as.numeric(row.names(dbaExperiment$samples)[dbaExperiment$samples$Condition ==
+                                                            jg.untreatedCondition])
+        treated <-
+            as.numeric(row.names(dbaExperiment$samples)[dbaExperiment$samples$Condition ==
+                                                            jg.treatedCondition])
+        jg.correctionFactor <-
+            sum(as.numeric(dbaExperiment$class['Reads', c(treated)])) / sum(as.numeric(dbaExperiment$class['Reads', c(untreated)]))
+
+#Apply coefficent and control factor
+jg.experimentPeaksetNormalised<-jg.applyNormalisation(jg.experimentPeakset,
+                                                      jg.coefficient,
+                                                      jg.correctionFactor,
+                                                      jg.treatedNames
+)
+
+
+#Return values to Diffbind and plot normalised result.
+jg.dba <- DiffBind:::pv.resetCounts(dbaExperiment,
+                                    jg.experimentPeaksetNormalised
+)
+
+
+#Analyze and plot with Diffbind      
+jg.dba_analysis<-dba.analyze(jg.dba)
+par(mar=c(5.1,5.1,4.1,4.1))
+#Store for later
+jg.dba_analysis_noER<-jg.dba_analysis
+#dba.plotMA(jg.dba_analysis,bFlip=TRUE,cex.lab=1.5, cex.axis=1.5, cex.main=1.25, cex.sub=1.5)
+#Check CTCF 
+ctcf.dba.analysis<-dba.analyze(dbaControl_noER)
+
+#dba.plotMA(ctcf.dba.analysis,bFlip=TRUE) 
+
+
+#Run on DeSeq
+jg.controlPeakset    <- jg.dbaGetPeakset(dba.count(dbaControl_noER, peaks=NULL, score=DBA_SCORE_READS))
+jg.controlPeaksetDeSeq<-jg.convertPeakset(jg.controlPeakset )
+jg.controlSizeFactors = estimateSizeFactorsForMatrix(jg.controlPeaksetDeSeq)
+
+jg.conditions <- read.csv(file=jg.controlSampleSheet, header=TRUE, sep=",")['Condition']
+
+jg.controlDeSeq<-jg.runDeSeq(jg.controlPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
+jg.controlResultsDeseq   = results(jg.controlDeSeq)
+
+
+
+jg.plotDeSeq<-function(ma.df, filename = 'file.name', p = 0.01, title.main = "Differential ChIP",log2fold =0.5, flip=FALSE)
+{;
+    
+    if (flip == TRUE)
+    {
+        ma.df$log2FoldChange <- -ma.df$log2FoldChange
+    }
+    par(mar=c(5.1,5.1,4.1,2.1))
+    xyplot(ma.df$log2FoldChange ~ log(ma.df$baseMean, base=10),#xlim=c(0,4),ylim=c(-3,1.25),
+           groups=(ma.df$padj < p & abs(ma.df$log2FoldChange) > log2fold & !is.na(ma.df$padj)),
+           col=c("black","red"), main=title.main, scales="free", aspect=1, pch=20, cex=0.5,
+           ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),
+           par.settings=list(axis.text=list(cex=1.5,font=1),par.main.text=list(cex=1.5,font=2),par.xlab.text=list(cex=1.5,font=2), par.ylab.text=list(cex=1.5,font=2)
+           )
+    );
+    
+}
+
+
+#Store this and use it later.
+
+
+CTCFbindingPlot<-jg.controlResultsDeseq
+
+
+```
+
+##Linear model
+
+
+```{r LinearModel, results='hide', message='false', warning='false', fig.cap="Comparison of mean counts in CTCF peaks before and after treatment. If the samples have no systematic bias before and after treatment then the linear fit would be expected to have a gradient of 1. Here, we establish that the gradient is < 1, implying a systematic bias between samples. The read counts in the treated samples peaks are corrected (blue), removing the bias, and resulting in a new gradient of 1."}
+
+#Remove print line from function.
+
+jg.plotNormalization<-function(jg.controlCountsTreated,jg.controlCountsUntreated)
+{
+  plot(rowMeans(jg.controlCountsTreated),rowMeans(jg.controlCountsUntreated), pch=20,
+       xlab="Counts in peak after treatment" ,  ylab="Counts in peak before treatment" ,
+       main="Comparision of Counts in peaks")
+  lm1<-lm(rowMeans(jg.controlCountsUntreated) ~ 0 + rowMeans(jg.controlCountsTreated))
+  
+  abline(c(0,lm1$coef),col="red3")
+  angularcoeff<-lm1$coef[1]
+  
+  points(rowMeans(jg.controlCountsTreated)*angularcoeff,rowMeans(jg.controlCountsUntreated),pch=20, col="royalblue3" )
+  treatment_fit<-rowMeans(jg.controlCountsTreated)*angularcoeff
+  lm1<-lm(treatment_fit ~ 0 + rowMeans(jg.controlCountsUntreated))
+  abline(c(0,lm1$coef),col="purple")
+  legend("topleft",legend=c("Raw", "Normalised"),pch=20,col=c("black","royalblue3"))
+}
+
+jg.plotNormalization(jg.controlCountsTreated,jg.controlCountsUntreated)
+```
+
+##Normalisation factors are consistent over a wide range in number of control binding sites
+
+```{r CTCFStablility, echo=FALSE,warning=FALSE,message=FALSE,error=FALSE}
+library("Brundle")
+
+jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX14438_hs_CTCF_DBA.csv"
+jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX14438_hs_ER_DBA.csv"
+jg.treatedCondition       =  "Fulvestrant"
+jg.untreatedCondition     =  "none"
+
+filename<-"Rdata/048_SLX-14438_dba_human_ER_CTCF.rda"
+load(filename)
+
+
+
+#Load Sample Ids from control sample sheet.
+jg.sampleIds <- jg.getSampleIds(jg.controlSampleSheet)
+
+## Extract Peak set from DiffBind
+jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
+jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl)
+
+
+#Get counts for each condition
+jg.controlCountsTreated<-jg.getControlCounts(jg.controlPeakset, 
+                                             jg.controlSampleSheet,
+                                             jg.treatedCondition)
+jg.controlCountsUntreated<-jg.getControlCounts(jg.controlPeakset,
+                                               jg.controlSampleSheet,
+                                               jg.untreatedCondition)
+
+#Get sample names for conditions
+jg.untreatedNames <- names(jg.controlCountsUntreated)
+jg.treatedNames   <- names(jg.controlCountsTreated)
+
+
+jg.coefficient_baseline<-jg.getNormalizationCoefficient(jg.controlCountsTreated,
+                                               jg.controlCountsUntreated)
+rows<-nrow(jg.controlCountsTreated)
+
+jg.coefficient<-matrix(nrow=100,ncol=100)
+
+
+for (n in 100:1)
+{
+    for (i in 1:100)
+    {
+        set.seed(i)
+        sampleRows<-sample(rows, rows*(n/100) )
+        jg.coefficient[n,i]<-jg.getNormalizationCoefficient(jg.controlCountsTreated[sampleRows, ],
+                               jg.controlCountsUntreated[sampleRows, ])
+    }
+}
+
+plot( rowMeans(jg.coefficient)/jg.coefficient_baseline*100-100,ylim=c(-2,+2),
+      xlim=c(100,0),
+      pch=20,col="blue",
+      type="l",
+      xlab="Percent of CTCF sites",
+      ylab="Percent Error in Normalisation Coefficient",
+      main="Stablity of Normalisation Coefficient",lwd=2)
+lines( apply(t(jg.coefficient), 2, max) /jg.coefficient_baseline*100-100,col="black",lty=2,lwd=2) #max=1.956436
+lines( apply(t(jg.coefficient), 2, min)/jg.coefficient_baseline*100-100, col="black",lty=2,lwd=2) #min=-1.970216
+lines( apply(t(jg.coefficient), 2, quantile)['25%',]/jg.coefficient_baseline*100-100 ,col="black", lwd=2)#min=-0.4968219
+lines( apply(t(jg.coefficient), 2, quantile)['75%',]/jg.coefficient_baseline*100-100, col="black",lwd=2)#max=-0.5254374
+legend("topleft", legend=c("Average", "25%/75% quantile","Max/min error"),
+       col=c("blue", "black","black"), lty=1:1:2, cex=0.8)
+
+```
+
+Stability of CTCF derived normalisation coefficient. Stability of the CTCF derived normalisation coefficient was analysed by sub-sampling CTCF peaks before undertaking the calculation (between 1-100% of total sites) at random. This analysis was repeated 100 times to model the variability of the result.
+
+##Comparison of CTCF and H2Av normalisation methods
+
+```{r CTCF.H2avComparision, results='hide', echo=FALSE,warning=FALSE,message=FALSE,error=FALSE} 
+jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX8047_dm.csv"
+jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX8047_consensus.csv"
+
+filename<-"Rdata/029_SLX-8047_SLX14229_dba_human_drosophila.rda"
+load(filename)
+
+## Extract Peak set from DiffBind
+jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
+jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl)
+
+
+#Convert Peakset to DESeq Workflow
+jg.controlPeaksetDeSeq<-jg.convertPeakset(jg.controlPeakset)
+
+#Establish size factors directly from Control data
+jg.controlSizeFactors = estimateSizeFactorsForMatrix(jg.controlPeaksetDeSeq)
+
+#Get conditions dataframe for DeSeq
+jg.conditions <- read.csv(file=jg.controlSampleSheet, header=TRUE, sep=",")['Condition']
+
+#Run DeSeq on control
+jg.controlDeSeq<-jg.runDeSeq(jg.controlPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
+jg.controlResultsDeseq   = results(jg.controlDeSeq)
+
+#Repeat for experimental conditions
+
+#Convert experiment Peakset to DeSeq Workflow
+jg.experimentPeaksetDeSeq<-jg.convertPeakset(jg.experimentPeakset)
+
+#Run DeSeq on experiment
+jg.experimentDeSeq<-jg.runDeSeq(jg.experimentPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
+jg.experimentResultsDeseq_SLX8047   = results(jg.experimentDeSeq)
+
+
+
+#Now run for SLX-14229 
+
+jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX14229_hs_CTCF_DBA.csv"
+#Using the same consensus peak set from above 
+jg.experimentSampleSheet  <- "samplesheet_SLX14229_hs_ER_consensus.csv"
+
+
+filename<-"Rdata/029_SLX-8047_SLX-14229_dba_human_ER_CTCF_consensus.rda"
+load(filename)
+
+## Extract Peak set from DiffBind
+jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
+jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl)
+
+
+#Convert Peakset to DeSeq Workflow
+jg.controlPeaksetDeSeq<-jg.convertPeakset(jg.controlPeakset)
+
+#Establish size factors directly from Control data
+jg.controlSizeFactors = estimateSizeFactorsForMatrix(jg.controlPeaksetDeSeq)
+
+#Get conditions dataframe for DeSeq
+jg.conditions <- read.csv(file=jg.controlSampleSheet, header=TRUE, sep=",")['Condition']
+
+#Run DeSeq on control
+jg.controlDeSeq<-jg.runDeSeq(jg.controlPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
+jg.controlResultsDeseq   = results(jg.controlDeSeq)
+
+#Repeat for experimental conditions
+
+#Convert experiment Peakset to DeSeq Workflow
+jg.experimentPeaksetDeSeq<-jg.convertPeakset(jg.experimentPeakset)
+
+#Run DeSeq on experiment
+jg.experimentDeSeq<-jg.runDeSeq(jg.experimentPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
+jg.experimentResultsDeseq_SLX14229   = results(jg.experimentDeSeq)
+
+library(latticeExtra)
+
+ma.df<-jg.experimentResultsDeseq_SLX14229
+
+a<-    xyplot((-ma.df$log2FoldChange+0.2) ~ log(ma.df$baseMean, base=10),
+              panel=function(...) {
+                  panel.xyplot(...)
+                  panel.abline(h=0, lty = "dotted", col = "black")
+                  panel.segments(3.0,0,1,1.6, col="red",lwd=2)
+                  panel.segments(3.0,0,1,-1.6, col="red",lwd=2)
+                  panel.segments(1,1.6,1,-1.6, col="red",lwd=2)
+              },
+           col=c("deepskyblue4"), ylim=c(-6,2), main="Comparision between CTCF and H2av", scales="free", aspect=1, pch=20, cex=0.5,
+           ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),
+           par.settings=list(par.main.text=list(cex=1.57,font=2),axis.text=list(cex=1.57,font=1),par.xlab.text=list(cex=1.57,font=2), par.ylab.text=list(cex=1.57,font=2)));
+    
+ma.df_2<-jg.experimentResultsDeseq_SLX8047
+#Note this has been manually addjusted to be more illustrative.
+b<-    xyplot(-(ma.df_2$log2FoldChange*1.1-0.1) ~ (log(ma.df_2$baseMean, base=10)*1.1+0.2),
+              panel=function(...) {
+                  panel.xyplot(...)
+                  panel.abline(h=0, lty = "dotted", col = "black")
+                  panel.segments(3.0,0,1,1.6, col="red",lwd=2)
+                  panel.segments(3.0,0,1,-1.6, col="red",lwd=2)
+                  panel.segments(1,1.6,1,-1.6, col="red",lwd=2)
+              },
+              col=c("palegreen3"), main="Comparision between CTCF and H2av", scales="free", aspect=1, pch=20, cex=0.5,
+              ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),
+              par.settings=list(par.xlab.text=list(cex=1.1,font=2), par.ylab.text=list(cex=1.1,font=2)));
+
+
+```
+
+
+```{r CTCF.H2avOverlay, out.width = '50%', out.extra='style="float:left"'}
+a + as.layer(b) 
+```
+
+
+```{r CTCF.H2avXYScatter, out.width = '50%', out.extra='style="float:left"', fig.cap="Comparison of normalisation methods using consensus peak set. (A) The analysis for the CTCF normalised (blue) and H2Av normalised (green) dataset using an ER consensus peak set of 10,000 peaks were formatted as an MA plot and overlaid. This recovered the low-fold change higher-intensity peaks that were not visible in Figure \ref{fig:ERCTCF}A and both datasets showed a similar distribution. (B) Comparison of fold-change values for individual ER binding sites between two datasets showed that the inclusion of these sites did not appear to affect the correlation (r = 0.77)."}
+
+
+plot(jg.experimentResultsDeseq_SLX14229$log2FoldChange,
+     jg.experimentResultsDeseq_SLX8047$log2FoldChange,
+     pch=20,
+     cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,
+     main="Comparision of fold change between datasets",
+     xlab=expression("log"[2]~" ER ChIP fold change CTCF normalised"),
+     ylab=expression("log"[2]~" ER ChIP fold change H2av normalised"))
+
+
+```
+
+#Supplementry
+
 ## Comparison of simple normalisation methods
 
 
-```{r results='hide', message=FALSE, warning=FALSE}
+```{r LoadDiffBind, results='hide', message=FALSE, warning=FALSE}
 library(DiffBind)
 
 ```
 
-```{r, fig.cap="Comparison of simple normalisation strategies employed. MA plots showing the changes in ER binding after 48 hours treatment with 100 nM fulvestrant. Three simple normalisation methods were applied to this data and compared to the raw count data. (A) Raw counts. (B) Reads Per Million (RPM) reads in peaks. (C) RPM aligned reads. (D) RPM total reads. Note that the highlighted peaks remain above zero under all three standard normalisations."}
+```{r ClassicMethods, fig.cap="Comparison of simple normalisation strategies employed. MA plots showing the changes in ER binding after 48 hours treatment with 100 nM fulvestrant. Three simple normalisation methods were applied to this data and compared to the raw count data. (A) Raw counts. (B) Reads Per Million (RPM) reads in peaks. (C) RPM aligned reads. (D) RPM total reads. Note that the highlighted peaks remain above zero under all three standard normalisations."}
 
 par(mfrow=c(2,2))
 
@@ -131,408 +610,10 @@ abline(h=0)
 
 ```
 
-## MA Plot of H2Av normalization
-```{r, fig.cap="MA plots showing ER binding before and after treatment with fulvestrant including matched Dm H2Av spike-in control.} (A) Reads corrected to total aligned reads showed the same off-centre peak density as observed in Figure 1. Putative unchanged ER binding sites are within the red triangle. (B) Overlaying the MA plot combining the changes in chromatin binding of Hs ER (black) and Dm H2Av (blue). Dm peaks overlay the off-centre peak density. (C) Utilising the Dm H2Av binding events as a ground truth for 0-fold change, a linear fit to the log-fold change is generated and the fit is applied to adjust the Hs ER binding events."}
-par(mfrow=c(1,3))
-# Read consensus peaks
-hsconsensus<-readRDS("Rdata/015_SLX-8047_hsconsensus.rds")
-dmconsensus<-readRDS("Rdata/015_SLX-8047_dmconsensus.rds")
-
-# Get counts
-hscounts<-hsconsensus[,-c(1:3)]
-dmcounts<-dmconsensus[,-c(1:3)]
-
-### MA for Drosophila + Human Counts
-# a is treated, b is not treated
-Mhs<-apply(hscounts,1,function(x){
-  fulvestrant<-mean(x[c(1,3,5,7)])
-  untreated<-mean(x[c(2,4,6,8)])
-  fc<-mean(fulvestrant)/mean(untreated)
-  log2fc<-log2(fc)
-  return(log2fc)
-})
-Ahs<-apply(hscounts,1,function(x){
-  return(log10(sum(x)))
-})
-Mdm<-apply(dmcounts,1,function(x){
-  fulvestrant<-mean(x[c(1,3,5,7)])
-  untreated<-mean(x[c(2,4,6,8)])
-  fc<-mean(fulvestrant)/mean(untreated)
-  log2fc<-log2(fc)
-  return(log2fc)
-})
-Adm<-apply(dmcounts,1,function(x){
-  return(log10(sum(x)))
-})
-
-
-plot(Ahs,Mhs,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM aligned reads",ylim=c(-6.25,2))
-abline(h=0)
-
-
-
-plot(Ahs,Mhs,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="RPM aligned reads",ylim=c(-6.25,2))
-points(Adm,Mdm,col="cornflowerblue",pch=20)
-abline(h=0)
-legend("topright",legend=c("Drosophila","Human"),pch=20,col=c("cornflowerblue","black"))
-lm1<-lm(Mdm~Adm)
-abline(lm1$coef,col="red")
-
-### 20th century normalization
-# Residuals of the Drosophila fit
-lm1<-lm(Mdm~Adm)
-intercept<-lm1$coef[1]
-angularcoeff<-lm1$coef[2]
-MhsFit<-Mhs-(Ahs*angularcoeff)-intercept
-MdmFit<-Mdm-(Adm*angularcoeff)-intercept
-
-
-plot(Ahs,MhsFit,cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,pch=20,ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),main="Counts normalized by H2av Distribution",ylim=c(-6.25,2))
-points(Adm,MdmFit,pch=20,col="cornflowerblue")
-abline(h=0)
-legend("topright",legend=c("Drosophila","Human"),pch=20,col=c("cornflowerblue","black"))
-lm1<-lm(MdmFit~Adm)
-abline(lm1$coef,col="red")
-
-```
-
-## RARA gene locus with CTCF Spike-in
-
-Figure 3 can be viewed interactively on the [USCS track](http://genome.ucsc.edu/cgi-bin/hgTracks?hgS_doOtherUser=submit&hgS_otherUserName=andrewholding&hgS_otherUserSessionName=Brundle).
-
-## MA Plot of CTCF Peaks
-
-```{r, results='hide', message=FALSE, warning=FALSE, fig.cap="Comparison of the control regions used to normalise ER analysis before and after treatment. Dots highlighted in red are significant (FDR = 0.01). The CTCF peaks used for normalisation show no significant change in the number reads before and after treatment."}
-
-source('package/brundle.R')
-filename<-"Rdata/040_SLX-14438_dba_human_ER_CTCF.rda"
-load(filename)
-jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
-
-filename<-"Rdata/059_SLX-14438_dba_human_ER_CTCF_noER.rda"
-load(filename)
-jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl_noER)
-
-
-#Get counts for each condition
-jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX14438_hs_CTCF_DBA_noER.csv"
-jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX14438_hs_ER_DBA.csv"
-jg.treatedCondition       =  "Fulvestrant"
-jg.untreatedCondition     =  "none"
-
-jg.controlCountsTreated<-jg.getControlCounts(jg.controlPeakset, 
-                                             jg.controlSampleSheet,
-                                             jg.treatedCondition)
-jg.controlCountsUntreated<-jg.getControlCounts(jg.controlPeakset,
-                                               jg.controlSampleSheet,
-                                               jg.untreatedCondition)
-
-#Get sample names for conditions
-jg.untreatedNames <- names(jg.controlCountsUntreated)
-jg.treatedNames   <- names(jg.controlCountsTreated)
-
-##Get Normalization Coefficient
-jg.coefficient<-jg.getNormalizationCoefficient(jg.controlCountsTreated,
-                                               jg.controlCountsUntreated)
-
-
-
-#DeSeq called by Diffbind will divide though by library size to normalise, 
-#and therefore partially undo our work. Solution is to correct our normalisation
-#factor to with this correction factor to remove library size part of our 
-#NormalisationFactor.
-
-jg.correctionFactor<-jg.getCorrectionFactor(jg.experimentSampleSheet,
-                                            jg.treatedNames,
-                                            jg.untreatedNames
-)
-
-
-#Apply coefficent and control factor
-jg.experimentPeaksetNormalised<-jg.applyNormalisation(jg.experimentPeakset,
-                                                      jg.coefficient,
-                                                      jg.correctionFactor,
-                                                      jg.treatedNames
-)
-
-
-#Return values to Diffbind and plot normalised result.
-jg.dba <- DiffBind:::pv.resetCounts(dbaExperiment,
-                                    jg.experimentPeaksetNormalised
-)
-
-
-#Analyze and plot with Diffbind      
-jg.dba_analysis<-dba.analyze(jg.dba)
-par(mar=c(5.1,5.1,4.1,4.1))
-#Store for later
-jg.dba_analysis_noER<-jg.dba_analysis
-#dba.plotMA(jg.dba_analysis,bFlip=TRUE,cex.lab=1.5, cex.axis=1.5, cex.main=1.25, cex.sub=1.5)
-#Check CTCF 
-ctcf.dba.analysis<-dba.analyze(dbaControl_noER)
-
-#dba.plotMA(ctcf.dba.analysis,bFlip=TRUE) 
-
-
-#Run on DeSeq
-jg.controlPeakset    <- jg.dbaGetPeakset(dba.count(dbaControl_noER, peaks=NULL, score=DBA_SCORE_READS))
-jg.controlPeaksetDeSeq<-jg.convertPeakset(jg.controlPeakset )
-jg.controlSizeFactors = estimateSizeFactorsForMatrix(jg.controlPeaksetDeSeq)
-
-jg.conditions <- read.csv(file=jg.controlSampleSheet, header=TRUE, sep=",")['Condition']
-
-jg.controlDeSeq<-jg.runDeSeq(jg.controlPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
-jg.controlResultsDeseq   = results(jg.controlDeSeq)
-
-
-
-jg.plotDeSeq<-function(ma.df, filename = 'file.name', p = 0.01, title.main = "Differential ChIP",log2fold =0.5, flip=FALSE)
-{;
-    
-    if (flip == TRUE)
-    {
-        ma.df$log2FoldChange <- -ma.df$log2FoldChange
-    }
-    par(mar=c(5.1,5.1,4.1,2.1))
-    xyplot(ma.df$log2FoldChange ~ log(ma.df$baseMean, base=10),#xlim=c(0,4),ylim=c(-3,1.25),
-           groups=(ma.df$padj < p & abs(ma.df$log2FoldChange) > log2fold & !is.na(ma.df$padj)),
-           col=c("black","red"), main=title.main, scales="free", aspect=1, pch=20, cex=0.5,
-           ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),
-           par.settings=list(axis.text=list(cex=1.5,font=1),par.main.text=list(cex=1.5,font=2),par.xlab.text=list(cex=1.5,font=2), par.ylab.text=list(cex=1.5,font=2)
-           )
-    );
-    
-}
-
-jg.plotDeSeq(jg.controlResultsDeseq,
-             p=0.01, 
-             title.main="Fold-change in CTCF binding",
-             flip=T
-)
-
-
-
-
-
-
-```
-
-##H2av With DiffBind
-
-```{r results='hide', message=FALSE, warning=FALSE,   out.width = '49%', out.extra='style="float:left"'}
-jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX8047_dm.csv"
-jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX8047_hs.csv"
-filename<-"Rdata/029_SLX-8047_dba_human_drosophila.rda"
-
-load(filename)
-
-
-## Extract Peak set from DiffBind
-jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
-jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl)
-
-#Convert Peakset to DeSeq Workflow
-jg.controlPeaksetDeSeq<-jg.convertPeakset(jg.controlPeakset)
-
-#Establish size factors directly from Control data
-jg.controlSizeFactors = estimateSizeFactorsForMatrix(jg.controlPeaksetDeSeq)
-
-#Get conditions dataframe for DeSeq
-jg.conditions <- read.csv(file=jg.controlSampleSheet, header=TRUE, sep=",")['Condition']
-
-#Run DeSeq on control
-jg.controlDeSeq<-jg.runDeSeq(jg.controlPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
-jg.controlResultsDeseq   = results(jg.controlDeSeq)
-
-#Repeat for experimental conditions
-
-#Convert experiment Peakset to DeSeq Workflow
-jg.experimentPeaksetDeSeq<-jg.convertPeakset(jg.experimentPeakset)
-
-#Run DeSeq on experiment
-jg.experimentDeSeq<-jg.runDeSeq(jg.experimentPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
-jg.experimentResultsDeseq   = results(jg.experimentDeSeq)
-
-jg.experimentDeSeqInternal<-jg.runDeSeq(jg.experimentPeaksetDeSeq, jg.conditions, NULL)
-jg.experimentResultsDeseqInternal   = results(jg.experimentDeSeqInternal)
-
-dbaExperimentCorrected<-jg.correctDBASizeFactors(dbaExperiment,
-                                                 jg.controlSizeFactors
-                                                 )
-
-dbaExperimentAnalysis<-dba.analyze(dbaExperiment)
-  dba.plotMA(dbaExperimentAnalysis)
-
-```
-
-```{r results='hide', message=FALSE, warning=FALSE, out.width = '49%', out.extra='style="float:left"'}
-  dbaExperimentAnalysisCorrected<-dba.analyze(dbaExperimentCorrected)
-  dba.plotMA(dbaExperimentAnalysisCorrected)
-```
-
-Comparison of DiffBind output before and after applying the corrected size factors from our pipeline generated from Drosophila spike-in control. (A) Analysis of ER binding before and after treatment with fulvestrant demonstrates that DiffBind’s default normalisation strategy is more effective than the DESeq2 default, but demonstrates a bias between samples. (B) Applying the correct size factors from our DESeq2 pipeline reduces the bias in the analysis (Data: SLX-8047).
-
-##Linear model
-
-
-```{r results='hide', message='false', warning='false', fig.cap="Comparison of mean counts in CTCF peaks before and after treatment. If the samples have no systematic bias before and after treatment then the linear fit would be expected to have a gradient of 1. Here, we establish that the gradient is < 1, implying a systematic bias between samples. The read counts in the treated samples peaks are corrected (blue), removing the bias, and resulting in a new gradient of 1."}
-
-#Remove print line from function.
-
-jg.plotNormalization<-function(jg.controlCountsTreated,jg.controlCountsUntreated)
-{
-  plot(rowMeans(jg.controlCountsTreated),rowMeans(jg.controlCountsUntreated), pch=20,
-       xlab="Counts in peak after treatment" ,  ylab="Counts in peak before treatment" ,
-       main="Comparision of Counts in peaks")
-  lm1<-lm(rowMeans(jg.controlCountsUntreated) ~ 0 + rowMeans(jg.controlCountsTreated))
-  
-  abline(c(0,lm1$coef),col="red3")
-  angularcoeff<-lm1$coef[1]
-  
-  points(rowMeans(jg.controlCountsTreated)*angularcoeff,rowMeans(jg.controlCountsUntreated),pch=20, col="royalblue3" )
-  treatment_fit<-rowMeans(jg.controlCountsTreated)*angularcoeff
-  lm1<-lm(treatment_fit ~ 0 + rowMeans(jg.controlCountsUntreated))
-  abline(c(0,lm1$coef),col="purple")
-  legend("topleft",legend=c("Raw", "Normalised"),pch=20,col=c("black","royalblue3"))
-}
-
-jg.plotNormalization(jg.controlCountsTreated,jg.controlCountsUntreated)
-```
-
-##Comparison of CTCF and H2Av normalisation methods
-
-```{r results='hide', echo=FALSE,warning=FALSE,message=FALSE,error=FALSE} 
-jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX8047_dm.csv"
-jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX8047_consensus.csv"
-
-filename<-"Rdata/029_SLX-8047_SLX14229_dba_human_drosophila.rda"
-load(filename)
-
-## Extract Peak set from DiffBind
-jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
-jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl)
-
-
-#Convert Peakset to DESeq Workflow
-jg.controlPeaksetDeSeq<-jg.convertPeakset(jg.controlPeakset)
-
-#Establish size factors directly from Control data
-jg.controlSizeFactors = estimateSizeFactorsForMatrix(jg.controlPeaksetDeSeq)
-
-#Get conditions dataframe for DeSeq
-jg.conditions <- read.csv(file=jg.controlSampleSheet, header=TRUE, sep=",")['Condition']
-
-#Run DeSeq on control
-jg.controlDeSeq<-jg.runDeSeq(jg.controlPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
-jg.controlResultsDeseq   = results(jg.controlDeSeq)
-
-#Repeat for experimental conditions
-
-#Convert experiment Peakset to DeSeq Workflow
-jg.experimentPeaksetDeSeq<-jg.convertPeakset(jg.experimentPeakset)
-
-#Run DeSeq on experiment
-jg.experimentDeSeq<-jg.runDeSeq(jg.experimentPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
-jg.experimentResultsDeseq_SLX8047   = results(jg.experimentDeSeq)
-
-
-
-#Now run for SLX-14229 
-
-jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX14229_hs_CTCF_DBA.csv"
-#Using the same consensus peak set from above 
-jg.experimentSampleSheet  <- "samplesheet_SLX14229_hs_ER_consensus.csv"
-
-
-filename<-"Rdata/029_SLX-8047_SLX-14229_dba_human_ER_CTCF_consensus.rda"
-load(filename)
-
-## Extract Peak set from DiffBind
-jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
-jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl)
-
-
-#Convert Peakset to DeSeq Workflow
-jg.controlPeaksetDeSeq<-jg.convertPeakset(jg.controlPeakset)
-
-#Establish size factors directly from Control data
-jg.controlSizeFactors = estimateSizeFactorsForMatrix(jg.controlPeaksetDeSeq)
-
-#Get conditions dataframe for DeSeq
-jg.conditions <- read.csv(file=jg.controlSampleSheet, header=TRUE, sep=",")['Condition']
-
-#Run DeSeq on control
-jg.controlDeSeq<-jg.runDeSeq(jg.controlPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
-jg.controlResultsDeseq   = results(jg.controlDeSeq)
-
-#Repeat for experimental conditions
-
-#Convert experiment Peakset to DeSeq Workflow
-jg.experimentPeaksetDeSeq<-jg.convertPeakset(jg.experimentPeakset)
-
-#Run DeSeq on experiment
-jg.experimentDeSeq<-jg.runDeSeq(jg.experimentPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
-jg.experimentResultsDeseq_SLX14229   = results(jg.experimentDeSeq)
-
-library(latticeExtra)
-
-ma.df<-jg.experimentResultsDeseq_SLX14229
-
-a<-    xyplot((-ma.df$log2FoldChange+0.2) ~ log(ma.df$baseMean, base=10),
-              panel=function(...) {
-                  panel.xyplot(...)
-                  panel.abline(h=0, lty = "dotted", col = "black")
-                  panel.segments(3.0,0,1,1.6, col="red",lwd=2)
-                  panel.segments(3.0,0,1,-1.6, col="red",lwd=2)
-                  panel.segments(1,1.6,1,-1.6, col="red",lwd=2)
-              },
-           col=c("deepskyblue4"), ylim=c(-6,2), main="Comparision between CTCF and H2av", scales="free", aspect=1, pch=20, cex=0.5,
-           ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),
-           par.settings=list(par.main.text=list(cex=1.57,font=2),axis.text=list(cex=1.57,font=1),par.xlab.text=list(cex=1.57,font=2), par.ylab.text=list(cex=1.57,font=2)));
-    
-ma.df_2<-jg.experimentResultsDeseq_SLX8047
-#Note this has been manually addjusted to be more illustrative.
-b<-    xyplot(-(ma.df_2$log2FoldChange*1.1-0.1) ~ (log(ma.df_2$baseMean, base=10)*1.1+0.2),
-              panel=function(...) {
-                  panel.xyplot(...)
-                  panel.abline(h=0, lty = "dotted", col = "black")
-                  panel.segments(3.0,0,1,1.6, col="red",lwd=2)
-                  panel.segments(3.0,0,1,-1.6, col="red",lwd=2)
-                  panel.segments(1,1.6,1,-1.6, col="red",lwd=2)
-              },
-              col=c("palegreen3"), main="Comparision between CTCF and H2av", scales="free", aspect=1, pch=20, cex=0.5,
-              ylab=expression("log"[2]~"ChIP fold change"), xlab=expression("log"[10]~"Mean of Normalized Counts"),
-              par.settings=list(par.xlab.text=list(cex=1.1,font=2), par.ylab.text=list(cex=1.1,font=2)));
-
-
-```
-
-
-```{r out.width = '50%', out.extra='style="float:left"'}
-a + as.layer(b) 
-```
-
-
-```{r out.width = '50%', out.extra='style="float:left"', fig.cap="Comparison of normalisation methods using consensus peak set. (A) The analysis for the CTCF normalised (blue) and H2Av normalised (green) dataset using an ER consensus peak set of 10,000 peaks were formatted as an MA plot and overlaid. This recovered the low-fold change higher-intensity peaks that were not visible in Figure \ref{fig:ERCTCF}A and both datasets showed a similar distribution. (B) Comparison of fold-change values for individual ER binding sites between two datasets showed that the inclusion of these sites did not appear to affect the correlation (r = 0.77)."}
-
-
-plot(jg.experimentResultsDeseq_SLX14229$log2FoldChange,
-     jg.experimentResultsDeseq_SLX8047$log2FoldChange,
-     pch=20,
-     cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,
-     main="Comparision of fold change between datasets",
-     xlab=expression("log"[2]~" ER ChIP fold change CTCF normalised"),
-     ylab=expression("log"[2]~" ER ChIP fold change H2av normalised"))
-
-
-```
-
-#Supplementry
 
 ##Method comparision
 
-```{r, results='hide', message=FALSE, warning=FALSE}
-
+```{r AnalysisPackageComparison, results='hide', message=FALSE, warning=FALSE}
 
 jg.controlMinOverlap      <- 5
 jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX14438_hs_CTCF_DBA.csv"
@@ -574,9 +655,23 @@ jg.treatedNames   <- names(jg.controlCountsTreated)
 
 jg.coefficient<-jg.getNormalizationCoefficient(jg.controlCountsTreated,
                                                jg.controlCountsUntreated)
-jg.correctionFactor<-jg.getCorrectionFactor(jg.experimentSampleSheet,
-                                            jg.treatedNames,
-                                            jg.untreatedNames)
+
+#Publication uses the counts from the Bam file, but to save space here we get them from the DiffBind object
+
+#jg.correctionFactor<-jg.getCorrectionFactor(jg.experimentSampleSheet,
+#                                            jg.treatedNames,
+#                                            jg.untreatedNames
+#                                            )
+
+
+untreated <-
+            as.numeric(row.names(dbaExperiment$samples)[dbaExperiment$samples$Condition ==
+                                                            jg.untreatedCondition])
+        treated <-
+            as.numeric(row.names(dbaExperiment$samples)[dbaExperiment$samples$Condition ==
+                                                            jg.treatedCondition])
+        jg.correctionFactor <-
+            sum(as.numeric(dbaExperiment$class['Reads', c(treated)])) / sum(as.numeric(dbaExperiment$class['Reads', c(untreated)]))
 
 #Apply coefficent and control factor
 jg.experimentPeaksetNormalised<-jg.applyNormalisation(jg.experimentPeakset,
@@ -662,7 +757,7 @@ Comparison of ChIP-seq Pipelines.} (A)ChIPComp data was plot from the CountSet o
 
 ##Reproducibility plots
 
-```{r, fig.cap="Correlation Plots of Replicate Experiments. (A) Scatter plots showing the correlation between the replicates with the lowest correlation value. This is provided both the control (top) and treatment (bottom) conditions. The plotted condition is highlighted with thick border in tables on the right. Colour represents density, blue = lowest, red = highest. (B) Tables showing the correlation coefficient for been each replicated. "}
+```{r ReproducbilityXYScatter, fig.cap="Correlation Plots of Replicate Experiments. (A) Scatter plots showing the correlation between the replicates with the lowest correlation value. This is provided both the control (top) and treatment (bottom) conditions. The plotted condition is highlighted with thick border in tables on the right. Colour represents density, blue = lowest, red = highest. (B) Tables showing the correlation coefficient for been each replicated. "}
 
 jg.plotScatter<-function(peaks,samples,yaxis,samplesCombinations,noYLabel=FALSE)
 {
@@ -781,57 +876,11 @@ jg.plotPanelsPlot(treatmentNames,
                   dbaExperiment_SLX12998,TRUE)
 ```
 
-##Venn diagrams
-
-```{r  out.width = '25%', out.extra='style="float:left"'}
-filename<-"Rdata/040_SLX-14438_dba_human_ER_CTCF.rda"
-load(filename)
-
-dba.plotVenn(dbaControl,dbaControl$masks$Fulvestrant, label1="Rep1", label2="Rep2", label3="Rep3", main="CTCF Peaks Fulvestrant")
-dba.plotVenn(dbaControl,dbaControl$masks$none, label1="Rep1", label2="Rep2", label3="Rep3", main="CTCF Peaks Control")
-dba.plotVenn(dbaExperiment,dbaExperiment$masks$Fulvestrant, label1="Rep1", label2="Rep2", label3="Rep3", main="ER Peaks Fulvestrant")
-dba.plotVenn(dbaExperiment,dbaExperiment$masks$none,label1="Rep1", label2="Rep2", label3="Rep3", main="ER Peaks Control")
-```
-
-
-```{r, out.width = '25%', out.extra='style="float:left"'}
-
-filename<-"Rdata/026_SLX-8047_dba_drosophila.rda"
-load(filename)
-filename<-"Rdata/026_SLX-8047_dba_human.rda"
-load(filename)
-
-
-
-dba.plotVenn(dba_dm,dba_dm$masks$Fulvestrant, label1="Rep1", label2="Rep2", label3="Rep3",label4="Rep4", main="H2av Peaks Fulvestrant")
-dba.plotVenn(dba_dm,dba_dm$masks$none,label1="Rep1", label2="Rep2", label3="Rep3",label4="Rep4", main="H2av Peaks Control")
-dba.plotVenn(dba,dba$masks$Fulvestrant, label1="Rep1", label2="Rep2", label3="Rep3", label4="Rep4",main="ER Peaks Fulvestrant")
-dba.plotVenn(dba,dba$masks$none,label1="Rep1", label2="Rep2", label3="Rep3",label4="Rep4", main="ER Peaks Control")
-```
-
-
-```{r, out.width = '25%', out.extra='style="float:left"'}
-filename<-"Rdata/014_SLX-12998_dba_mouse.rda"
-load(filename)
-
-dba.plotVenn(dba,dba$masks$Fulvestrant, label1="Rep1", label2="Rep2", label3="Rep3", label4="Rep4",main="Mouse ER Peaks Fulvestrant")
-dba.plotVenn(dba,dba$masks$none,label1="Rep1", label2="Rep2", label3="Rep3",label4="Rep4", main="Mouse ER Peaks Control")
-
-filename<-"Rdata/015_SLX-12998_dba_human.rda"
-load(filename)
-
-dba.plotVenn(dba,dba$masks$Fulvestrant, label1="Rep1", label2="Rep2", label3="Rep3", label4="Rep4",main="ER Peaks Fulvestrant")
-dba.plotVenn(dba,dba$masks$none,label1="Rep1", label2="Rep2", label3="Rep3",label4="Rep4", main="ER Peaks Control")
-```
-
-Venn diagrams showing peak overlap between replicates. (A) Peak overlap between samples for CTCF internal control. (B) Peak overlap for murine chromatin spike-in samples. (C) Peak overlap for Drosophila chromatin spike-in. As expected, samples treated with fulvestrant showed fewer ER peaks and a higher proportion of peaks unique to individual samples. This is indicative in a loss of ER binding leading and the resulting decrease in single to noise ratio. As we use a statistical analysis and model the variance of the peaks between replicates, false positives in the treated condition will be removed at the point of differential binding analysis.
-
-
 ##MA Plots of mouse ER normalization
 
 
 
-```{r}
+```{r MAPlotMouseSpikeIn}
 
 par(mfrow=c(1,3))
 
@@ -937,7 +986,7 @@ MA plots showing the addition of Mm derived chromatin spike-in to the ChIP-seq a
 
 ##Relative reads aligments in mouse samples
 
-```{r, fig.cap="Distribution of reads for Mm chromatin spike-in normalisation strategy. Comparison of murine chromatin between samples showed no systematic bias in the sample preparation. Bar plots (left axis) represent the fraction of total aligned reads. The dot plot represents the total aligned reads (right axis) for each sample."}
+```{r RelativeReadAligmentMm, fig.cap="Distribution of reads for Mm chromatin spike-in normalisation strategy. Comparison of murine chromatin between samples showed no systematic bias in the sample preparation. Bar plots (left axis) represent the fraction of total aligned reads. The dot plot represents the total aligned reads (right axis) for each sample."}
 filename<-"Rdata/012_SLX-12998_nrreads.rda"
 load(filename)
 
@@ -1007,9 +1056,11 @@ mtext("Reads aligned (Millions)",side=4,line=4)
 ```
 
 
+
+
 ##MA plots of CTCF Parallel-Factor ChIP
 
-```{r}
+```{r CTCFNormalisationPlots}
 par(mfrow=c(1,3))
 
 hsconsensus_ER<-readRDS("Rdata/018_SLX-14229_hsconsensus_ER.rds")
@@ -1109,7 +1160,7 @@ MA plots showing ER binding before and after treatment with fulvestrant includin
 
 
 
-```{r,results='hide', message=FALSE, warning=FALSE,   out.width = '33%', out.extra='style="float:left"'}
+```{r ERCTCFHeatmap,results='hide', message=FALSE, warning=FALSE,   out.width = '33%', out.extra='style="float:left"'}
 filename<-"Rdata/015_SLX-14229_dbacounts_human.rda"
 load(filename)
 plot(dbacounts)
@@ -1125,9 +1176,62 @@ plot(dba)
 
 Clustering of samples before and after ER and CTCF peak extractions shows the effect of fulvestrant on ER peaks drive clustering of the raw data.} To confirm that the effects seen at the RARa locus were consistent across the genome, we compared the clustering of the CTCF and the ER peaks with respect to the treatment with fulvestrant. Initial clustering was weakly correlated with that of the treatment condition (A). Clustering specifically to CTCF derived peak data (B) resulted in a loss of grouping by treatment, while clustering specifically ER-derived peak data (C) led to a clearer separation by treatment.
 
+##Comparison of control regions
+
+```{r H2avControlRegions, results='hide', message=FALSE, warning=FALSE,  out.width = '50%', out.extra='style="float:left"'}
+
+filename<-"Rdata/029_SLX-8047_dba_human_drosophila.rda"
+  load(filename)
+  
+ jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX8047_dm.csv"
+
+  ## Extract Peak set from DiffBind
+jg.controlPeakset    <- jg.dbaGetPeakset(dbaControl)
+
+#Convert Peakset to DeSeq Workflow
+jg.controlPeaksetDeSeq<-jg.convertPeakset(jg.controlPeakset)
+
+#Establish size factors directly from Control data
+jg.controlSizeFactors = estimateSizeFactorsForMatrix(jg.controlPeaksetDeSeq)
+
+#Get conditions dataframe for DeSeq
+jg.conditions <- read.csv(file=jg.controlSampleSheet, header=TRUE, sep=",")['Condition']
+
+#Run DeSeq on control
+#jg.controlDeSeq<-jg.runDeSeq(jg.controlPeaksetDeSeq, jg.conditions,jg.controlSizeFactors)
+#jg.controlResultsDeseq   = results(jg.controlDeSeq)
+
+#Some defaults in DeSeq changed after preparing figures, the next 3 steps overides these setting to get the same figures as in the manuscript.
+
+DESeqData<-DESeqDataSetFromMatrix(jg.controlPeaksetDeSeq, jg.conditions, ~Condition)
+jg.controlDeSeq<-DESeq(DESeqData,betaPrior = TRUE)
+jg.controlResultsDeseq   = results(jg.controlDeSeq, MLE=TRUE)
+
+
+ jg.plotDeSeq(jg.controlResultsDeseq,
+               p=0.01, 
+               title.main="Fold-change in H2av binding",
+               flip=T
+               )
+```
+
+
+```{r CTCFControlRegions, results='hide', message=FALSE, warning=FALSE,  out.width = '50%', out.extra='style="float:left"'}
+
+
+jg.plotDeSeq(CTCFbindingPlot,
+             p=0.01, 
+             title.main="Fold-change in CTCF binding",
+             flip=T
+)
+
+```
+
+Comparison of the control regions used to normalise ER analysis before and after treatment. Dots highlighted in red are significant (FDR = 0.01). (A) H2Av occupancy of the Drosophila genome shows no significant changes before and after treatment. (B) The CTCF peaks used for normalisation show no significant change in the number reads before and after treatment.
+
 ##Normalisation using DESeq2 SizeFactors
 
-```{r, results='hide', message=FALSE, warning=FALSE,  out.width = '50%', out.extra='style="float:left"'}
+```{r DeSEQDmNormalisation, results='hide', message=FALSE, warning=FALSE,  out.width = '50%', out.extra='style="float:left"'}
 
 dbaSummits                <- 200
 jg.controlMinOverlap      <- 5
@@ -1170,7 +1274,7 @@ jg.experimentResultsDeseqInternal   = results(jg.experimentDeSeqInternal)
 ```
 Normalisation of ER binding external spike implemented using DESeq2. Highlighted data points are considered significant fold-changes with a FDR = 0.01. (A) Initial analysis of the ER binding with default parameters shows an equal increase and decrease in ER binding. The distribution seen is not reflective of the documented response of ER on treatment with fulvestrant. (B) Estimating the DESeq2 size factors from the sample spike-in corrects the distortion in the results.
 
-```{r, results='hide', message=FALSE, warning=FALSE,  out.width = '50%', out.extra='style="float:left"'}
+```{r DeSEQCTCFNormalisation, results='hide', message=FALSE, warning=FALSE,  out.width = '50%', out.extra='style="float:left"'}
 
 dbaSummits                <- 200
 jg.controlMinOverlap      <- 5
@@ -1216,7 +1320,7 @@ Normalisation of ER binding internal CTCF control. Highlighted data points are c
 
 ##Comparison of normalisation DiffBind plots
 
-```{r,results='hide', message=FALSE, warning=FALSE,   out.width = '32%', out.extra='style="float:left"'}
+```{r DiffBindNormalisation,results='hide', message=FALSE, warning=FALSE,   out.width = '32%', out.extra='style="float:left"'}
 jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX14438_hs_CTCF_DBA.csv"
 jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX14438_hs_ER_DBA.csv"
 
@@ -1244,9 +1348,23 @@ jg.treatedNames   <- names(jg.controlCountsTreated)
 
 jg.coefficient<-jg.getNormalizationCoefficient(jg.controlCountsTreated,
                                                jg.controlCountsUntreated)
-jg.correctionFactor<-jg.getCorrectionFactor(jg.experimentSampleSheet,
-                                            jg.treatedNames,
-                                            jg.untreatedNames)
+
+
+#Estiamte correction factor from Diffbind Object as Bams may not be avalible
+
+untreated <-
+            as.numeric(row.names(dbaExperiment$samples)[dbaExperiment$samples$Condition ==
+                                                            jg.untreatedCondition])
+        treated <-
+            as.numeric(row.names(dbaExperiment$samples)[dbaExperiment$samples$Condition ==
+                                                            jg.treatedCondition])
+        jg.correctionFactor <-
+            sum(as.numeric(dbaExperiment$class['Reads', c(treated)])) / sum(as.numeric(dbaExperiment$class['Reads', c(untreated)]))
+        
+        
+#jg.correctionFactor<-jg.getCorrectionFactor(jg.experimentSampleSheet,
+#                                            jg.treatedNames,
+#                                            jg.untreatedNames)
 
 #Apply coefficent and control factor
 jg.experimentPeaksetNormalised<-jg.applyNormalisation(jg.experimentPeakset,
@@ -1312,7 +1430,7 @@ Comparison of DiffBind results before and after our two methods of normalisation
 
 ##Cross normalisation
 
-```{r results='hide', message=FALSE, warning=FALSE, fig.cap="Comparison of fold-change of ER binding after both xenogenic and cross-normalisation. Pearson's correlation between the two methods is 0.992 (3sf, p-value tending to 0). Deviation of data points from parity is a result the integer nature of read counts, nonetheless this effect is is very small as demonstrated correlation coefficient between the two datasets."}
+```{r CrossNormalisationXYScatter, results='hide', message=FALSE, warning=FALSE,  out.width = '50%', out.extra='style="float:left"'}
 filename<-"Rdata/047_SLX-14438_dba_human_ER_CTCF.rda"
 load(filename)
 
@@ -1363,6 +1481,9 @@ jg.dba <- DiffBind:::pv.resetCounts(dbaExperiment,
                                     jg.experimentPeaksetNormalised
 )
 
+jg.treatedNamesPF<-jg.treatedNames
+jg.untreatedNamesPF<-jg.untreatedNames
+
 #jg.dba is now normalised a list of ER peaks and their expected ratio
 
 
@@ -1385,8 +1506,8 @@ jg.ERCountsUntreated<-jg.getControlCounts(jg.normalisedExperimentPeakset,
                                                jg.untreatedCondition)
 
 #Get sample names for conditions
-jg.untreatedNames <- names(jg.ERCountsTreated)
-jg.treatedNames   <- names(jg.ERCountsUntreated)
+jg.treatedNames <- names(jg.ERCountsTreated)
+jg.untreatedNames   <- names(jg.ERCountsUntreated)
 
 
 
@@ -1421,8 +1542,8 @@ jg.EROnlyCountsUntreated<-jg.getControlCounts(jg.EROnlyExperimentPeakset,
                                           jg.untreatedCondition)
 
 #Get sample names for conditions
-jg.untreatedNames <- names(jg.EROnlyCountsTreated)
-jg.treatedNames   <- names(jg.EROnlyCountsUntreated)
+jg.untreatedNames <- names(jg.EROnlyCountsUntreated)
+jg.treatedNames   <- names(jg.EROnlyCountsTreated)
 
 
 
@@ -1432,10 +1553,19 @@ jg.EROnlyExperimentRatio<-jg.getNormalizationCoefficient(jg.EROnlyCountsTreated,
 #Create new ratio 
 jg.ERNormalisationRatio<-jg.ERratio/jg.EROnlyExperimentRatio
 
-g.correctionFactor<-jg.getCorrectionFactor(jg.EROnlyExperimentSampleSheet,
-                                            jg.treatedNames,
-                                            jg.untreatedNames
-)
+untreated <-
+            as.numeric(row.names(dbaERonlyExperiment$samples)[dbaERonlyExperiment$samples$Condition ==
+                                                            jg.untreatedCondition])
+        treated <-
+            as.numeric(row.names(dbaERonlyExperiment$samples)[dbaERonlyExperiment$samples$Condition ==
+                                                            jg.treatedCondition])
+        jg.correctionFactor <-
+            sum(as.numeric(dbaERonlyExperiment$class['Reads', c(treated)])) / sum(as.numeric(dbaERonlyExperiment$class['Reads', c(untreated)]))
+
+#jg.correctionFactor<-jg.getCorrectionFactor(jg.EROnlyExperimentSampleSheet,
+#                                            jg.treatedNames,
+#                                            jg.untreatedNames
+#)
 
 jg.ERexperimentPeaksetNormalised<-jg.applyNormalisation(jg.EROnlyExperimentPeakset,
                                                       jg.ERNormalisationRatio,
@@ -1471,9 +1601,144 @@ plot(
 )
 ```
 
+```{r CrossNormalisationBoxPlot, message=FALSE, warning=FALSE, out.width = '50%', out.extra='style="float:left"', fig.cap="Comparison of fold-change of ER binding after both xenogenic and cross-normalisation. (A) Scatter plot of fold-change as established at individual sites by each method.  Pearson's correlation between the two methods is 0.992 (3sf, p-value tending to 0). Deviation of data points from parity is a result the integer nature of read counts, nonetheless this effect is is very small as demonstrated correlation coefficient between the two datasets. (B) Box-plot showing the fold-change of ER binding before and after treatment at ∼550 ER sites proximal to CTCF binding. The mean and maximum fold-change is reduced at these sites by Parallel-Factor ChiP, but the effect is marginal."}
+
+library(Brundle)
+
+erChIP<-makeGRangesFromDataFrame(jg.EROnlyExperimentPeakset,keep.extra.columns=TRUE)
+pfChIP<-makeGRangesFromDataFrame(jg.normalisedExperimentPeakset,keep.extra.columns=TRUE)
+ctcfBED<-read.delim("SLX-14438_merged/peaks/CTCF_union.bed",header = F)
+colnames(ctcfBED)<-c( "CHR" ,"START","END")
+jg.controlPeaksetWide<-ctcfBED
+jg.controlPeaksetWide[2]<-ctcfBED[2]-1000
+jg.controlPeaksetWide[3]<-ctcfBED[3]+1000
+ctcfChIP<-makeGRangesFromDataFrame(jg.controlPeaksetWide)
+
+#jg.plotMA(jg.normalisedExperimentPeakset,jg.normalisedExperimentPeakset,jg.untreatedNamesPF,jg.treatedNamesPF,1)
+#jg.plotMA(jg.EROnlyExperimentPeakset,jg.EROnlyExperimentPeakset,jg.treatedNames,jg.untreatedNames,1/jg.ERNormalisationRatio)
+
+erChIPctcfOverlap<-subsetByOverlaps(erChIP,ctcfChIP)
+pfChIPctcfOverlap<-subsetByOverlaps(pfChIP,ctcfChIP)
+
+erChIPpfOverlap<-subsetByOverlaps(erChIPctcfOverlap,pfChIPctcfOverlap)
+pfChIPerOverlap<-subsetByOverlaps(pfChIPctcfOverlap,erChIPctcfOverlap)
+
+erChIPuntreated<-rowMeans(as.matrix(elementMetadata(erChIPpfOverlap)[,jg.untreatedNames]))
+erChIPtreated<-rowMeans(as.matrix(elementMetadata(erChIPpfOverlap)[,jg.treatedNames]))
+#erChIPtreated/erChIPuntreated
+
+pfChIPuntreated<-rowMeans(as.matrix(elementMetadata(pfChIPerOverlap)[,jg.untreatedNamesPF]))
+pfChIPtreated<-rowMeans(as.matrix(elementMetadata(pfChIPerOverlap)[,jg.treatedNamesPF]))
+#pfChIPtreated/pfChIPuntreated
+
+
+boxplot(log(erChIPtreated/erChIPuntreated),
+        log(pfChIPtreated/pfChIPuntreated),
+        xlab="Experiment",
+        ylab="Log(Fold-Change)",
+        main=paste("Fold-Change of ER binding","Proximal to CTCF",collapse="\n"),
+        names=c(" Cross-Normalised"," Parrallel Factor"),
+        pch=20)
+
+
+```
+
+
+
+## Activation of ER in MCF7
+
+```{r ERNormalisedMAPlot,results='hide', message=FALSE, warning=FALSE}
+
+jg.controlSampleSheet     <- "samplesheet/samplesheet_SLX15091_CTCF.csv"
+jg.experimentSampleSheet  <- "samplesheet/samplesheet_SLX15091_ER.csv"
+jg.treatedCondition       =  "Estrogen"
+jg.untreatedCondition     =  "none"
+
+#####
+#
+# Main Code
+#
+#####
+
+filename<-"Rdata/065_SLX-15091_dba_human_ER_CTCF.rda"
+load(filename)
+
+
+jg.experimentPeaksetNormalised<-Brundle(
+            dbaExperiment,
+            dbaControl,
+            jg.treatedCondition,
+            jg.untreatedCondition,
+            jg.experimentSampleSheet,
+            jg.controlSampleSheet,
+            jg.noBAMs = TRUE ) #As previous examples, BAMs were used in the manuscript.
+
+jg.dba <- DiffBind:::pv.resetCounts(dbaExperiment, jg.experimentPeaksetNormalised)
+
+jg.dba_analysis<-dba.analyze(jg.dba)
+dba.plotMA(jg.dba_analysis,bFlip=TRUE,th=0.05)
+
+write.csv(dba.report(jg.dba_analysis,th=1),file="csv/E2_normalised_results.csv")
+
+```
+
+Comparison of fold-change of ER binding before and after treatment with estradiol. MA plot of ER binding after normalisation to CTCF binding displays a significant increase in ER binding at 45 minutes after treatment with estradiol. 
+
+```{r ERChIPReproducibility,results='hide', message=FALSE, warning=FALSE}
+
+controlNames<-c("1a","3b")
+
+jg.experimentPeakset <- jg.dbaGetPeakset(dbaExperiment)
+relativeLibrarySize<-jg.getLibrarySize(dbaExperiment,
+                                       jg.experimentPeakset)
+peaksLibrarySize<-relativeLibrarySize[controlNames]
+peaks<-jg.experimentPeakset[controlNames]
+peaks[1]<-round(peaks[1]/peaksLibrarySize[1])
+peaks[2]<-round(peaks[2]/peaksLibrarySize[2])
+x<-c("Rep1","Rep3")
+names(x)<-controlNames
+x<-as.matrix(x)
+jg.plotScatter(peaks,controlNames, T,t(x),FALSE)
+Axis(side=2, labels=TRUE,ylab="Log(Counts)")
+mtext("log(Counts)", side=2, line=3)
+
+```
+
+Comparison of log(Counts) for binding sites was under taken to confirm reproducibility. The data with the lowest correlation is shown and was seen between Replicate 1 and Replicate 3 in the control condition.
+
+## Comparision of ER binding from public datasets
+
+
+Comparison ER binding from public datasets.Common peaks detected for ER Ross-Innes CS, et al. 2010; Welboren WJ, et al., 2009; Ceschin DG, et al. 2011 and our data (FDR = 0.01). Venn diagram was generated with ChIPSeqAnno.
+```{r ERVennOverlap, message=FALSE, warning=FALSE}
+library(ChIPpeakAnno)
+library(GenomicRanges)
+
+
+m1 = read.table("bed/ERoverlap/Carrol-GenesDev.bed", sep="\t")
+m2 = read.table("bed/ERoverlap/ER_45minsGains_001_hg18.bed", sep="\t")
+m3 = read.table("bed/ERoverlap/LinER.txt", sep="\t")
+m4 = read.table("bed/ERoverlap/Welboren.bed", sep="\t")
+m5 = read.table("bed/ERoverlap/NA_peaks.narrowPeak", sep="\t") #Called with macs2 against EtOH control
+m5<-m5[c(1:3)]
+
+
+m1.r = BED2RangedData(m1)
+m2.r = BED2RangedData(m2)
+m3.r = BED2RangedData(m3)
+m4.r = BED2RangedData(m4)
+m5.r = BED2RangedData(m5)
+#mkd = makeVennDiagram(list(m1.r,m2.r,m3.r,m4.r,m5.r),
+#                      NameOfPeaks=c("Ross-Innes 2010", "Guertin 2017", "Lin 2007", "Welboren 2009","Ceschin 2011"), totalTest=200000)
+
+mkd = makeVennDiagram(list(m1.r,m2.r,m4.r,m5.r),
+                      NameOfPeaks=c("Ross-Innes 2010", "Guertin 2017", "Welboren 2009","Ceschin 2011"))
+
+```
+
 ## Changes in H4K12ac following E2 treatment
 
-```{r,results='hide', message=FALSE, warning=FALSE}
+```{r H4K12acNormalised,results='hide', message=FALSE, warning=FALSE}
 filename<-"Rdata/066_SLX-15090_dba_human_ER_CTCF_merged.rda"
 load(filename)
 
@@ -1491,7 +1756,9 @@ jg.experimentPeaksetNormalised<-Brundle(
             jg.treatedCondition,
             jg.untreatedCondition,
             jg.experimentSampleSheet,
-            jg.controlSampleSheet )
+            jg.controlSampleSheet,
+            jg.noBAMs=TRUE
+            ) #BAMS we used in the manuscript data, but removed to keep file size down.
 
 jg.dba <- DiffBind:::pv.resetCounts(dbaExperiment, jg.experimentPeaksetNormalised)
 
@@ -1505,7 +1772,7 @@ write.csv(dba.report(jg.dba_analysis,th=1),file="csv/H4_normalised_results.csv")
 
 Comparison of fold-change of H4 acetylation (Lys12) before and after treatment with estradiol.  MA plot of H4K12ac after normalisation to CTCF binding displays an increase at 2 hours after treatment with estradiol. 
 
-```{r,results='hide', message=FALSE, warning=FALSE}
+```{r H4K12acReproducibility,results='hide', message=FALSE, warning=FALSE}
 
 jg.plotScatter<-function(peaks,samples,yaxis,samplesCombinations,noYLabel=FALSE)
 {
@@ -1587,11 +1854,11 @@ mtext("log(Counts)", side=2, line=3)
 Comparison of log(Counts) for binding sites was under taken to confirm reproducibility. The data with the lowest correlation is shown and was seen between Replicate 2 and Repelicate 3 in the control condition.
  
 
-```{r,results='hide', message=FALSE, warning=FALSE}
+```{r H4K12acProfile,results='hide', message=FALSE, warning=FALSE}
 
-profile<-read.table("SLX-15090/Homer_Profile.txt",sep="\t")
+profile<-read.table("SLX-15090/Homer_ER_Profile.txt",sep="\t")
 profile_ER<-as.matrix(profile[,c(1,2)])
-plot(profile_ER,t="l",col="red", xlab="Distance from TSS",ylab="Read Depth",main="H4K12ac Profile")
+plot(profile_ER,t="l",col="red", xlab="Distance from ER Binding site",ylab="Read Depth",main="H4K12ac Profile")
 profile_Ctrl<-as.matrix(profile[,c(1,5)])
 lines(profile_Ctrl,col="blue")
 legend("topright",legend = c("Estrogen", "Control"), col=c("red","blue"),pch = c(19,19))
@@ -1602,6 +1869,7 @@ abline(v=0, lty=3)
 
 H4k12ac occupancy profile before and after treatment with E2 shows a general increase around transcription start sites (TSS).
 
+<<<<<<< HEAD
 ## Activation of ER in MCF7
 
 ```{r,results='hide', message=FALSE, warning=FALSE}
@@ -1820,3 +2088,5 @@ legend("topright",legend = c("PDX01", "PDX03", "PDX04", "PDX05"), col=c("#00AFBB
 
 ```
 
+=======
+>>>>>>> 5726b09b2f153f0cb695aba8500d54060fb96656
