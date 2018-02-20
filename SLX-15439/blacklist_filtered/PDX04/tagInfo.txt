@@ -1,0 +1,12 @@
+name	Unique Positions	Total Tags
+genome	1266172	3709372.0
+fragmentLengthEstimate=94		
+peakSizeEstimate=132		
+tagsPerBP=0.010459		
+averageTagsPerPosition=2.930		
+averageTagLength=49.912		
+gsizeEstimate=354645361		
+averageFragmentGCcontent=-1.000		
+chr1	913491	2690193.0
+chr2	352681	1019179.0
+cmd=makeTagDirectory PDX04/ SLX-15439.D702_D501.HNKNYBBXX.s_6.bwa.homo_sapiens.bam		
