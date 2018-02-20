@@ -1869,7 +1869,7 @@ abline(v=0, lty=3)
 
 H4k12ac occupancy profile before and after treatment with E2 shows a general increase around transcription start sites (TSS).
 
-<<<<<<< HEAD
+
 ## Activation of ER in MCF7
 
 ```{r,results='hide', message=FALSE, warning=FALSE}
@@ -1930,7 +1930,7 @@ mtext("log(Counts)", side=2, line=3)
 
 Comparison of log(Counts) for binding sites was under taken to confirm reproducibility. The data with the lowest correlation is shown and was seen between Replicate 1 and Replicate 3 in the control condition.
 
-#PDX Analysis
+##PDX Analysis
 
 ```{r, results='hide', message=FALSE, warning=FALSE}
 
@@ -2088,5 +2088,4 @@ legend("topright",legend = c("PDX01", "PDX03", "PDX04", "PDX05"), col=c("#00AFBB
 
 ```
 
-=======
->>>>>>> 5726b09b2f153f0cb695aba8500d54060fb96656
+
